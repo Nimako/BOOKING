@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePropertiesTable extends Migration
+class CreateBedTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,15 @@ class CreatePropertiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('properties', function (Blueprint $table) {
+        Schema::create('bed_types', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            // Central Columns
+            // Central Column
             $table->tinyInteger('status')->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
-            // fields
-            $table->string('name');
-            $table->string('about_us')->nullable();
-            $table->string('primary_telephone')->nullable();
-            $table->string('secondary_telephone')->nullable();
-            $table->string('longitude_latitude')->nullable();
-            $table->string('logo_path')->nullable();
-            $table->string('country_region');
+            // Field
+            $table->string('name')->unique();
         });
     }
 
@@ -38,6 +32,6 @@ class CreatePropertiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('properties');
+        Schema::dropIfExists('bed_types');
     }
 }

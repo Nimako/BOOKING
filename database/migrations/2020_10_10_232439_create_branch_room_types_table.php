@@ -16,21 +16,21 @@ class CreateBranchRoomTypesTable extends Migration
         Schema::create('branch_room_types', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            // Central Columns
+            // Central Column
             $table->tinyInteger('status')->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
-            // Fields
+            // Field
             $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('room_type_id');
+            $table->string('roomtype_ids', 255)->nullable();
+            $table->text('roomtype_values')->nullable()->comment("Format => ...");
             $table->string('best_fit')->nullable();
             $table->string('image_ids')->nullable();
             $table->text('image_urls')->nullable();
-            $table->string('amenity_ids')->nullable();
-            $table->text('amenity_values')->nullable();
+            $table->string('room_size')->nullable();
             // Foreign Keys
             $table->foreign('branch_id')->references('id')->on('branches');
-            $table->foreign('room_type_id')->references('id')->on('room_types');
+            //$table->foreign('room_type_id')->references('id')->on('room_types');
         });
     }
 

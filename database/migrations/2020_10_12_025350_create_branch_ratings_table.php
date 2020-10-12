@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBranchFacilitiesTable extends Migration
+class CreateBranchRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateBranchFacilitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('branch_facilities', function (Blueprint $table) {
+        Schema::create('branch_ratings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             // Central Columns
@@ -21,12 +21,14 @@ class CreateBranchFacilitiesTable extends Migration
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Fields
+            $table->float('value');
             $table->unsignedBigInteger('branch_id');
-            $table->string('facility_ids', 255)->nullable();
-            $table->text('facility_values')->nullable()->comment("Format =>  name-of-facility**icon-class**qty");
-            // Foreign Keys
+            $table->unsignedBigInteger('criteria_id');
+            $table->unsignedBigInteger('user_id');
+            // Foreign keys
             $table->foreign('branch_id')->references('id')->on('branches');
-            //$table->foreign('facility_id')->references('id')->on('facilities');
+            $table->foreign('criteria_id')->references('id')->on('criterias');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
@@ -37,6 +39,6 @@ class CreateBranchFacilitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('branch_facilities');
+        Schema::dropIfExists('branch_ratings');
     }
 }

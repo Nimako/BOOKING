@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBranchFacilitiesTable extends Migration
+class CreateRoomOtherOptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,20 @@ class CreateBranchFacilitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('branch_facilities', function (Blueprint $table) {
+        Schema::create('room_other_options', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            // Central Columns
+            // Central Column
             $table->tinyInteger('status')->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
-            // Fields
-            $table->unsignedBigInteger('branch_id');
-            $table->string('facility_ids', 255)->nullable();
-            $table->text('facility_values')->nullable()->comment("Format =>  name-of-facility**icon-class**qty");
+            // Field
+            $table->unsignedBigInteger('room_id');
+            $table->text('added_amenities')->nullable();
+            $table->string('added_amenity_ids')->nullable();
+            $table->float('price')->nullable();
             // Foreign Keys
-            $table->foreign('branch_id')->references('id')->on('branches');
-            //$table->foreign('facility_id')->references('id')->on('facilities');
+            $table->foreign('room_id')->references('id')->on('branch_room_types');
         });
     }
 
@@ -37,6 +37,6 @@ class CreateBranchFacilitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('branch_facilities');
+        Schema::dropIfExists('room_other_options');
     }
 }
