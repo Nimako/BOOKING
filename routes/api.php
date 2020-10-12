@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
@@ -33,6 +34,11 @@ Route::group(['prefix'=>'auth'],function(){
 
      Route::post('/AuthHistory',  [AccountController::class,'SaveLoginHistory']);
 });
-  
+
+// Property Listing
+Route::group(['prefix'=>'property'],function(){
+    Route::post('/save',  [PropertyController::class,'store']);
+});
+
 
 

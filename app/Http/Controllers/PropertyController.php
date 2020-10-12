@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Property;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class PropertyController extends Controller
@@ -27,17 +29,30 @@ class PropertyController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation
-        $rules = [
-            'name' => "required",
-            'street_name' => "required",
-            'city' => "required"
-        ];
-        $validator = Validator::make($request->all(), $rules);
-        if($validator->fails()) {
-            return ApiResponse::returnErrorMessage($message = $validator->errors());
+        if(!empty($request->getFields)) {
+            return ApiResponse::returnData(Schema::getColumnListing('properties'));
         }
-        
+        else {
+            // Validation
+            $rules = [
+                'name' => "required",
+                'street_name' => "required",
+                'city' => "required",
+                'primary_telephone' => "required"
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if($validator->fails()) {
+                return ApiResponse::returnErrorMessage($message = $validator->errors());
+            }
+
+            // Pre-data Processing
+
+            // Saving Data
+            if($property = Property::create($request->all()))
+                return ApiResponse::returnSuccessMessage($message = "Property Saved and Awaiting Review.");
+            else
+                return ApiResponse::returnErrorMessage($message = "An Error Occurred. Please Try Again or Contact Support");
+        }
     }
 
     /**

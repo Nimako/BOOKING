@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use App\Traits\ApiResponse;
 
 class Handler extends ExceptionHandler
 {
@@ -33,5 +35,31 @@ class Handler extends ExceptionHandler
     public function register()
     {
         //
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
+     */
+    public function render($request, $exception)
+    {
+        # Mysql Query Error
+        if($exception instanceof QueryException) {
+            $errorMsg = explode('(', $exception->getMessage());
+            return ApiResponse::returnErrorMessage($errorMsg[0]);
+        }
+
+        # Sending Emails Error
+        /*if($exception instanceof Swift_TransportException) {
+            $errorMsg = explode('(', $exception->getMessage());
+            return ApiResponse::returnErrorMessage($errorMsg[0]);
+        }*/
+
+        return parent::render($request, $exception);
     }
 }

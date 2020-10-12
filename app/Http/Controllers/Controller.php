@@ -11,3 +11,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 }
+
+/***********************************************
+Status For Processing Data
+/************************************************/
+define('AWAITING_APPROVAL', 0);

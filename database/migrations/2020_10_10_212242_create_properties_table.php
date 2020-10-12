@@ -17,7 +17,7 @@ class CreatePropertiesTable extends Migration
             $table->id();
             $table->timestamps();
             // Central Columns
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->default(0);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // fields
@@ -27,7 +27,7 @@ class CreatePropertiesTable extends Migration
             $table->string('secondary_telephone')->nullable();
             $table->string('longitude_latitude')->nullable();
             $table->string('logo_path')->nullable();
-            $table->string('country_region');
+            $table->string('country_region')->nullable();
         });
     }
 
