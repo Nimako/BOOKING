@@ -38,7 +38,9 @@ class PropertyController extends Controller
                 'name' => "required",
                 'street_name' => "required",
                 'city' => "required",
-                'primary_telephone' => "required"
+                'primary_telephone' => "required",
+                'user_id' => "required",
+                'email' => "required|email:filter"
             ];
             $validator = Validator::make($request->all(), $rules);
             if($validator->fails()) {
@@ -46,6 +48,7 @@ class PropertyController extends Controller
             }
 
             // Pre-data Processing
+            $request->request->add(['created_by' => $request->user_id]);
 
             // Saving Data
             if($property = Property::create($request->all()))
@@ -53,6 +56,11 @@ class PropertyController extends Controller
             else
                 return ApiResponse::returnErrorMessage($message = "An Error Occurred. Please Try Again or Contact Support");
         }
+    }
+
+    public function PropertyApproval($propertyId)
+    {
+
     }
 
     /**

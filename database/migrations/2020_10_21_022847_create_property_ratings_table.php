@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBranchRatingsTable extends Migration
+class CreatePropertyRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateBranchRatingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('branch_ratings', function (Blueprint $table) {
+        Schema::create('property_ratings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             // Central Columns
@@ -22,13 +22,11 @@ class CreateBranchRatingsTable extends Migration
             $table->bigInteger('updated_by')->nullable();
             // Fields
             $table->float('value');
-            $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('criteria_id');
-            $table->unsignedBigInteger('user_id');
-            // Foreign keys
-            $table->foreign('branch_id')->references('id')->on('branches');
-            $table->foreign('criteria_id')->references('id')->on('criterias');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('property_id');
+            $table->string('criteria_ids', 255)->nullable();
+            $table->text('criteria_values')->nullable();
+            // Foreign Keys
+            $table->foreign('property_id')->references('id')->on('properties');
         });
     }
 
@@ -39,6 +37,6 @@ class CreateBranchRatingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('branch_ratings');
+        Schema::dropIfExists('property_ratings');
     }
 }

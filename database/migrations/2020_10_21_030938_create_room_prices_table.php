@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRoomOtherOptionsTable extends Migration
+class CreateRoomPricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,20 @@ class CreateRoomOtherOptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('room_other_options', function (Blueprint $table) {
+        Schema::create('room_prices', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            // Central Column
-            $table->tinyInteger('status')->default(1);
+            // Central Columns
+            $table->tinyInteger('status')->default(0);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
-            // Field
+            // Table Fields
             $table->unsignedBigInteger('room_id');
-            $table->text('added_amenities')->nullable();
-            $table->string('added_amenity_ids')->nullable();
-            $table->float('price')->nullable();
+            $table->string('guest_occupancy',255);
+            $table->float('discount')->nullable();
+            $table->float('amount')->nullable();
             // Foreign Keys
-            $table->foreign('room_id')->references('id')->on('branch_room_types');
+            $table->foreign('room_id')->references('id')->on('room_apartments');
         });
     }
 
@@ -37,6 +37,6 @@ class CreateRoomOtherOptionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('room_other_options');
+        Schema::dropIfExists('room_prices');
     }
 }

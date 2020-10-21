@@ -16,8 +16,12 @@ class CreatePropertyTypesTable extends Migration
         Schema::create('property_types', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            // fields
-            $table->string('name')->unique();;
+            // Central Columns
+            $table->tinyInteger('status')->default(0);
+            $table->bigInteger('created_by')->nullable();
+            $table->bigInteger('updated_by')->nullable();
+            // Table Fields
+            $table->string('name')->unique();
         });
     }
 
