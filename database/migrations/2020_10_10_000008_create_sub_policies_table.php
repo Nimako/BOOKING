@@ -17,12 +17,13 @@ class CreateSubPoliciesTable extends Migration
             $table->id();
             $table->timestamps();
             // Central Columns
-            $table->tinyInteger('status')->default(1);
+            $table->char('status', 2)->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Fields
             $table->unsignedBigInteger('policy_id');
-            $table->string('name');
+            $table->string('name')->unique();
+            $table->string('options')->nullable();
             // Foreign Keys
             $table->foreign('policy_id')->references('id')->on('policies');
         });

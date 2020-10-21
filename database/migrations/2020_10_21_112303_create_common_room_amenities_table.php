@@ -17,7 +17,7 @@ class CreateCommonRoomAmenitiesTable extends Migration
             $table->id();
             $table->timestamps();
             // Central Column
-            $table->tinyInteger('status')->default(1);
+            $table->char('status', 2)->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Field

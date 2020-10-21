@@ -17,7 +17,7 @@ class CreateRoomApartmentsTable extends Migration
             $table->id();
             $table->timestamps();
             // Central Columns
-            $table->tinyInteger('status')->default(0);
+            $table->char('status', 2)->default(1);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Table Fields

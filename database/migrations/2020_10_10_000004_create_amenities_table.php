@@ -16,6 +16,10 @@ class CreateAmenitiesTable extends Migration
         Schema::create('amenities', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            // Central Columns
+            $table->char('status', 2)->default(1);
+            $table->bigInteger('created_by')->nullable();
+            $table->bigInteger('updated_by')->nullable();
             // fields
             $table->string('name')->unique();
             $table->string('icon_class')->nullable();
