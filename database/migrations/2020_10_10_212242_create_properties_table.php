@@ -27,17 +27,19 @@ class CreatePropertiesTable extends Migration
             $table->string('geolocation')->nullable();
             $table->string('street_address')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('country')->nullable();
+            $table->integer('country_id')->nullable();
             $table->text('about_us')->nullable();
             $table->text('summary_text')->nullable();
-            $table->text('primary_telephone')->nullable();
-            $table->text('secondary_telephone')->nullable();
-            $table->text('email')->nullable();
+            $table->string('primary_telephone')->nullable();
+            $table->string('secondary_telephone')->nullable();
+            $table->string('email', 255)->nullable();
+            $table->string('website', 255)->nullable();
             $table->text('nearby_locations')->nullable();
-            $table->text('serve_breakfast')->nullable();
-            $table->text('languages_spoken')->nullable();
+            $table->char('serve_breakfast', 3)->nullable();
+            $table->string('languages_spoken', 255)->nullable();
             $table->string('images_ids', 255)->nullable();
             $table->text('images_paths')->nullable();
+            $table->string('current_onboard_stage')->nullable();
             // Foreign Keys
             $table->foreign('property_type_id')->references('id')->on('property_types');
         });

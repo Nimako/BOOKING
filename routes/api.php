@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\DefaultValuesController;
+use App\Http\Controllers\NewPropertyListingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
@@ -35,9 +36,14 @@ Route::group(['prefix'=>'auth'],function(){
      Route::post('/AuthHistory',  [AccountController::class,'SaveLoginHistory']);
 });
 
+// Default Item Listing
+Route::group(['prefix'=>'default-items'],function(){
+   Route::post('/',  [DefaultValuesController::class,'GetDefaultList']);
+});
+
 // Property Listing
 Route::group(['prefix'=>'property'],function(){
-    Route::post('/save',  [PropertyController::class,'store']);
+    Route::post('/onboarding',  [NewPropertyListingController::class,'stage1']);
 });
 
 
