@@ -9,17 +9,16 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Mail\VerifyMail;
+use App\Mail\ForgetPassword;
 use Illuminate\Support\Facades\Mail;
 use App\Models\UserAccount;
-
-
 
 class AccountController extends Controller
 {
 
+
     public function SignUpFireBase(Request $request)
     {
-     
         if(empty($request->Email)){
 
             return response()->json([ 'statusCode' => 500, 'message' => "Email is required"]);
@@ -27,7 +26,7 @@ class AccountController extends Controller
         }else{
 
         $query =  UserAccount::updateOrCreate(
-                ['Email' => trim($request->Email),],
+                ['Email' => $request->Email],
                 [ 
                 'FirstName'       => $request->FirstName,
                 'LastName'        => $request->LastName,
@@ -57,41 +56,72 @@ class AccountController extends Controller
 
     public function SignUpManual(Request $request)
     {
-      
         #Assignment of request variables
         $UserAccount = new UserAccount();
 
         # Checking for duplication
-        $duplicateEmail    = UserAccount::where('Email',$request->Email)->first();
+        $duplicateEmail = UserAccount::where('Email',trim($request->Email))->first();
 
-        if(!empty($duplicateEmail)){
+        if($request->Step==1){
 
-            return response()->json(['statusCode' => 500, 'message' => "Email Already Exist"]);
+            if(!empty($duplicateEmail)){
+                return response()->json([ 'statusCode' => 500, "Step"=>1, 'message' => "Email already exist in our system"]);
+            }
 
-        }else{ 
-
-            #Variable Assignments
-            $UserAccount->Email        = $request->Email;
-            $UserAccount->FirstName    = $request->FirstName;
-            $UserAccount->LastName     = $request->LastName;
+            $UserAccount->Email        = trim($request->Email);
             $UserAccount->UserPassword = Hash::make($request->Password);
             $UserAccount->Provider     = 'manual';
             $UserAccount->Country      = $request->Country;
             $UserAccount->City         = $request->City;
             $UserAccount->Region       = $request->Region;
-        
+
             if($UserAccount->save()) {
 
-                $this->SendVerificationEmail($request);
-                
-                return response()->json(['statusCode' => 200,  "message" => "User save"]);
+                $this->SendVerificationEmail($request); //send an
+                return response()->json(['statusCode' => 200, "Step"=> 1, "LoginToken"=> sha1($request->Email), "message" => "successfully registered. check verify your email to continue"]);
 
             }else{
-                return response()->json(['statusCode' => 500, "message" => "Failed Saving"]);
+                return response()->json(['statusCode' => 500, "Step"=> 1, "message" => "Failed Saving"]);
             } 
+
+        }elseif($request->Step==2){
+
+            $query =  UserAccount::updateOrCreate(
+                ['Email' => $request->Email],
+                [ 
+                'FirstName'       => $request->FirstName,
+                'LastName'        => $request->LastName
+                ]
+            );
+
+            if($query) {
+                return response()->json(['statusCode' => 200, "Step"=> 2,  "message" => "Record updated"]);
+            }else{
+                return response()->json(['statusCode' => 500, "Step"=> 2, "message" => "Failed updating"]);
+            } 
+
+        }elseif($request->Step==3){
+
+            $query =  UserAccount::updateOrCreate(
+                ['Email' => $request->Email],
+                [ 
+                'PhoneNum'        => $request->PhoneNum
+                ]
+            );
+
+            if($query) {
+                return response()->json(['statusCode' => 200, "Step"=>  3,  "message" => "Record updated"]);
+            }else{
+                return response()->json(['statusCode' => 500, "Step"=> 3, "message" => "Failed updating"]);
+            } 
+            
+        }else{
+            return response()->json(['statusCode' => 500, "message" => "Please specify step number"]);
         }
 
     }
+
+
 
 
     public function SignInManual(Request $request)
@@ -103,13 +133,9 @@ class AccountController extends Controller
             return response()->json(['statusCode' => 500,  "message" => "Email and Password is required"]);
         }
 
-        if(empty($request->Provider) && $user->Provider !="manual"){
-            return response()->json(['statusCode' => 500,  "message" => "Please use {$user->Provider} to login"]);
-        }
-        
         if(!empty($user)){
 
-            if (Hash::check($request->Password, $user->UserPassword)){
+            if (Hash::check($request->Password, $user->UserPassword)&&$user->Provider == "manual"){
 
                 $data = [];
 
@@ -121,7 +147,7 @@ class AccountController extends Controller
                 $data['City']          = $user->City;
                 $data['Region']        = $user->Region;
                 $data['ProfileImage']  = $user->ProfileImage;
-                $data['EmailVerify']  =  $user->EmailVerify;
+                $data['EmailVerify']   =  $user->EmailVerify;
 
                 return response()->json(['payload'=>$data,'statusCode' => 200,  "message" => "Success"]);
 
@@ -131,7 +157,7 @@ class AccountController extends Controller
 
 
         }else{
-               return response()->json(['statusCode' => 500, "message" => "Password is not found in our system"]);
+               return response()->json(['statusCode' => 500, "message" => "Email is not found in our system"]);
         } 
     }
 
@@ -148,7 +174,6 @@ class AccountController extends Controller
 
         if(!empty($user->id)){
  
-
             #Variable Assignments
             $LoginHistory->UserID          = $user->id;
             $LoginHistory->Provider        = $request->Provider;
@@ -166,14 +191,14 @@ class AccountController extends Controller
             $LoginHistory->DeviceType      = $request->DeviceType;
             $LoginHistory->BrowserType     = $request->BrowserType;
 
-            if($LoginHistory->save()) {
- 
-                UserAccount::where('Email',$request->Email)->update(['LastLogin' => Carbon::now()]);
+            $LoginHistory->save();
 
-                return response()->json(['statusCode' => 200,  "message" => "Login History Log"]);
-            }else{
-                return response()->json(['statusCode' => 500, "message" => "Failed Saving"]);
-            } 
+            UserAccount::where('Email',$request->Email)->update(['LastLogin' => Carbon::now()]);
+
+            return response()->json(['statusCode' => 200,  "message" => "Login History Log"]);
+ 
+        }else{
+            return response()->json(['statusCode' => 200,  "message" => "User not found History"]);
         }
 
     }
@@ -198,17 +223,16 @@ class AccountController extends Controller
 
             Mail::to(trim($request->Email))->send(new VerifyMail($user));
 
-            return response()->json(['statusCode' => 200,  "message" => "Verification link sent"]);
+            return $user['token']; //response()->json(['statusCode' => 200,  "message" => "Verification link sent"]);
 
         }
 
     }
 
 
-    public function VerifyUser(Request $request,$token){
+    public function VerifyUser(Request $request){
 
-        //$verifyUser      = DB::table('VerifyUser')->where('token',$request->token)->first();
-        $verifyUser      = DB::table('verifyuser')->where('token',$token)->first();
+        $verifyUser  = DB::table('verifyuser')->where('token',$request->VerifyCode)->first();
 
         if(!empty($verifyUser)){ 
 
@@ -218,7 +242,6 @@ class AccountController extends Controller
                 return response()->json(['statusCode' => 200,  "message" => "Your e-mail is already verified. You can now login"]);
             }
 
-
             $today  = date("Y-m-d");
             $expire = $verifyUser->DateCreated; 
             
@@ -226,16 +249,53 @@ class AccountController extends Controller
             $expire_time = strtotime($expire);
 
             if ($expire_time < $today_time){
-                return response()->json(['statusCode' => 200,  "message" => "Sorry your verification link has expired"]);
+                return response()->json(['statusCode' => 500,  "message" => "Sorry your verification link has expired"]);
             }else{
 
                 $affected = DB::table('useraccount')->where('id', $verifyUser->UserID)->update(['Verified' => "YES"]);
 
-                return response()->json(['statusCode' => 200,  "message" => "Your e-mail is verified. You can now login"]);
+                return response()->json(['statusCode' => 200,  "message" => "Your e-mail is now verified. You can now login"]);
             }   
         }else{
-            return response()->json(['statusCode' => 200,  "message" => "Sorry your verification link has expired"]);
+                return response()->json(['statusCode' => 500,  "message" => "Sorry your verification link has expired"]);
         }
+
+    }
+
+
+    public function ResetPassword(Request $request){
+
+        $data   = UserAccount::where('Email',trim($request->Email))->first();
+
+        if(empty($data)){
+            return response()->json(['statusCode' => 500,  "message" => "The email specified is not in our system"]);
+        }else{
+
+       if($request->Step==1){
+
+           $user = [];
+           $user['token'] = sha1($request->Email);
+           $user['email'] = $data->Email;
+           $user['name']  = $data->FirstName ." ". $data->LastName;
+
+           Mail::to(trim($request->Email))->send(new ForgetPassword($user));
+
+           return response()->json(['statusCode' => 200,  "message" => "Email has been sent to your inbox which contain instruction on how to reset your password"]);
+
+
+       }elseif($request->Step==2){
+
+          //$resetCode = $request->ResetCode;
+         //$query =  UserAccount::where('Email', $request->Email)->where('id', $data->id)->update(['UserPassword' => Hash::make($request->Password)]);
+
+         if($query){
+            return response()->json(['statusCode' => 200,  "message" => "Password reset successfully"]);
+         }else{
+            return response()->json(['statusCode' => 500,  "message" => "Failed to reset password"]);
+         }
+       }
+
+    }
 
     }
 

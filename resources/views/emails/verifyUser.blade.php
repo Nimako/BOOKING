@@ -8,12 +8,18 @@
   </head>
   <body>
     <div class="container">
+        
+        <h2>Verify your email address</h2>
 
-        <h2>Verify your email address {{$user['name']}}</h2>
-        <br/>
-        Your registered email ID is {{$user['email']}} , Please click on the below link to verify your email account
-        <br/>
-        <a class="btn btn-block btn-primary" href="{{url('VerifyUser', $user['token'])}}">Confirm</a>
+       <p>
+        You've created an account with the email address: {{$user['email']}}
+        Click 'confirm' to verify the email address and unlock your full account.
+        We'll also import any bookings you've made with that address.
+       </p>
+
+        {{-- <a class="btn btn-block btn-primary" href="{{url('VerifyUser', $user['token'])}}">Confirm</a> --}}
+
+        <a class="btn btn-block btn-primary" href="https://listing-site-df269.firebaseapp.com/verify-email/{{$user['token']}}">Confirm</a>
 
     </div>
   </body>

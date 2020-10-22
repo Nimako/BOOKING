@@ -13,7 +13,21 @@ class UserAccount extends Model
 
     protected $primaryKey  = 'id';
 
-    protected $fillable = ['Email'];
+    protected $fillable = [
+                          'Email',
+                          'Password',
+                          'FirstName',
+                          'LastName',
+                          'DisplayName',
+                          'DateBirth',
+                          'PhoneNum',
+                          'Country',
+                          'City',
+                          'Region',
+                          'ProfileImage',
+                          'Provider',
+                          'FireBaseUserID'
+                        ];
 
     const CREATED_AT       = 'DateCreated';
     const UPDATED_AT       = null;

@@ -20,6 +20,6 @@ Route::get('/', function () {
 });
 
 
-Route::get('VerifyUser/{id}',  [AccountController::class,'VerifyUser']);
+Route::get('VerifyUser/{id}',  [AccountController::class,'VerifyUser'])->name("verifyaccount");
 
 Route::get('DeleteUser/{email}',  [TestController::class,'DeleteUser']);
