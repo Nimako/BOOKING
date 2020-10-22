@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommonPropertyFacility;
+use App\Models\Facility;
 use App\Models\Property;
 use App\Models\RoomApartment;
 use App\Traits\ApiResponse;
@@ -11,7 +13,6 @@ use Ramsey\Uuid\Uuid;
 
 class NewPropertyListingController extends Controller
 {
-    //
    public function stage1(Request $request)
    {
       // Validation
@@ -42,7 +43,58 @@ class NewPropertyListingController extends Controller
          RoomApartment::create($roomApartmentDetails);
 
          // return statement
-         return ApiResponse::returnSuccessData(array('uuid' => $property->uuid));
+         return ApiResponse::returnSuccessData(array('id' => $property->uuid));
+      }
+   }
+
+   public function stage2(Request $request)
+   {
+      // Validation
+      $rules = [
+         'id' => "required|exists:properties,uuid",
+      ];
+      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Id"]);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else{
+         // return statement
+         return ApiResponse::returnSuccessMessage($message = "Stage 2 Completed");
+      }
+   }
+
+   public function stage3(Request $request)
+   {
+      // Validation
+      $rules = [
+         'id' => "required|exists:properties,uuid",
+      ];
+      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Id"]);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else{
+         if(!empty($request->facilities))
+         {
+            // getting facilities names using ids
+            $searchedFacilities = Facility::wherein(['id' => implode(',', (array)$request->facilities)])->get();
+
+            // if property record found
+            if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id'])->first())
+               $doNothing = "";
+            else
+               $propertyCommonFacilities = new CommonPropertyFacility();
+
+            // saving data
+            $propertyCommonFacilities->facility_ids = implode(',', (array)$request->facilities);
+            $propertyCommonFacilities->facility_text = implode(',', (array)$searchedFacilities);
+            $propertyCommonFacilities->save();
+         }
+         else
+            $doNothing = "";
+
+         // return statement
+         return ApiResponse::returnSuccessMessage($message = "Stage 3 Completed");
       }
    }
 }

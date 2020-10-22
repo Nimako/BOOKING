@@ -17,16 +17,16 @@ class DefaultValuesController extends Controller
    {
       switch ($request->item) {
          case 'amenities' :
-            $responseData = Amenity::all();
+            $responseData = Amenity::all(['id','name','icon_class']);
             break;
          case 'facilities' :
-            $responseData = Facility::all();
+            $responseData = Facility::all(['id','name','icon_class']);
             break;
          case 'policies' :
-            $responseData = Policy::all();
+            $responseData = Policy::all(['id','name']);
             break;
          case 'property_types' :
-            $responseData = PropertyType::all();
+            $responseData = PropertyType::all(['id','name','description']);
             break;
          case 'currency' :
             $responseData = Country::all(['id','currency']);

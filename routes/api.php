@@ -43,7 +43,9 @@ Route::group(['prefix'=>'default-items'],function(){
 
 // Property Listing
 Route::group(['prefix'=>'property'],function(){
-    Route::post('/onboarding',  [NewPropertyListingController::class,'stage1']);
+    Route::post('/onboarding/stage1',  [NewPropertyListingController::class,'stage1']);
+    Route::post('/onboarding/stage2',  [NewPropertyListingController::class,'stage2']);
+    Route::post('/onboarding/stage3',  [NewPropertyListingController::class,'stage3']);
 });
 
 
