@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DefaultValuesController;
+use App\Http\Controllers\NewPropertyListingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
@@ -36,6 +38,18 @@ Route::group(['middleware' => 'checkheaders'], function () {
         Route::post('/AuthHistory',  [AccountController::class,'SaveLoginHistory']);
     });
 });
-  
+
+// Default Item Listing
+Route::group(['prefix'=>'default-items'],function(){
+   Route::post('/',  [DefaultValuesController::class,'GetDefaultList']);
+});
+
+// Property Listing
+Route::group(['prefix'=>'property'],function(){
+    Route::post('/onboarding/stage1',  [NewPropertyListingController::class,'stage1']);
+    Route::post('/onboarding/stage2',  [NewPropertyListingController::class,'stage2']);
+    Route::post('/onboarding/stage3',  [NewPropertyListingController::class,'stage3']);
+});
+
 
 
