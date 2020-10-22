@@ -7,6 +7,7 @@ use App\Models\RoomApartment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Uuid;
 
 class NewPropertyListingController extends Controller
 {
@@ -30,7 +31,8 @@ class NewPropertyListingController extends Controller
             'street_address' => $request->street_address,
             'property_type_id' => $request->property_type_id,
             'created_by' => $request->created_by,
-            'current_onboard_stage' => "stage1"
+            'current_onboard_stage' => "stage1",
+            'uuid' => Uuid::uuid6()
          ];
          $property = Property::create($propertyDetails);
          $roomApartmentDetails = [
@@ -40,7 +42,7 @@ class NewPropertyListingController extends Controller
          RoomApartment::create($roomApartmentDetails);
 
          // return statement
-         return ApiResponse::returnSuccessMessage($message = "Successful");
+         return ApiResponse::returnSuccessData(array('uuid' => $property->uuid));
       }
    }
 }

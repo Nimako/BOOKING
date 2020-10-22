@@ -9,5 +9,5 @@ class Property extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','street_address','property_type_id','website','country_id','created_by'];
+    protected $fillable = ['uuid','name','street_address','property_type_id','website','country_id','created_by'];
 }

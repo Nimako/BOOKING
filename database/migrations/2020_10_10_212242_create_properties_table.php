@@ -21,6 +21,7 @@ class CreatePropertiesTable extends Migration
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Table Fields
+            $table->uuid('uuid');
             $table->unsignedBigInteger('property_type_id');
             $table->string('name');
             $table->string('text_location')->nullable();
