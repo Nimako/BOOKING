@@ -285,8 +285,8 @@ class AccountController extends Controller
 
        }elseif($request->Step==2){
 
-          //$resetCode = $request->ResetCode;
-         //$query =  UserAccount::where('Email', $request->Email)->where('id', $data->id)->update(['UserPassword' => Hash::make($request->Password)]);
+          $resetCode = $request->ResetCode;
+         $query =  UserAccount::where('Email', $request->Email)->where('id', $data->id)->update(['UserPassword' => Hash::make($request->Password)]);
 
          if($query){
             return response()->json(['statusCode' => 200,  "message" => "Password reset successfully"]);
