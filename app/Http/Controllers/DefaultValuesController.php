@@ -23,7 +23,7 @@ class DefaultValuesController extends Controller
             $responseData = Facility::all(['id','name','icon_class']);
             break;
          case 'policies' :
-            $responseData = Policy::all(['id','name']);
+            $responseData = Policy::with('sub_policies',)->get(['id','name']);
             break;
          case 'property_types' :
             $responseData = PropertyType::all(['id','name','description']);

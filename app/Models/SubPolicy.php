@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubPolicy extends Model
 {
     use HasFactory;
+
+   public function getpolicy()
+   {
+      return $this->belongsTo('App\Models\Policy', 'policy_id');
+   }
 }

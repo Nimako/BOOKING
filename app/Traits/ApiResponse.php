@@ -15,12 +15,12 @@ trait ApiResponse
     */
    public static function returnValidationError($errors)
    {
-		return response()->json(['errors' => $errors],  Response::HTTP_BAD_REQUEST);
+		return response()->json(['statuscode' => VALIDATION_ERROR, 'errors' => $errors],  Response::HTTP_OK);
    }
 
    public static function returnSuccessData($data)
    {
-      return response()->json(['data' => $data], Response::HTTP_CREATED);
+      return response()->json(['statuscode' => SUCCESS, 'data' => $data], Response::HTTP_OK);
    }
 
     public static function returnData($data)
@@ -30,11 +30,11 @@ trait ApiResponse
 
    public static function returnSuccessMessage($message)
    {
-      return response()->json(['message' => $message], Response::HTTP_OK);
+      return response()->json(['statuscode' => SUCCESS, 'message' => $message], Response::HTTP_OK);
    }
 
    public static function returnErrorMessage($message)
    {
-      return response()->json(['message' => $message], Response::HTTP_NOT_ACCEPTABLE);
+      return response()->json(['statuscode' => ERROR, 'message' => $message], Response::HTTP_OK);
    }
 }

@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Policy extends Model
 {
     use HasFactory;
+
+   public function sub_policies()
+   {
+      return $this->hasMany('App\Models\SubPolicy');
+   }
+
 }
