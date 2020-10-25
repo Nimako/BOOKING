@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CommonPropertyFacility;
+use App\Models\CommonPropertyPolicy;
 use App\Models\Facility;
 use App\Models\Policy;
 use App\Models\Property;
@@ -19,6 +20,7 @@ class NewPropertyListingController extends Controller
       // if property exists
       if(!empty($request->id))
       {
+         $stringGlue = "**";
          // validation
          $rules = [
             'id' => "required|exists:properties,uuid",
@@ -36,12 +38,12 @@ class NewPropertyListingController extends Controller
             if(!empty($request->latitude) || !empty($request->longitude))
                $request->request->add(['geolocation' => $request->latitude.','.$request->longitude]);
             if(!empty($request->languages_spoke))
-               $request->request->add(['languages_spoken' => implode('**', (array)$request->languages_spoke)]);
+               $request->request->add(['languages_spoken' => implode($stringGlue, (array)$request->languages_spoke)]);
 
             // saving property info
             $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
 
-            # checking other parameters
+            # if facilities added to request
             if(!empty($request->facilities)) {
                $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
                if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
@@ -53,14 +55,33 @@ class NewPropertyListingController extends Controller
 
                // saving data
                $facilitiesByName = array_map(function($facility) { return $facility['name']; }, $searchedFacilities);
-               $propertyCommonFacilities->facility_ids = implode('**', (array)$request->facilities);
-               $propertyCommonFacilities->facility_text = implode('**', (array)$facilitiesByName);
+               $propertyCommonFacilities->facility_ids = trim(implode($stringGlue, (array)$request->facilities), $stringGlue);
+               $propertyCommonFacilities->facility_text = trim(implode($stringGlue, (array)$facilitiesByName), $stringGlue);
                $propertyCommonFacilities->save();
             }
 
-            if(!empty($request->house_rules))
+            # if policies added to request
+            if(!empty($request->policies))
             {
+               $subPolicyText = $subPolicyIds = "";
+               foreach ($request->policies as $key => $value) {
+                  if($subPolicy = SubPolicy::find($key)) {
+                     $subPolicyIds .= $key.$stringGlue;
+                     $subPolicyText .= $subPolicy->name.'='.$value.$stringGlue;
+                  }
+               }
 
+               if($propertyCommonPolicies = CommonPropertyPolicy::where(['property_id' => $searchedProperty->id])->first())
+                  $doNothing = "";
+               else {
+                  $propertyCommonPolicies = new CommonPropertyPolicy();
+                  $propertyCommonPolicies->property_id = $searchedProperty->id;
+               }
+
+               // saving data
+               $propertyCommonPolicies->sub_policy_ids = trim($subPolicyIds, $stringGlue);
+               $propertyCommonPolicies->sub_policy_text = trim($subPolicyText, $stringGlue);
+               $propertyCommonPolicies->save();
             }
 
             // return statement
@@ -77,43 +98,20 @@ class NewPropertyListingController extends Controller
       }
    }
 
-   public function stage6(Request $request)
+   public function onBoardingDetails(Request $request)
    {
       // Validation
       $rules = [
          'id' => "required|exists:properties,uuid",
+         'current_onboard_stage' => "required"
       ];
-      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Id"]);
+      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
       if($validator->fails()) {
          return ApiResponse::returnErrorMessage($message = $validator->errors());
       }
       else{
-         if(!empty($request->house_rules))
-         {
-            // getting facilities names using ids
-            return $searchedFacilities = SubPolicy::wherein('id', (array)$request->house_rules)->get(['name'])->toArray();
-
-            // if property record found
-            $searchedProperty = Property::where(['uuid' => $request->id])->first();
-            if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
-               $doNothing = "";
-            else {
-               $propertyCommonFacilities = new CommonPropertyFacility();
-               $propertyCommonFacilities->property_id = $searchedProperty->id;
-            }
-
-            // saving data
-            $facilitiesByName = array_map(function($facility) { return $facility['name']; }, $searchedFacilities);
-            $propertyCommonFacilities->facility_ids = implode('**', (array)$request->facilities);
-            $propertyCommonFacilities->facility_text = implode('**', (array)$facilitiesByName);
-            $propertyCommonFacilities->save();
-
-            // saving current on-boarding stage
-            $searchedProperty->current_onboard_stage = "stage3";
-            $searchedProperty->save();
-         }
-         else
-            $doNothing = "";
+         // if property record found
+         $searchedProperty = Property::where(['uuid' => $request->id])->first();
 
          // return statement
          return ApiResponse::returnSuccessMessage($message = "Stage 6 Completed");
