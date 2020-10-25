@@ -17,10 +17,10 @@ class NewPropertyListingController extends Controller
    {
       // Validation
       $rules = [
-         'name' => "required",
-         'street_address' => "required",
+         'name'             => "required",
+         'street_address'   => "required",
          'property_type_id' => "required",
-         'created_by' => "required"
+         'created_by'       => "required"
       ];
       $validator = Validator::make($request->all(), $rules);
       if($validator->fails()) {
@@ -37,7 +37,7 @@ class NewPropertyListingController extends Controller
          ];
          $property = Property::create($propertyDetails);
          $roomApartmentDetails = [
-            'property_id' => $property->id,
+            'property_id'  => $property->id,
             'num_of_rooms' => $request->num_of_rooms,
          ];
          RoomApartment::create($roomApartmentDetails);
