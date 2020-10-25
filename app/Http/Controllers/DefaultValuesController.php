@@ -9,7 +9,6 @@ use App\Models\Policy;
 use App\Models\PropertyType;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class DefaultValuesController extends Controller
 {
