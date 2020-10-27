@@ -25,7 +25,8 @@ class NewPropertyListingController extends Controller
          // validation
          $rules = [
             'id' => "required|exists:properties,uuid",
-            'current_onboard_stage' => "required"
+            'current_onboard_stage' => "required",
+            'created_by' => "required"
          ];
          $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
          if($validator->fails()) {
@@ -64,10 +65,10 @@ class NewPropertyListingController extends Controller
             }
 
             # if policies added to request
-            if(!empty($request->policies))
+            if(!empty($request->subpolicies))
             {
                $subPolicyText = $subPolicyIds = "";
-               foreach ($request->policies as $key => $value) {
+               foreach ($request->subpolicies as $key => $value) {
                   if($subPolicy = SubPolicy::find($key)) {
                      $subPolicyIds .= $key.$stringGlue;
                      $subPolicyText .= $subPolicy->name.'='.$value.$stringGlue;
