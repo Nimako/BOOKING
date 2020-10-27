@@ -26,9 +26,11 @@ class CreatePropertiesTable extends Migration
             $table->string('name')->nullable();
             $table->string('text_location')->nullable();
             $table->string('geolocation')->nullable();
-            $table->string('street_address')->nullable();
+            $table->string('street_address_1')->nullable();
+            $table->string('street_address_2')->nullable();
             $table->string('postal_code')->nullable();
             $table->integer('country_id')->nullable();
+            $table->integer('city')->nullable();
             $table->text('about_us')->nullable();
             $table->text('summary_text')->nullable();
             $table->string('primary_telephone')->nullable();
