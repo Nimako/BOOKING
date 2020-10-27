@@ -14,15 +14,16 @@ class CreatePropertyTypesTable extends Migration
     public function up()
     {
         Schema::create('property_types', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            // Central Columns
-            $table->char('status', 2)->default(1);
-            $table->bigInteger('created_by')->nullable();
-            $table->bigInteger('updated_by')->nullable();
-            // Table Fields
-            $table->string('name')->unique();
-            $table->string('description')->nullable();
+           $table->id();
+           $table->uuid('uuid');
+           $table->timestamps();
+           // Central Columns
+           $table->char('status', 2)->default(1);
+           $table->bigInteger('created_by')->nullable();
+           $table->bigInteger('updated_by')->nullable();
+           // Table Fields
+           $table->string('name')->unique();
+           $table->string('description')->nullable();
         });
     }
 

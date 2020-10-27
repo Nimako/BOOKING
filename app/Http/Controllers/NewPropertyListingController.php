@@ -7,6 +7,7 @@ use App\Models\CommonPropertyPolicy;
 use App\Models\Facility;
 use App\Models\Policy;
 use App\Models\Property;
+use App\Models\PropertyType;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,8 @@ class NewPropertyListingController extends Controller
                $request->request->add(['geolocation' => $request->latitude.','.$request->longitude]);
             if(!empty($request->languages_spoke))
                $request->request->add(['languages_spoken' => implode($stringGlue, (array)$request->languages_spoke)]);
+            if(!empty($request->property_type_id))
+               $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
 
             // saving property info
             $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
@@ -91,6 +94,9 @@ class NewPropertyListingController extends Controller
       else {
          // data pre-processing
          $request->request->add(['uuid' => Uuid::uuid6()]);
+         if(!empty($request->property_type_id))
+            $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
+
          // saving data
          $responseData = Property::create($request->all());
          // return statement

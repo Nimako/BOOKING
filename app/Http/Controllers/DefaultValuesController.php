@@ -25,7 +25,7 @@ class DefaultValuesController extends Controller
             $responseData = Policy::with('sub_policies')->get(['id','name']);
             break;
          case 'property_types' :
-            $responseData = PropertyType::all(['id','name','description']);
+            $responseData = PropertyType::all(['uuid','name','description']);
             break;
          case 'country' :
             $responseData = Country::all(['id','iso','name','currency']);
