@@ -18,4 +18,4 @@ Status For Processing Data
 define('AWAITING_APPROVAL', 0);
 define('VALIDATION_ERROR', 400);
 define('SUCCESS', 200);
-define('ERROR', 300);
+define('ERROR', 500);

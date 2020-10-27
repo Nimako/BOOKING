@@ -28,7 +28,7 @@ class DefaultValuesController extends Controller
             $responseData = PropertyType::all(['id','name','description']);
             break;
          case 'country' :
-            $responseData = Country::all(['id','name','currency']);
+            $responseData = Country::all(['id','iso','name','currency']);
             break;
          default :
             $responseData['options'] = ['amenities', 'facilities', 'policies', 'property_types', 'country'];
