@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Amenity;
 use App\Models\CommonPropertyFacility;
 use App\Models\CommonPropertyPolicy;
+use App\Models\CommonRoomAmenities;
 use App\Models\Facility;
 use App\Models\Policy;
 use App\Models\Property;
 use App\Models\PropertyType;
+use App\Models\RoomApartment;
+use App\Models\RoomDetails;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -43,6 +47,10 @@ class NewPropertyListingController extends Controller
                $request->request->add(['languages_spoken' => implode($stringGlue, (array)$request->languages_spoke)]);
             if(!empty($request->property_type_id))
                $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
+            if(!empty($request->room_details))
+               $request->request->add(['num_of_rooms' => sizeof($request->room_details)]);
+
+            $request->request->add(['property_id' => $searchedProperty->id]);
 
             // saving property info
             $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
@@ -88,11 +96,64 @@ class NewPropertyListingController extends Controller
                $propertyCommonPolicies->save();
             }
 
+            // apartment details
+            if(!empty($request->room_size) || !empty($request->total_guest_capacity) || !empty($request->total_rooms) || !empty($request->total_bathrooms))
+            {
+               if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first())
+                  $room->update($request->all());
+               else
+                  $room = RoomApartment::create($request->all());
+
+               if(!empty($request->room_details))
+               {
+                  foreach ($request->room_details as $detail) {
+                     $bedDetails[] = [
+                        'room_id' => $room->id,
+                        'room_name' => $detail['name'],
+                        'bed_type' => $detail['bed_type'],
+                        'bed_type_qty' => $detail['bed_qty']
+                     ];
+                  }
+                  RoomDetails::insert($bedDetails);
+               }
+            }
+
+            # if amenities added to request
+            if(!empty($request->amenities)) {
+               $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
+               if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
+                  $doNothing = "";
+               else {
+                  $commonAmenities = new CommonRoomAmenities();
+                  $commonAmenities->room_id = $room->id;
+               }
+
+               // saving data
+               $amenitiesByName = array_map(function($amenity) { return $amenity['name']; }, $searchedAmenities);
+               $commonAmenities->popular_amenity_ids = trim(implode($stringGlue, (array)$request->amenities), $stringGlue);
+               $commonAmenities->popular_amenity_text = trim(implode($stringGlue, (array)$amenitiesByName), $stringGlue);
+               $commonAmenities->save();
+
+               // updating link to room details
+               $searchedRoom = RoomApartment::find($room->id);
+               $searchedRoom->common_room_amenity_id = $commonAmenities->id;
+               $searchedRoom->save();
+            }
+
             // return statement
             return ApiResponse::returnSuccessData($data = ['id' => $searchedProperty->uuid, 'completed_onboard_stage' => $request->current_onboard_stage]);
          }
       }
+      // new property
       else {
+         // validation
+         $rules = [
+            'property_type_id' => "required|exists:property_types,uuid",
+         ];
+         $validator = Validator::make($request->all(), $rules, $customMessage = ['property_type_id.exists' => "Invalid Property Type Reference"]);
+         if($validator->fails())
+            return ApiResponse::returnErrorMessage($message = $validator->errors());
+
          // data pre-processing
          $request->request->add(['uuid' => Uuid::uuid6()]);
          if(!empty($request->property_type_id))

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amenity;
+use App\Models\BedType;
 use App\Models\Country;
 use App\Models\Facility;
 use App\Models\Policy;
@@ -30,8 +31,11 @@ class DefaultValuesController extends Controller
          case 'country' :
             $responseData = Country::all(['id','iso','name','currency']);
             break;
+         case 'bedtypes' :
+            $responseData = BedType::all(['id','name']);
+            break;
          default :
-            $responseData['options'] = ['amenities', 'facilities', 'policies', 'property_types', 'country'];
+            $responseData['options'] = ['amenities','facilities','policies','property_types','country','bedtypes'];
             break;
       }
 
