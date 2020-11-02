@@ -5,6 +5,7 @@ use App\Http\Controllers\NewPropertyListingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\TestController;
 
 
 /*
@@ -48,6 +49,9 @@ Route::group(['prefix'=>'default-items'],function(){
 Route::group(['prefix'=>'property'],function(){
     Route::post('/onboarding/save',  [NewPropertyListingController::class,'onBoarding']);
 });
+
+
+Route::post('/CompressImage',  [TestController::class,'CompressImage']);
 
 
 
