@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -52,38 +53,47 @@ class TestController extends Controller
 
    public function CompressImage(request $request){
 
-    $temp_name =  $request->file('image');
+    $UploadFile =  $request->file('image'); //temp file
 
-    // $temp_name->getClientOriginalName();
-    // $temp_name->getRealPath();
-    // $temp_name->getClientOriginalExtension();
-    // $temp_name->getSize();
+
+    //$UploadFile->getClientOriginalName();
+    //$UploadFile->getRealPath();      //temp file
+    //$UploadFile->getClientOriginalExtension();
+    //$UploadFile->getSize();
+    //$UploadFile->getClientMimeType();
     
     if($request->hasfile('image'))
     {
 
-      $quality = self::GenerateQuality($temp_name->getSize());
+      $quality = self::GenerateQuality($UploadFile->getSize());
 
-      $info = getimagesize($temp_name);
-      if ($info['mime'] == 'image/jpeg' || $info['mime'] == 'image/jpg' ) $image = imagecreatefromjpeg($temp_name);
-      elseif ($info['mime'] == 'image/gif') $image = imagecreatefromgif($temp_name);
-      elseif ($info['mime'] == 'image/png') $image = imagecreatefrompng($temp_name);
-      elseif ($info['mime'] == 'image/webp') $image = imagecreatefromwebp($temp_name);
+      $info = getimagesize($UploadFile);
+      if ($info['mime'] == 'image/jpeg' || $info['mime'] == 'image/jpg' ) $image = imagecreatefromjpeg($UploadFile);
+      elseif ($info['mime'] == 'image/gif')  $image = imagecreatefromgif($UploadFile);
+      elseif ($info['mime'] == 'image/png')  $image = imagecreatefrompng($UploadFile);
+      elseif ($info['mime'] == 'image/webp') $image = imagecreatefromwebp($UploadFile);
+      
+      $propertyUUID  = rand(); //Property UUID which will be part of the request
+      $imageCountNum = rand(); //image number which can be added to the request
+      
+      $NewFileName  = base64_encode($propertyUUID.$imageCountNum).".webp"; //rename 
 
-      $NewFileName  = sha1(time()).".webp";   
-
-      $path = public_path().'/properties/'.date('Y-m').'/';
+      $path = public_path().'/properties/'.date('Y').'/'.date('m').'/';
       File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
       $NewPath = $path.$NewFileName;
 
       imagewebp($image,$NewPath,$quality);
       imagedestroy($image); 
 
-      echo $quality;
+      return $NewPath;
+
     }
 
 
    }
+
+
+
 
 
    public function resizeImagePost(Request $request)
