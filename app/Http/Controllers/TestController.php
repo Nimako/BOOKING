@@ -6,6 +6,8 @@ use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+
 class TestController extends Controller
 {
 
@@ -26,32 +28,7 @@ class TestController extends Controller
     }
 
 
-   public static function GenerateQuality($imageSize){
-
-    if($imageSize >= 5000000){
-
-      return 40;
-
-    }elseif($imageSize <= 4000000 && $imageSize >= 3000000){
-
-      return 50;
-
-    }elseif($imageSize <= 3000000 && $imageSize >= 2000000){
-
-      return 60;
-
-    }elseif($imageSize <= 2000000){
-
-      return 70;
-
-    }else{
-      return 80;
-    }
-
-  }
-
-
-   public function CompressImage(request $request, $imageCountNum = 1)
+   public function _CompressImage(request $request, $imageCountNum = 1)
    {
        $UploadFile =  $request->file('image'); //temp file
 
@@ -89,10 +66,6 @@ class TestController extends Controller
       }
    }
 
-
-
-
-
    public function resizeImagePost(Request $request)
    {
 
@@ -115,6 +88,5 @@ class TestController extends Controller
            ->with('success','Image Upload successful')
            ->with('imageName',$input['imagename']);
    }
-
 
 }

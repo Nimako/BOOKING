@@ -14,7 +14,9 @@ use App\Models\RoomApartment;
 use App\Models\RoomDetails;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
+use App\Traits\ImageProcessor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 
@@ -138,6 +140,24 @@ class NewPropertyListingController extends Controller
                $searchedRoom = RoomApartment::find($room->id);
                $searchedRoom->common_room_amenity_id = $commonAmenities->id;
                $searchedRoom->save();
+            }
+
+            # image uploads
+            if($request->hasFile('images')) {
+               foreach ($request->file('images') as $image){
+                  $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+               }
+               # searching for record
+               if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first()) {
+                  // unlinking previous files
+                  if(!empty($room->image_paths)) {
+                     foreach ($filePaths = explode($stringGlue, $room->image_paths) as $filePath) {
+                        unlink('storage/'.$filePath);
+                     }
+                  }
+                  # updating file upload field
+                  $room->update(['image_paths' => implode($stringGlue, $fileStoragePaths)]);
+               }
             }
 
             // return statement
