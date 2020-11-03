@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 class TestController extends Controller
 {
-    
+
     public function DeleteUser($email){
 
       //$query =  DB::table('useraccount')->delete();
@@ -33,7 +33,7 @@ class TestController extends Controller
       return 40;
 
     }elseif($imageSize <= 4000000 && $imageSize >= 3000000){
-      
+
       return 50;
 
     }elseif($imageSize <= 3000000 && $imageSize >= 2000000){
@@ -51,45 +51,42 @@ class TestController extends Controller
   }
 
 
-   public function CompressImage(request $request){
+   public function CompressImage(request $request, $imageCountNum = 1)
+   {
+       $UploadFile =  $request->file('image'); //temp file
 
-    $UploadFile =  $request->file('image'); //temp file
+       //$UploadFile->getClientOriginalName();
+       //$UploadFile->getRealPath();      //temp file
+       //$UploadFile->getClientOriginalExtension();
+       //$UploadFile->getSize();
+       //$UploadFile->getClientMimeType();
 
+       if($request->hasfile('image'))
+       {
 
-    //$UploadFile->getClientOriginalName();
-    //$UploadFile->getRealPath();      //temp file
-    //$UploadFile->getClientOriginalExtension();
-    //$UploadFile->getSize();
-    //$UploadFile->getClientMimeType();
-    
-    if($request->hasfile('image'))
-    {
+         $quality = self::GenerateQuality($UploadFile->getSize());
 
-      $quality = self::GenerateQuality($UploadFile->getSize());
+         $info = getimagesize($UploadFile);
+         if ($info['mime'] == 'image/jpeg' || $info['mime'] == 'image/jpg' ) $image = imagecreatefromjpeg($UploadFile);
+         elseif ($info['mime'] == 'image/gif')  $image = imagecreatefromgif($UploadFile);
+         elseif ($info['mime'] == 'image/png')  $image = imagecreatefrompng($UploadFile);
+         elseif ($info['mime'] == 'image/webp') $image = imagecreatefromwebp($UploadFile);
 
-      $info = getimagesize($UploadFile);
-      if ($info['mime'] == 'image/jpeg' || $info['mime'] == 'image/jpg' ) $image = imagecreatefromjpeg($UploadFile);
-      elseif ($info['mime'] == 'image/gif')  $image = imagecreatefromgif($UploadFile);
-      elseif ($info['mime'] == 'image/png')  $image = imagecreatefrompng($UploadFile);
-      elseif ($info['mime'] == 'image/webp') $image = imagecreatefromwebp($UploadFile);
-      
-      $propertyUUID  = rand(); //Property UUID which will be part of the request
-      $imageCountNum = rand(); //image number which can be added to the request
-      
-      $NewFileName  = base64_encode($propertyUUID.$imageCountNum).".webp"; //rename 
+         $propertyUUID  = rand(); //Property UUID which will be part of the request
+         $imageCountNum = rand(); //image number which can be added to the request
 
-      $path = public_path().'/properties/'.date('Y').'/'.date('m').'/';
-      File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
-      $NewPath = $path.$NewFileName;
+         $NewFileName  = base64_encode($propertyUUID.$imageCountNum).".webp"; //rename
 
-      imagewebp($image,$NewPath,$quality);
-      imagedestroy($image); 
+         $path = public_path().'/properties/'.date('Y').'/'.date('m').'/';
+         File::isDirectory($path) or File::makeDirectory($path, 0777, true, true);
+         $NewPath = $path.$NewFileName;
 
-      return $NewPath;
+         imagewebp($image,$NewPath,$quality);
+         imagedestroy($image);
 
-    }
+         return $NewPath;
 
-
+      }
    }
 
 
@@ -98,22 +95,22 @@ class TestController extends Controller
 
    public function resizeImagePost(Request $request)
    {
-      
- 
+
+
        $image = $request->file('image');
        $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
-    
+
        $destinationPath = public_path('/thumbnail');
        $img = Image::make($image->getRealPath());
        $img->resize(100, 100, function ($constraint) {
            $constraint->aspectRatio();
        })->save($destinationPath.'/'.$input['imagename']);
-  
+
        $destinationPath = public_path('/images');
        $image->move($destinationPath, $input['imagename']);
-  
+
        $this->postImage->add($input);
-  
+
        return back()
            ->with('success','Image Upload successful')
            ->with('imageName',$input['imagename']);
