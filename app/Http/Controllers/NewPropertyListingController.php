@@ -20,7 +20,7 @@ use Ramsey\Uuid\Uuid;
 
 class NewPropertyListingController extends Controller
 {
-   public function onBoarding(Request $request)
+   public function OnBoarding(Request $request)
    {
       // if property exists
       if(!empty($request->id))
@@ -185,12 +185,12 @@ class NewPropertyListingController extends Controller
       }
    }
 
-   public function onBoardingDetails(Request $request)
+   public function FullOnBoardingDetails(Request $request)
    {
       // Validation
       $rules = [
          'id' => "required|exists:properties,uuid",
-         'current_onboard_stage' => "required"
+         'userid' => "required|exists:users,id"
       ];
       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
       if($validator->fails()) {
@@ -198,10 +198,10 @@ class NewPropertyListingController extends Controller
       }
       else{
          // if property record found
-         $searchedProperty = Property::where(['uuid' => $request->id])->first();
+         $searchedProperty = Property::where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
 
          // return statement
-         return ApiResponse::returnSuccessMessage($message = "Stage 6 Completed");
+         return ApiResponse::returnSuccessData($searchedProperty);
       }
    }
 }

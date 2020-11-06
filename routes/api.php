@@ -48,6 +48,7 @@ Route::group(['prefix'=>'default-items'],function(){
 // Property Listing
 Route::group(['prefix'=>'property'],function(){
     Route::post('/onboarding/save',  [NewPropertyListingController::class,'onBoarding']);
+    Route::post('/onboarding/search',  [NewPropertyListingController::class,'FullOnBoardingDetails']);
 });
 
 
