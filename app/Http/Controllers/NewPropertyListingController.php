@@ -7,7 +7,6 @@ use App\Models\CommonPropertyFacility;
 use App\Models\CommonPropertyPolicy;
 use App\Models\CommonRoomAmenities;
 use App\Models\Facility;
-use App\Models\Policy;
 use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\RoomApartment;
@@ -16,7 +15,6 @@ use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 
@@ -122,6 +120,7 @@ class NewPropertyListingController extends Controller
 
             # if amenities added to request
             if(!empty($request->amenities)) {
+               $room = RoomApartment::where(['property_id' => $searchedProperty->id])->first();
                $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
                if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
                   $doNothing = "";
