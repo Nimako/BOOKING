@@ -51,7 +51,8 @@ class Handler extends ExceptionHandler
         # Mysql Query Error
         if($exception instanceof QueryException) {
             $errorMsg = explode('(', $exception->getMessage());
-            return ApiResponse::returnErrorMessage($errorMsg[0]);
+            $details = ['FileName' => $exception->getFile(), 'LineNum' => $exception->getLine()];
+            return ApiResponse::returnErrorMessage($errorMsg[0], $details);
         }
 
         # Sending Emails Error

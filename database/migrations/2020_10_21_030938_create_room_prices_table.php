@@ -23,8 +23,8 @@ class CreateRoomPricesTable extends Migration
             // Table Fields
             $table->unsignedBigInteger('room_id');
             $table->string('guest_occupancy',255);
-            $table->float('discount')->nullable();
-            $table->float('amount')->nullable();
+            $table->string('discount', 255)->nullable();
+            $table->string('amount', 255)->nullable();
             // Foreign Keys
             $table->foreign('room_id')->references('id')->on('room_apartments');
         });

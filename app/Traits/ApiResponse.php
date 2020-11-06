@@ -33,8 +33,8 @@ trait ApiResponse
       return response()->json(['statuscode' => SUCCESS, 'message' => $message], Response::HTTP_OK);
    }
 
-   public static function returnErrorMessage($message)
+   public static function returnErrorMessage($message, $data = null)
    {
-      return response()->json(['statuscode' => ERROR, 'message' => $message], Response::HTTP_OK);
+      return response()->json(['statuscode' => ERROR, 'message' => $message, 'details' =>$data], Response::HTTP_OK);
    }
 }

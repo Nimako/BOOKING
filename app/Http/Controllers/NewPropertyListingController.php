@@ -11,6 +11,7 @@ use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\RoomApartment;
 use App\Models\RoomDetails;
+use App\Models\RoomPrices;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
@@ -157,6 +158,29 @@ class NewPropertyListingController extends Controller
                   # updating file upload field
                   $room->update(['image_paths' => implode($stringGlue, $fileStoragePaths)]);
                }
+            }
+
+            # room prices
+            if(!empty($request->price_list)) {
+               $guestOccupancy = $amount = $discounts = array();
+               $room = RoomApartment::where(['property_id' => $searchedProperty->id])->first();
+               foreach ($request->price_list as $pricesDetails) {
+                  $guestOccupancy[] = $pricesDetails['guest_occupancy'];
+                  $amount[] = $pricesDetails['amount'];
+                  $discount[] = $pricesDetails['discount'];
+               }
+               // saving data
+               if($roomPrices = RoomPrices::where(['room_id' => $room->id])->first())
+                  $doNothing = "";
+               else {
+                  $roomPrices = new RoomPrices();
+                  $roomPrices->room_id = $room->id;
+               }
+
+               $roomPrices->guest_occupancy = implode($stringGlue, $guestOccupancy);
+               $roomPrices->amount = implode($stringGlue, $amount);
+               $roomPrices->discount = implode($stringGlue, $discount);
+               $roomPrices->save();
             }
 
             // return statement
