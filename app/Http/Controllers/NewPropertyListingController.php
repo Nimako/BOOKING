@@ -144,19 +144,21 @@ class NewPropertyListingController extends Controller
 
             # image uploads
             if($request->hasFile('images')) {
-               foreach ($request->file('images') as $image){
-                  $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
-               }
                # searching for record
                if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first()) {
                   // unlinking previous files
-                  if(!empty($room->image_paths)) {
-                     foreach ($filePaths = explode($stringGlue, $room->image_paths) as $filePath) {
+                  if($room->image_paths != null) {
+                     $filePaths = explode($stringGlue, $room->image_paths);
+                     foreach ($filePaths as $filePath) {
                         unlink('storage/'.$filePath);
                      }
                   }
+                  // upload new files
+                  foreach ($request->file('images') as $image){
+                     $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+                  }
                   # updating file upload field
-                  $room->update(['image_paths' => implode($stringGlue, $fileStoragePaths)]);
+                  RoomApartment::find($room->id)->update(['image_paths' => implode($stringGlue, $fileStoragePaths)]);
                }
             }
 
