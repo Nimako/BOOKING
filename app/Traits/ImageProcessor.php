@@ -54,7 +54,7 @@ class ImageProcessor
          elseif ($info['mime'] == 'image/webp')
             $image = imagecreatefromwebp($fileResource);
 
-         $NewFileName  = microtime().'-'.$imageCountNum.".webp"; //rename
+         $NewFileName  = str_replace(' ', '-',microtime()).'-'.$imageCountNum.".webp"; //rename
          $imagePath = $storagePath.$NewFileName;
          Storage::disk('public')->put($imagePath, File::get($fileResource));
 
