@@ -58,7 +58,7 @@ class ImageProcessor
          $imagePath = $storagePath.$NewFileName;
          Storage::disk('public')->put($imagePath, File::get($fileResource));
 
-         imagewebp($image,'storage/'.$imagePath,$quality);
+         imagewebp($image,storage_path('app/public/'.$imagePath),$quality);
          imagedestroy($image);
 
          return $imagePath;
