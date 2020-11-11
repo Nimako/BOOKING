@@ -26,7 +26,6 @@ class NewPropertyListingController extends Controller
       // if property exists
       if(!empty($request->id))
       {
-         $stringGlue = "**";
          // validation
          $rules = [
             'id' => "required|exists:properties,uuid",
@@ -45,7 +44,7 @@ class NewPropertyListingController extends Controller
             if(!empty($request->latitude) || !empty($request->longitude))
                $request->request->add(['geolocation' => $request->latitude.','.$request->longitude]);
             if(!empty($request->languages_spoke))
-               $request->request->add(['languages_spoken' => implode($stringGlue, (array)$request->languages_spoke)]);
+               $request->request->add(['languages_spoken' => implode(STRING_GLUE, (array)$request->languages_spoke)]);
             if(!empty($request->property_type_id))
                $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
             if(!empty($request->room_details))
@@ -68,8 +67,8 @@ class NewPropertyListingController extends Controller
 
                // saving data
                $facilitiesByName = array_map(function($facility) { return $facility['name']; }, $searchedFacilities);
-               $propertyCommonFacilities->facility_ids = trim(implode($stringGlue, (array)$request->facilities), $stringGlue);
-               $propertyCommonFacilities->facility_text = trim(implode($stringGlue, (array)$facilitiesByName), $stringGlue);
+               $propertyCommonFacilities->facility_ids = trim(implode(STRING_GLUE, (array)$request->facilities), STRING_GLUE);
+               $propertyCommonFacilities->facility_text = trim(implode(STRING_GLUE, (array)$facilitiesByName), STRING_GLUE);
                $propertyCommonFacilities->save();
             }
 
@@ -79,8 +78,8 @@ class NewPropertyListingController extends Controller
                $subPolicyText = $subPolicyIds = "";
                foreach ($request->subpolicies as $key => $value) {
                   if($subPolicy = SubPolicy::find($key)) {
-                     $subPolicyIds .= $key.$stringGlue;
-                     $subPolicyText .= $subPolicy->name.'='.$value.$stringGlue;
+                     $subPolicyIds .= $key.STRING_GLUE;
+                     $subPolicyText .= $subPolicy->name.'='.$value.STRING_GLUE;
                   }
                }
 
@@ -92,8 +91,8 @@ class NewPropertyListingController extends Controller
                }
 
                // saving data
-               $propertyCommonPolicies->sub_policy_ids = trim($subPolicyIds, $stringGlue);
-               $propertyCommonPolicies->sub_policy_text = trim($subPolicyText, $stringGlue);
+               $propertyCommonPolicies->sub_policy_ids = trim($subPolicyIds, STRING_GLUE);
+               $propertyCommonPolicies->sub_policy_text = trim($subPolicyText, STRING_GLUE);
                $propertyCommonPolicies->save();
             }
 
@@ -132,8 +131,8 @@ class NewPropertyListingController extends Controller
 
                // saving data
                $amenitiesByName = array_map(function($amenity) { return $amenity['name']; }, $searchedAmenities);
-               $commonAmenities->popular_amenity_ids = trim(implode($stringGlue, (array)$request->amenities), $stringGlue);
-               $commonAmenities->popular_amenity_text = trim(implode($stringGlue, (array)$amenitiesByName), $stringGlue);
+               $commonAmenities->popular_amenity_ids = trim(implode(STRING_GLUE, (array)$request->amenities), STRING_GLUE);
+               $commonAmenities->popular_amenity_text = trim(implode(STRING_GLUE, (array)$amenitiesByName), STRING_GLUE);
                $commonAmenities->save();
 
                // updating link to room details
@@ -148,7 +147,7 @@ class NewPropertyListingController extends Controller
                if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first()) {
                   // unlinking previous files
                   if($room->image_paths != null) {
-                     $filePaths = explode($stringGlue, $room->image_paths);
+                     $filePaths = explode(STRING_GLUE, $room->image_paths);
                      foreach ($filePaths as $filePath) {
                         unlink('storage/'.$filePath);
                      }
@@ -158,7 +157,7 @@ class NewPropertyListingController extends Controller
                      $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
                   }
                   # updating file upload field
-                  RoomApartment::find($room->id)->update(['image_paths' => implode($stringGlue, $fileStoragePaths)]);
+                  RoomApartment::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                }
             }
 
@@ -179,9 +178,9 @@ class NewPropertyListingController extends Controller
                   $roomPrices->room_id = $room->id;
                }
 
-               $roomPrices->guest_occupancy = implode($stringGlue, $guestOccupancy);
-               $roomPrices->amount = implode($stringGlue, $amount);
-               $roomPrices->discount = implode($stringGlue, $discount);
+               $roomPrices->guest_occupancy = implode(STRING_GLUE, $guestOccupancy);
+               $roomPrices->amount = implode(STRING_GLUE, $amount);
+               $roomPrices->discount = implode(STRING_GLUE, $discount);
                $roomPrices->save();
             }
 
@@ -224,8 +223,9 @@ class NewPropertyListingController extends Controller
       }
       else{
          // if property record found
-         $searchedProperty = Property::where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
+         $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
 
+         //
          // return statement
          return ApiResponse::returnSuccessData($searchedProperty);
       }

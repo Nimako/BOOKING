@@ -19,3 +19,12 @@ define('AWAITING_APPROVAL', 0);
 define('VALIDATION_ERROR', 400);
 define('SUCCESS', 200);
 define('ERROR', 500);
+
+##### Statuses #####
+define('STATUS', array(
+   'ACTIVE' => 1
+));
+
+
+#### Others ####
+define('STRING_GLUE', '**');
