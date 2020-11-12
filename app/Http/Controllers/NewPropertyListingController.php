@@ -224,6 +224,7 @@ class NewPropertyListingController extends Controller
       else{
          // if property record found
          $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
+         //$searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
 
          //
          // return statement
