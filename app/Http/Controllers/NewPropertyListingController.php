@@ -215,7 +215,7 @@ class NewPropertyListingController extends Controller
       // Validation
       $rules = [
          'id' => "required|exists:properties,uuid",
-         'userid' => "required|exists:users,id"
+         'userid' => "required|exists:useraccount,id"
       ];
       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
       if($validator->fails()) {
