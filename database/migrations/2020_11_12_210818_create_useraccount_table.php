@@ -39,10 +39,8 @@ class CreateUseraccountTable extends Migration
            $table->string('Provider')->nullable();
            $table->enum('HasProperty',array('YES','NO'))->default('No');
            $table->enum('Verified',array('YES','NO'))->default('No');
-           $table->string('Verified')->nullable();
            $table->dateTime('FirstLogin');
            $table->dateTime('LastLogin');
-           $table->enum('Verified',array('ACTIVE','INACTIVE','BLOCK'))->default('No');
         });
     }
 
