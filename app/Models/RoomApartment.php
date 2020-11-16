@@ -20,7 +20,8 @@ class RoomApartment extends Model
    {
       $tempVar = explode(STRING_GLUE, $this->image_paths);
       foreach ($tempVar as $url) {
-         $paths[] = asset('storage/app/public/'.$url);
+         if(!empty($url))
+            $paths[] = asset('storage/app/public/'.$url);
       }
       return $this->attributes['image_pathss'] = $paths;
    }

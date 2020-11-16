@@ -14,10 +14,16 @@ class Property extends Model
        'serve_breakfast','languages_spoken','images_ids','images_paths','current_onboard_stage','created_by'
     ];
 
-    protected $hidden = ['created_at','updated_at','updated_by'];
+    protected $hidden = ['created_at','updated_at','updated_by',];
+    protected $appends = ['property_type_text'];
 
    public function Details()
    {
       return $this->hasOne('App\Models\RoomApartment');
+   }
+
+   public function getPropertyTypeTextAttribute()
+   {
+      return $this->attributes['property_type_text'] = PropertyType::find($this->property_type_id)->name;
    }
 }
