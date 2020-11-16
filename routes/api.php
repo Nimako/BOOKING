@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DefaultValuesController;
 use App\Http\Controllers\NewPropertyListingController;
+use App\Http\Controllers\PropertyListingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
@@ -47,8 +48,10 @@ Route::group(['prefix'=>'default-items'],function(){
 
 // Property Listing
 Route::group(['prefix'=>'property'],function(){
+   # Onboarding routes
     Route::post('/onboarding/save',  [NewPropertyListingController::class,'onBoarding']);
     Route::post('/onboarding/search',  [NewPropertyListingController::class,'FullOnBoardingDetails']);
+    Route::post('/onboarding/userproperties',  [PropertyListingController::class,'GetUserProperties']);
 });
 
 
