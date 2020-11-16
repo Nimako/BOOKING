@@ -25,6 +25,10 @@ define('STATUS', array(
    'ACTIVE' => 1
 ));
 
+# property status
+define('PENDING_PROPERTY_APPROVAL', 2);
+define('PROPERTY_IN_REVIEW', 3);
+define('PUBLISHED_PROPERTY', 3);
 
 #### Others ####
 define('STRING_GLUE', '**');

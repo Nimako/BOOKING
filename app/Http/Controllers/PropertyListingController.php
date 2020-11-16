@@ -46,19 +46,28 @@ class PropertyListingController extends Controller
       }
    }
 
-   public function Search(Request $request)
+   public function SearchProperty(Request $request)
    {
       // Validation
       $rules = [
-         'id' => "required|exists:properties,uuid",
          'country' => "required"
       ];
-      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
+      $validator = Validator::make($request->all(), $rules);
       if($validator->fails()) {
          return ApiResponse::returnErrorMessage($message = $validator->errors());
       }
       else {
-         $countryDetails = Country::where([''])->first();
+         #
+         if($countryDetails = Country::where(['iso' => $request->country])->first()) {
+            # variable declaration
+            if($request->property_type)
+               $property_type_condition = " and property_type_id = ".$request->property_type;
+            $where_condition = "status = ".PUBLISHED_PROPERTY." and country_id = ".$countryDetails->id.@$property_type_condition;
+            $searchedPropertys = Property::whereRaw($where_condition)->get();
+         }
+
+         # return
+         return ApiResponse::returnSuccessData($searchedPropertys);
       }
    }
 }

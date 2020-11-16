@@ -52,6 +52,9 @@ Route::group(['prefix'=>'property'],function(){
     Route::post('/onboarding/save',  [NewPropertyListingController::class,'onBoarding']);
     Route::post('/onboarding/search',  [NewPropertyListingController::class,'FullOnBoardingDetails']);
     Route::post('/onboarding/userproperties',  [PropertyListingController::class,'GetUserProperties']);
+
+    # searching of approved properties
+    Route::post('/search',  [PropertyListingController::class,'SearchProperty']);
 });
 
 
