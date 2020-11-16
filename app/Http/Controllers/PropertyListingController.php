@@ -7,6 +7,7 @@ use App\Models\Property;
 use App\Models\RoomApartment;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PropertyListingController extends Controller
@@ -59,11 +60,19 @@ class PropertyListingController extends Controller
       else {
          #
          if($countryDetails = Country::where(['iso' => $request->country])->first()) {
-            # variable declaration
+            # variable conditions
             if($request->property_type)
-               $property_type_condition = " and property_type_id = ".$request->property_type;
-            $where_condition = "status = ".PUBLISHED_PROPERTY." and country_id = ".$countryDetails->id.@$property_type_condition;
-            $searchedPropertys = Property::whereRaw($where_condition)->get();
+               $property_type_condition = " and a.property_type_id = ".$request->property_type;
+            if($request->num_of_guests)
+               $numofguest_condition = " and b.total_guest_capacity = ".$request->num_of_guests;
+            if($request->num_of_rooms)
+               $numofrooms_condition = " and b.num_of_rooms = ".$request->num_of_rooms;
+
+            $where_condition = "a.status = ".PUBLISHED_PROPERTY." and a.country_id = ".$countryDetails->id. @$property_type_condition. @$numofguest_condition. @$numofrooms_condition;
+            $query = "select * from properties a left join room_apartments b on b.property_id = a.id where ".$where_condition;
+            $searchedPropertys = DB::select($query);
+
+
          }
 
          # return
