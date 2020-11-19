@@ -31,6 +31,7 @@ class CreatePropertiesTable extends Migration
             $table->string('postal_code')->nullable();
             $table->integer('country_id')->nullable();
             $table->string('city')->nullable();
+            $table->string('area')->nullable();
             $table->text('about_us')->nullable();
             $table->text('summary_text')->nullable();
             $table->string('primary_telephone')->nullable();

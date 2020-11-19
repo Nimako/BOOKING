@@ -25,6 +25,7 @@ class CreatePropertyRatingsTable extends Migration
             $table->unsignedBigInteger('property_id');
             $table->string('criteria_ids', 255)->nullable();
             $table->text('criteria_values')->nullable();
+            $table->tinyInteger('current_rating')->nullable();
             // Foreign Keys
             $table->foreign('property_id')->references('id')->on('properties');
         });
