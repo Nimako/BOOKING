@@ -122,7 +122,7 @@ class PropertyListingController extends Controller
                   'serve_breakfast' => $property->serve_breakfast,
                   'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
                   'displayImg' => $images[0],
-                  'distance_from_location' => ceil(PropertyListingController::distance($request->latitude,$request->longitude,$geoData[0],$geoData[1],'K'))." km",
+                  'distance_from_location' => ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],$geoData[1],'K'))." km",
                   'price' => $allamount[$priceIndex],
                   'discount_given' => $allDiscounts[$priceIndex],
                   'facilities' => $facilities,

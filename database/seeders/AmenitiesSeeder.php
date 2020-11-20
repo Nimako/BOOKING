@@ -2,38 +2,45 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\NewPropertyListingController;
 use App\Models\Amenity;
 use App\Models\BedType;
 use App\Models\Country;
 use App\Models\Facility;
 use App\Models\Policy;
+use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\SubPolicy;
+use App\Models\UserAccount;
 use Illuminate\Database\Seeder;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Http\Request;
 
 class AmenitiesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        // Amenities
-       AmenitiesSeeder::CreateAmenities();
-       // Bed Types
-       AmenitiesSeeder::CreateBedTypes();
-       // Facilities
-       AmenitiesSeeder::CreateFacilities();
-       // Policy / SubPolicies
-       AmenitiesSeeder::CreatePolicy();
-       // Property Types
-       AmenitiesSeeder::CreatePropertyTypes();
-       // Countries
-       AmenitiesSeeder::createCountries();
-    }
+   /**
+    * Run the database seeds.
+    *
+    * @return void
+    */
+   public function run()
+   {
+      // Amenities
+      AmenitiesSeeder::CreateAmenities();
+      // Bed Types
+      AmenitiesSeeder::CreateBedTypes();
+      // Facilities
+      AmenitiesSeeder::CreateFacilities();
+      // Policy / SubPolicies
+      AmenitiesSeeder::CreatePolicy();
+      // Property Types
+      AmenitiesSeeder::CreatePropertyTypes();
+      // Countries
+      AmenitiesSeeder::createCountries();
+      // Creating Dummy Data
+      //AmenitiesSeeder::createNewProperty();
+      //AmenitiesSeeder::createApprovedProperty();
+   }
 
    public static function CreateAmenities()
    {
@@ -65,7 +72,8 @@ class AmenitiesSeeder extends Seeder
       BedType::insert($bedTypes);
    }
 
-   public static function CreateFacilities() {
+   public static function CreateFacilities()
+   {
       $facilityList = [
          ['name' => "Bar", 'icon_class' => "", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
          ['name' => "Suana", 'icon_class' => "", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
@@ -99,13 +107,13 @@ class AmenitiesSeeder extends Seeder
          ],
       ];
 
-      foreach ($policyList as $key=>$value) {
-         if(is_string($key)) {
+      foreach ($policyList as $key => $value) {
+         if (is_string($key)) {
             $newPolicy = new Policy();
             $newPolicy->name = $key;
             $newPolicy->save();
             // looping through details
-            $subPolicyDetails = array_map(function($param) use ($newPolicy){
+            $subPolicyDetails = array_map(function ($param) use ($newPolicy) {
                return $temp = [
                   'name' => $param['name'],
                   'options' => $param['options'],
@@ -117,7 +125,8 @@ class AmenitiesSeeder extends Seeder
       }
    }
 
-   public static function CreatePropertyTypes() {
+   public static function CreatePropertyTypes()
+   {
       $propertyList = [
          ['uuid' => Uuid::uuid6(), 'name' => "Apartment", 'description' => "Furnished and self catering accommodation where guests went the entire place.", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
          ['uuid' => Uuid::uuid6(), 'name' => "Homes", 'description' => "Properties like apartments, holiday inns homes and villas.", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
@@ -146,7 +155,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'AU', 'name' => 'AUSTRALIA', 'nicename' => 'Australia', 'iso3' => 'AUS', 'numcode' => 36, 'phonecode' => 61, 'currency' => 'AUD'],
          ['iso' => 'AT', 'name' => 'AUSTRIA', 'nicename' => 'Austria', 'iso3' => 'AUT', 'numcode' => 40, 'phonecode' => 43, 'currency' => 'EUR'],
          ['iso' => 'AZ', 'name' => 'AZERBAIJAN', 'nicename' => 'Azerbaijan', 'iso3' => 'AZE', 'numcode' => 31, 'phonecode' => 994, 'currency' => 'AZN'],
-         ['iso' => 'BS', 'name' =>  'BAHAMAS', 'nicename' => 'Bahamas', 'iso3' => 'BHS', 'numcode' => 44, 'phonecode' => 1242, 'currency' => 'BSD'],
+         ['iso' => 'BS', 'name' => 'BAHAMAS', 'nicename' => 'Bahamas', 'iso3' => 'BHS', 'numcode' => 44, 'phonecode' => 1242, 'currency' => 'BSD'],
          ['iso' => 'BH', 'name' => 'BAHRAIN', 'nicename' => 'Bahrain', 'iso3' => 'BHR', 'numcode' => 48, 'phonecode' => 973, 'currency' => 'BHD'],
          ['iso' => 'BD', 'name' => 'BANGLADESH', 'nicename' => 'Bangladesh', 'iso3' => 'BGD', 'numcode' => 50, 'phonecode' => 880, 'currency' => 'BDT'],
          ['iso' => 'BB', 'name' => 'BARBADOS', 'nicename' => 'Barbados', 'iso3' => 'BRB', 'numcode' => 52, 'phonecode' => 1246, 'currency' => 'BBD'],
@@ -158,30 +167,30 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'BT', 'name' => 'BHUTAN', 'nicename' => 'Bhutan', 'iso3' => 'BTN', 'numcode' => 64, 'phonecode' => 975, 'currency' => 'BTN'],
          ['iso' => 'BO', 'name' => 'BOLIVIA', 'nicename' => 'Bolivia', 'iso3' => 'BOL', 'numcode' => 68, 'phonecode' => 591, 'currency' => 'BOB'],
          ['iso' => 'BA', 'name' => 'BOSNIA AND HERZEGOVINA', 'nicename' => 'Bosnia and Herzegovina', 'iso3' => 'BIH', 'numcode' => 70, 'phonecode' => 387, 'currency' => 'BAM'],
-         ['iso' => 'BW', 'name' => 'BOTSWANA', 'nicename' =>  'Botswana', 'iso3' => 'BWA', 'numcode' => 72, 'phonecode' => 267, 'currency' => 'BWP'],
+         ['iso' => 'BW', 'name' => 'BOTSWANA', 'nicename' => 'Botswana', 'iso3' => 'BWA', 'numcode' => 72, 'phonecode' => 267, 'currency' => 'BWP'],
          ['iso' => 'BV', 'name' => 'BOUVET ISLAND', 'nicename' => 'Bouvet Island', 'iso3' => '', 'numcode' => '', 'phonecode' => 49, 'currency' => 'NOK'],
          ['iso' => 'BR', 'name' => 'BRAZIL', 'nicename' => 'Brazil', 'iso3' => 'BRA', 'numcode' => 76, 'phonecode' => 55, 'currency' => 'BRL'],
-         ['iso' => 'IO', 'name' =>  'BRITISH INDIAN OCEAN TERRITORY', 'nicename' => 'British Indian Ocean Territory', 'iso3' => '', 'numcode' => '', 'phonecode' => 246, 'currency' => 'USD'],
+         ['iso' => 'IO', 'name' => 'BRITISH INDIAN OCEAN TERRITORY', 'nicename' => 'British Indian Ocean Territory', 'iso3' => '', 'numcode' => '', 'phonecode' => 246, 'currency' => 'USD'],
          ['iso' => 'BG', 'name' => 'BULGARIA', 'nicename' => 'Bulgaria', 'iso3' => 'BGR', 'numcode' => 100, 'phonecode' => 359, 'currency' => 'BGN'],
-         ['iso' => 'BF', 'name' =>  'BURKINA FASO', 'nicename' => 'Burkina Faso', 'iso3' => 'BFA', 'numcode' => 854, 'phonecode' => 226, 'currency' => 'XOF'],
+         ['iso' => 'BF', 'name' => 'BURKINA FASO', 'nicename' => 'Burkina Faso', 'iso3' => 'BFA', 'numcode' => 854, 'phonecode' => 226, 'currency' => 'XOF'],
          ['iso' => 'BI', 'name' => 'BURUNDI', 'nicename' => 'Burundi', 'iso3' => 'BDI', 'numcode' => 108, 'phonecode' => 257, 'currency' => 'BIF'],
          ['iso' => 'KH', 'name' => 'CAMBODIA', 'nicename' => 'Cambodia', 'iso3' => 'KHM', 'numcode' => 116, 'phonecode' => 855, 'currency' => 'USD'],
          ['iso' => 'CM', 'name' => 'CAMEROON', 'nicename' => 'Cameroon', 'iso3' => 'CMR', 'numcode' => 120, 'phonecode' => 237, 'currency' => 'XAF'],
          ['iso' => 'CA', 'name' => 'CANADA', 'nicename' => 'Canada', 'iso3' => 'CAN', 'numcode' => 124, 'phonecode' => 1, 'currency' => 'CAD'],
          ['iso' => 'CV', 'name' => 'CAPE VERDE', 'nicename' => 'Cape Verde', 'iso3' => 'CPV', 'numcode' => 132, 'phonecode' => 238, 'currency' => 'CVE'],
-         ['iso' => 'KY', 'name' => 'CAYMAN ISLANDS', 'nicename' => 'Cayman Islands', 'iso3' =>  'CYM', 'numcode' => 136, 'phonecode' => 1345, 'currency' => 'KYD'],
+         ['iso' => 'KY', 'name' => 'CAYMAN ISLANDS', 'nicename' => 'Cayman Islands', 'iso3' => 'CYM', 'numcode' => 136, 'phonecode' => 1345, 'currency' => 'KYD'],
          ['iso' => 'CF', 'name' => 'CENTRAL AFRICAN REPUBLIC', 'nicename' => 'Central African Republic', 'iso3' => 'CAF', 'numcode' => 140, 'phonecode' => 236, 'currency' => 'XAF'],
          ['iso' => 'TD', 'name' => 'CHAD', 'nicename' => 'Chad', 'iso3' => 'TCD', 'numcode' => 148, 'phonecode' => 235, 'currency' => 'XAF'],
          ['iso' => 'CL', 'name' => 'CHILE', 'nicename' => 'Chile', 'iso3' => 'CHL', 'numcode' => 152, 'phonecode' => 56, 'currency' => 'CLP'],
-         ['iso' => 'CN', 'name' => 'CHINA', 'nicename' => 'China', 'iso3' => 'CHN', 'numcode' =>  156, 'phonecode' => 86, 'currency' => 'CNY'],
+         ['iso' => 'CN', 'name' => 'CHINA', 'nicename' => 'China', 'iso3' => 'CHN', 'numcode' => 156, 'phonecode' => 86, 'currency' => 'CNY'],
          ['iso' => 'CX', 'name' => 'CHRISTMAS ISLAND', 'nicename' => 'Christmas Island', 'iso3' => '', 'numcode' => '', 'phonecode' => 61, 'currency' => 'AUD'],
          ['iso' => 'CC', 'name' => 'COCOS (KEELING) ISLANDS', 'nicename' => 'Cocos (Keeling) Islands', 'iso3' => '', 'numcode' => '', 'phonecode' => 672, 'currency' => 'AUD'],
          ['iso' => 'CO', 'name' => 'COLOMBIA', 'nicename' => 'Colombia', 'iso3' => 'COL', 'numcode' => 170, 'phonecode' => 57, 'currency' => 'COP'],
-         ['iso' => 'KM', 'name' => 'COMOROS', 'nicename' => 'Comoros', 'iso3' => 'COM', 'numcode' => 174, 'phonecode' =>  269, 'currency' => 'KMF'],
+         ['iso' => 'KM', 'name' => 'COMOROS', 'nicename' => 'Comoros', 'iso3' => 'COM', 'numcode' => 174, 'phonecode' => 269, 'currency' => 'KMF'],
          ['iso' => 'CG', 'name' => 'CONGO', 'nicename' => 'Congo', 'iso3' => 'COG', 'numcode' => 178, 'phonecode' => 242, 'currency' => 'XAF'],
          ['iso' => 'CD', 'name' => 'CONGO, THE DEMOCRATIC REPUBLIC OF THE CONGO', 'nicename' => 'Congo, the Democratic Republic of the Congo', 'iso3' => 'COD', 'numcode' => 180, 'phonecode' => 242, 'currency' => 'CDF'],
-         ['iso' => 'CK', 'name' => 'COOK ISLANDS', 'nicename' => 'Cook Islands', 'iso3' => 'COK', 'numcode' =>  184, 'phonecode' => 682, 'currency' => 'CKD'],
-         ['iso' => 'CR', 'name' => 'COSTA RICA', 'nicename' => 'Costa Rica', 'iso3' => 'CRI', 'numcode' =>  188, 'phonecode' => 506, 'currency' => 'CRC'],
+         ['iso' => 'CK', 'name' => 'COOK ISLANDS', 'nicename' => 'Cook Islands', 'iso3' => 'COK', 'numcode' => 184, 'phonecode' => 682, 'currency' => 'CKD'],
+         ['iso' => 'CR', 'name' => 'COSTA RICA', 'nicename' => 'Costa Rica', 'iso3' => 'CRI', 'numcode' => 188, 'phonecode' => 506, 'currency' => 'CRC'],
          ['iso' => 'CI', 'name' => 'COTE D\'IVOIRE', 'nicename' => 'Cote D\'Ivoire', 'iso3' => 'CIV', 'numcode' => 384, 'phonecode' => 225, 'currency' => 'XOF'],
          ['iso' => 'HR', 'name' => 'CROATIA', 'nicename' => 'Croatia', 'iso3' => 'HRV', 'numcode' => 191, 'phonecode' => 385, 'currency' => 'HRK'],
          ['iso' => 'CU', 'name' => 'CUBA', 'nicename' => 'Cuba', 'iso3' => 'CUB', 'numcode' => 192, 'phonecode' => 53, 'currency' => 'CUP'],
@@ -194,7 +203,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'EC', 'name' => 'ECUADOR', 'nicename' => 'Ecuador', 'iso3' => 'ECU', 'numcode' => 218, 'phonecode' => 593, 'currency' => 'USD'],
          ['iso' => 'EG', 'name' => 'EGYPT', 'nicename' => 'Egypt', 'iso3' => 'EGY', 'numcode' => 818, 'phonecode' => 20, 'currency' => 'EGP'],
          ['iso' => 'SV', 'name' => 'EL SALVADOR', 'nicename' => 'El Salvador', 'iso3' => 'SLV', 'numcode' => 222, 'phonecode' => 503, 'currency' => 'USD'],
-         ['iso' =>  'EQ', 'name' => 'EQUATORIAL GUINEA', 'nicename' => 'Equatorial Guinea', 'iso3' => 'EQN', 'numcode' => 226, 'phonecode' => 240, 'currency' => 'XAF'],
+         ['iso' => 'EQ', 'name' => 'EQUATORIAL GUINEA', 'nicename' => 'Equatorial Guinea', 'iso3' => 'EQN', 'numcode' => 226, 'phonecode' => 240, 'currency' => 'XAF'],
          ['iso' => 'ER', 'name' => 'ERITREA', 'nicename' => 'Eritrea', 'iso3' => 'ERI', 'numcode' => 232, 'phonecode' => 291, 'currency' => 'ERN'],
          ['iso' => 'EE', 'name' => 'ESTONIA', 'nicename' => 'Estonia', 'iso3' => 'EST', 'numcode' => 233, 'phonecode' => 372, 'currency' => 'EUR'],
          ['iso' => 'ET', 'name' => 'ETHIOPIA', 'nicename' => 'Ethiopia', 'iso3' => 'ETH', 'numcode' => 231, 'phonecode' => 251, 'currency' => 'ETB'],
@@ -234,19 +243,19 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'IQ', 'name' => 'IRAQ', 'nicename' => 'Iraq', 'iso3' => 'IRQ', 'numcode' => 368, 'phonecode' => 964, 'currency' => 'IQD'],
          ['iso' => 'IE', 'name' => 'IRELAND', 'nicename' => 'Ireland', 'iso3' => 'IRL', 'numcode' => 372, 'phonecode' => 353, 'currency' => 'EUR'],
          ['iso' => 'IL', 'name' => 'ISRAEL', 'nicename' => 'Israel', 'iso3' => 'ISR', 'numcode' => 376, 'phonecode' => 972, 'currency' => 'ILS'],
-         ['iso' => 'IT', 'name' =>  'ITALY', 'nicename' => 'Italy', 'iso3' => 'ITA', 'numcode' => 380, 'phonecode' => 39, 'currency' => 'EUR'],
+         ['iso' => 'IT', 'name' => 'ITALY', 'nicename' => 'Italy', 'iso3' => 'ITA', 'numcode' => 380, 'phonecode' => 39, 'currency' => 'EUR'],
          ['iso' => 'JM', 'name' => 'JAMAICA', 'nicename' => 'Jamaica', 'iso3' => 'JAM', 'numcode' => 388, 'phonecode' => 1876, 'currency' => 'JMD'],
          ['iso' => 'JP', 'name' => 'JAPAN', 'nicename' => 'Japan', 'iso3' => 'JPN', 'numcode' => 392, 'phonecode' => 81, 'JPY'],
          ['iso' => 'JO', 'name' => 'JORDAN', 'nicename' => 'Jordan', 'iso3' => 'JOR', 'numcode' => 400, 'phonecode' => 962, 'currency' => 'JOD'],
          ['iso' => 'KZ', 'name' => 'KAZAKHSTAN', 'nicename' => 'Kazakhstan', 'iso3' => 'KAZ', 'numcode' => 398, 'phonecode' => 7, 'currency' => 'KZT'],
          ['iso' => 'KE', 'name' => 'KENYA', 'nicename' => 'Kenya', 'iso3' => 'KEN', 'numcode' => 404, 'phonecode' => 254, 'currency' => 'KES'],
          ['iso' => 'KI', 'name' => 'KIRIBATI', 'nicename' => 'Kiribati', 'iso3' => 'KIR', 'numcode' => 296, 'phonecode' => 686, 'currency' => 'AUD'],
-         ['iso' => 'KP', 'name' => 'KOREA, DEMOCRATIC PEOPLE\'S REPUBLIC OF', 'nicename' =>  'Korea, Democratic People\'s Republic of', 'iso3' => 'PRK', 'numcode' => 408, 'phonecode' => 850, 'currency' => 'KPW'],
+         ['iso' => 'KP', 'name' => 'KOREA, DEMOCRATIC PEOPLE\'S REPUBLIC OF', 'nicename' => 'Korea, Democratic People\'s Republic of', 'iso3' => 'PRK', 'numcode' => 408, 'phonecode' => 850, 'currency' => 'KPW'],
          ['iso' => 'KR', 'name' => 'KOREA, REPUBLIC OF KOREA', 'nicename' => 'Korea, Republic of Korea', 'iso3' => 'KOR', 'numcode' => 410, 'phonecode' => 82, 'currency' => 'KRW'],
          ['iso' => 'KW', 'name' => 'KUWAIT', 'nicename' => 'Kuwait', 'iso3' => 'KWT', 'numcode' => 414, 'phonecode' => 965, 'currency' => 'KWD'],
          ['iso' => 'KG', 'name' => 'KYRGYZSTAN', 'nicename' => 'Kyrgyzstan', 'iso3' => 'KGZ', 'numcode' => 417, 'phonecode' => 996, 'currency' => 'KGS'],
          ['iso' => 'LA', 'name' => 'LAO PEOPLE\'S DEMOCRATIC REPUBLIC', 'nicename' => 'Lao People\'s Democratic Republic', 'iso3' => 'LAO', 'numcode' => 418, 'phonecode' => 856, 'currency' => 'LAK'],
-         ['iso' => 'LV', 'name' => 'LATVIA', 'nicename' => 'Latvia', 'iso3' => 'LVA', 'numcode' =>  428, 'phonecode' => 371, 'currency' => 'EUR'],
+         ['iso' => 'LV', 'name' => 'LATVIA', 'nicename' => 'Latvia', 'iso3' => 'LVA', 'numcode' => 428, 'phonecode' => 371, 'currency' => 'EUR'],
          ['iso' => 'LB', 'name' => 'LEBANON', 'nicename' => 'Lebanon', 'iso3' => 'LBN', 'numcode' => 422, 'phonecode' => 961, 'currency' => 'LBP'],
          ['iso' => 'LS', 'name' => 'LESOTHO', 'nicename' => 'Lesotho', 'iso3' => 'LSO', 'numcode' => 426, 'phonecode' => 266, 'currency' => 'LSL'],
          ['iso' => 'LR', 'name' => 'LIBERIA', 'nicename' => 'Liberia', 'iso3' => 'LBR', 'numcode' => 430, 'phonecode' => 231, 'currency' => 'LRD'],
@@ -284,7 +293,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'NE', 'name' => 'NIGER', 'nicename' => 'Niger', 'iso3' => 'NER', 'numcode' => 562, 'phonecode' => 227, 'currency' => 'XOF'],
          ['iso' => 'NG', 'name' => 'NIGERIA', 'nicename' => 'Nigeria', 'iso3' => 'NGA', 'numcode' => 566, 'phonecode' => 234, 'currency' => 'NGN'],
          ['iso' => 'NU', 'name' => 'NIUE', 'nicename' => 'Niue', 'iso3' => 'NIU', 'numcode' => 570, 'phonecode' => 683, 'currency' => 'NID'],
-         ['iso' => 'NF', 'name' => 'NORFOLK ISLAND', 'nicename' => 'Norfolk Island', 'iso3' => 'NFK', 'numcode' => 574, 'phonecode' =>  672, 'currency' => 'AUD'],
+         ['iso' => 'NF', 'name' => 'NORFOLK ISLAND', 'nicename' => 'Norfolk Island', 'iso3' => 'NFK', 'numcode' => 574, 'phonecode' => 672, 'currency' => 'AUD'],
          ['iso' => 'MP', 'name' => 'NORTHERN MARIANA ISLANDS', 'nicename' => 'Northern Mariana Islands', 'iso3' => 'MNP', 'numcode' => 580, 'phonecode' => 1670, 'currency' => 'USD'],
          ['iso' => 'NO', 'name' => 'NORWAY', 'nicename' => 'Norway', 'iso3' => 'NOR', 'numcode' => 578, 'phonecode' => 47, 'currency' => 'NOK'],
          ['iso' => 'OM', 'name' => 'OMAN', 'nicename' => 'Oman', 'iso3' => 'OMN', 'numcode' => 512, 'phonecode' => 968, 'currency' => 'OMR'],
@@ -295,20 +304,20 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'PG', 'name' => 'PAPUA NEW GUINEA', 'nicename' => 'Papua New Guinea', 'iso3' => 'PNG', 'numcode' => 598, 'phonecode' => 675, 'currency' => 'PGK'],
          ['iso' => 'PY', 'name' => 'PARAGUAY', 'nicename' => 'Paraguay', 'iso3' => 'PRY', 'numcode' => 600, 'phonecode' => 595, 'currency' => 'PYG'],
          ['iso' => 'PE', 'name' => 'PERU', 'nicename' => 'Peru', 'iso3' => 'PER', 'numcode' => 604, 'phonecode' => 51, 'currency' => 'PEN'],
-         ['iso' => 'PH', 'name' => 'PHILIPPINES', 'nicename' => 'Philippines', 'iso3' => 'PHL', 'numcode' => 608, 'phonecode' =>  63, 'currency' => 'PHP'],
+         ['iso' => 'PH', 'name' => 'PHILIPPINES', 'nicename' => 'Philippines', 'iso3' => 'PHL', 'numcode' => 608, 'phonecode' => 63, 'currency' => 'PHP'],
          ['iso' => 'PN', 'name' => 'PITCAIRN', 'nicename' => 'Pitcairn', 'iso3' => 'PCN', 'numcode' => 612, 'phonecode' => 0, 'currency' => 'NZD'],
          ['iso' => 'PL', 'name' => 'POLAND', 'nicename' => 'Poland', 'iso3' => 'POL', 'numcode' => 616, 'phonecode' => 48, 'currency' => 'PLN'],
          ['iso' => 'PT', 'name' => 'PORTUGAL', 'nicename' => 'Portugal', 'iso3' => 'PRT', 'numcode' => 620, 'phonecode' => 351, 'currency' => 'EUR'],
          ['iso' => 'PR', 'name' => 'PUERTO RICO', 'nicename' => 'Puerto Rico', 'iso3' => 'PRI', 'numcode' => 630, 'phonecode' => 1787, 'currency' => 'USD'],
          ['iso' => 'QA', 'name' => 'QATAR', 'nicename' => 'Qatar', 'iso3' => 'QAT', 'numcode' => 634, 'phonecode' => 974, 'currency' => 'QAR'],
-         ['iso' => 'RE', 'name' =>  'REUNION', 'nicename' => 'Reunion', 'iso3' => 'REU', 'numcode' => 638, 'phonecode' => 262, 'currency' => 'EUR'],
-         ['iso' => 'RO', 'name' =>  'ROMANIA', 'nicename' => 'Romania', 'iso3' => 'ROM', 'numcode' => 642, 'phonecode' => 40, 'currency' => 'RON'],
+         ['iso' => 'RE', 'name' => 'REUNION', 'nicename' => 'Reunion', 'iso3' => 'REU', 'numcode' => 638, 'phonecode' => 262, 'currency' => 'EUR'],
+         ['iso' => 'RO', 'name' => 'ROMANIA', 'nicename' => 'Romania', 'iso3' => 'ROM', 'numcode' => 642, 'phonecode' => 40, 'currency' => 'RON'],
          ['iso' => 'RU', 'name' => 'RUSSIAN FEDERATION', 'nicename' => 'Russian Federation', 'iso3' => 'RUS', 'numcode' => 643, 'phonecode' => 70, 'currency' => 'RUB'],
          ['iso' => 'RW', 'name' => 'RWANDA', 'nicename' => 'Rwanda', 'iso3' => 'RWA', 'numcode' => 646, 'phonecode' => 250, 'currency' => 'RWF'],
          ['iso' => 'SH', 'name' => 'SAINT HELENA', 'nicename' => 'Saint Helena', 'iso3' => 'SHN', 'numcode' => 654, 'phonecode' => 290, 'currency' => 'SHP'],
          ['iso' => 'KN', 'name' => 'SAINT KITTS AND NEVIS', 'nicename' => 'Saint Kitts and Nevis', 'iso3' => 'KNA', 'numcode' => 659, 'phonecode' => 1869, 'currency' => 'XCD'],
          ['iso' => 'LC', 'name' => 'SAINT LUCIA', 'nicename' => 'Saint Lucia', 'iso3' => 'LCA', 'numcode' => 662, 'phonecode' => 1758, 'currency' => 'XCD'],
-         ['iso' => 'PM', 'name' => 'SAINT PIERRE AND MIQUELON', 'nicename' => 'Saint Pierre and Miquelon', 'iso3' =>  'SPM', 'numcode' => 666, 'phonecode' => 508, 'currency' => 'EUR'],
+         ['iso' => 'PM', 'name' => 'SAINT PIERRE AND MIQUELON', 'nicename' => 'Saint Pierre and Miquelon', 'iso3' => 'SPM', 'numcode' => 666, 'phonecode' => 508, 'currency' => 'EUR'],
          ['iso' => 'VC', 'name' => 'SAINT VINCENT AND THE GRENADINES', 'nicename' => 'Saint Vincent and the Grenadines', 'iso3' => 'VCT', 'numcode' => 670, 'phonecode' => 1784, 'currency' => 'XCD'],
          ['iso' => 'WS', 'name' => 'SAMOA', 'nicename' => 'Samoa', 'iso3' => 'WSM', 'numcode' => 882, 'phonecode' => 684, 'currency' => 'WST'],
          ['iso' => 'SM', 'name' => 'SAN MARINO', 'nicename' => 'San Marino', 'iso3' => 'SMR', 'numcode' => 674, 'phonecode' => 378, 'currency' => 'EUR'],
@@ -323,7 +332,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'SB', 'name' => 'SOLOMON ISLANDS', 'nicename' => 'Solomon Islands', 'iso3' => 'SLB', 'numcode' => 90, 'phonecode' => 677, 'currency' => 'SBD'],
          ['iso' => 'SO', 'name' => 'SOMALIA', 'nicename' => 'Somalia', 'iso3' => 'SOM', 'numcode' => 706, 'phonecode' => 252, 'currency' => 'SOS'],
          ['iso' => 'ZA', 'name' => 'SOUTH AFRICA', 'nicename' => 'South Africa', 'iso3' => 'ZAF', 'numcode' => 710, 'phonecode' => 27, 'currency' => 'ZAR'],
-         ['iso' => 'GS', 'name' => 'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS', 'nicename' => 'South Georgia and the South Sandwich Islands', 'iso3' => '', 'numcode' => '', 'phonecode' =>  0, 'currency' => 'GBP'],
+         ['iso' => 'GS', 'name' => 'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS', 'nicename' => 'South Georgia and the South Sandwich Islands', 'iso3' => '', 'numcode' => '', 'phonecode' => 0, 'currency' => 'GBP'],
          ['iso' => 'ES', 'name' => 'SPAIN', 'nicename' => 'Spain', 'iso3' => 'ESP', 'numcode' => 724, 'phonecode' => 34, 'currency' => 'EUR'],
          ['iso' => 'LK', 'name' => 'SRI LANKA', 'nicename' => 'Sri Lanka', 'iso3' => 'LKA', 'numcode' => 144, 'phonecode' => 94, 'currency' => 'LKR'],
          ['iso' => 'SD', 'name' => 'SUDAN', 'nicename' => 'Sudan', 'iso3' => 'SDN', 'numcode' => 736, 'phonecode' => 249, 'currency' => 'SDG'],
@@ -334,7 +343,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'SW', 'name' => 'SWITZERLAND', 'nicename' => 'Switzerland', 'iso3' => 'SWE', 'numcode' => 756, 'phonecode' => 41, 'currency' => 'CHF'],
          ['iso' => 'SY', 'name' => 'SYRIAN ARAB REPUBLIC', 'nicename' => 'Syrian Arab Republic', 'iso3' => 'SYR', 'numcode' => 760, 'phonecode' => 963, 'currency' => 'SYP'],
          ['iso' => 'TW', 'name' => 'TAIWAN, PROVINCE OF CHINA', 'nicename' => 'Taiwan, Province of China', 'iso3' => 'TWN', 'numcode' => 158, 'phonecode' => 886, 'currency' => 'TWD'],
-         ['iso' => 'TJ', 'name' => 'TAJIKISTAN', 'nicename' =>  'Tajikistan', 'iso3' => 'TJK', 'numcode' => 762, 'phonecode' => 992, 'currency' => 'TJS'],
+         ['iso' => 'TJ', 'name' => 'TAJIKISTAN', 'nicename' => 'Tajikistan', 'iso3' => 'TJK', 'numcode' => 762, 'phonecode' => 992, 'currency' => 'TJS'],
          ['iso' => 'TZ', 'name' => 'TANZANIA, UNITED REPUBLIC OF TANZANIA', 'nicename' => 'Tanzania, United Republic of Tanzania', 'iso3' => 'TZA', 'numcode' => 834, 'phonecode' => 255, 'currency' => 'TZS'],
          ['iso' => 'TH', 'name' => 'THAILAND', 'nicename' => 'Thailand', 'iso3' => 'THA', 'numcode' => 764, 'phonecode' => 66, 'currency' => 'THB'],
          ['iso' => 'TL', 'name' => 'TIMOR-LESTE', 'nicename' => 'Timor-Leste', 'iso3' => '', 'numcode' => '', 'phonecode' => 670, 'currency' => 'USD'],
@@ -367,7 +376,7 @@ class AmenitiesSeeder extends Seeder
          ['iso' => 'ZW', 'name' => 'ZIMBABWE', 'nicename' => 'Zimbabwe', 'iso3' => 'ZWE', 'numcode' => 716, 'phonecode' => 263, 'currency' => 'ZBD'],
          ['iso' => 'ME', 'name' => 'MONTENEGRO', 'nicename' => 'Montenegro', 'iso3' => 'MNE', 'numcode' => 499, 'phonecode' => 382, 'currency' => 'EUR'],
          ['iso' => 'BQ', 'name' => 'BONAIRE, SINT EUSTATIUS AND SABA', 'nicename' => 'Bonaire, Sint Eustatius and Saba', 'iso3' => 'BES', 'numcode' => 535, 'phonecode' => 599, 'currency' => 'USD'],
-         ['iso' => 'CW', 'name' => 'CURACAO', 'nicename' => 'Curacao', 'iso3' => 'CUW', 'numcode' =>  531, 'phonecode' => 599, 'currency' => 'ANG'],
+         ['iso' => 'CW', 'name' => 'CURACAO', 'nicename' => 'Curacao', 'iso3' => 'CUW', 'numcode' => 531, 'phonecode' => 599, 'currency' => 'ANG'],
          ['iso' => 'GG', 'name' => 'GUERNSEY', 'nicename' => 'Guernsey', 'iso3' => 'GGY', 'numcode' => 831, 'phonecode' => 44, 'currency' => 'GBP'],
          ['iso' => 'IM', 'name' => 'ISLE OF MAN', 'nicename' => 'Isle of Man', 'iso3' => 'IMN', 'numcode' => 833, 'phonecode' => 44, 'currency' => 'GBP'],
          ['iso' => 'JE', 'name' => 'JERSEY', 'nicename' => 'Jersey', 'iso3' => 'JEY', 'numcode' => 832, 'phonecode' => 44, 'currency' => 'JEP'],
@@ -379,5 +388,129 @@ class AmenitiesSeeder extends Seeder
       ];
 
       Country::insert($listOfCountries);
+   }
+
+   public static function createNewProperty()
+   {
+      // creating useraccount
+      $useraccountDetails = [
+        'FirstName' => "Osborne",
+         'LastName' => "Mordreds",
+         'Email' => "osborne.mordred@gmail.com",
+         'PhoneNum' => '233541786220',
+         'UserPassword' => password_hash('P@$$w0rd', PASSWORD_DEFAULT),
+         'DisplayName' => "OsMordreds",
+         'DateBirth' => "2020-09-07",
+         'Country' => "Ghana",
+         'City' => "Accra",
+         'Region' => "Greatre-Accra",
+         'HasProperty' => 'YES',
+         'Verified' => 'YES',
+         'FirstLogin' => date('Y-m-d H:i:s')
+      ];
+      $userInsertResult = UserAccount::create($useraccountDetails);
+
+      // creating property
+      $property = [
+         'uuid' => Uuid::uuid6(),
+         "name" => "Golden Tulip Annex",
+         "street_address_1" => "No.12 E West-street, Abelemkpe - Accra",
+         "property_type_id" => PropertyType::find(1)->id,
+         "country_id" => 80,
+         "city" => "accra",
+         "created_by" => $userInsertResult->id,
+         "area" => "Airport"
+      ];
+      $createPropertyResult = Property::create($property);
+
+      // property details
+      $propertyDetails = [
+         "id" => $createPropertyResult->uuid,
+         "current_onboard_stage" => "Stage5",
+         "created_by" => 1,
+
+         "latitude" => 5.550000,
+         "longitude" => -0.020000,
+         "facilities" => [1,3],
+         "serve_breakfast" => "Yes",
+         "languages_spoke" => ["English","Twi","French"],
+         "subpolicies" => ["1" =>"Yes","2" => "No"],
+
+         "total_guest_capacity" => 4,
+         "total_bathrooms" => 3,
+         "room_details" => [
+            ["name" => "bedroom1", "bed_type" => 1, "bed_qty" => 1],
+            ["name" => "bedroom2", "bed_type" => 1, "bed_qty" => 1],
+            ["name" => "bedroom3", "bed_type" => 1, "bed_qty" => 1]
+         ],
+         "num_of_rooms" => 3,
+         "amenities" => [1, 3, 2],
+         "price_list" => [
+            ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
+            ["guest_occupancy" => 3, "amount" => 90, "discount" => 10],
+            ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
+         ],
+         "summary_text" => "this  is a long text"
+      ];
+
+      $request = new Request();
+      $request->merge($propertyDetails);
+
+      $newProperty = new NewPropertyListingController();
+      return $newProperty->OnBoarding($request);
+   }
+
+   public static function createApprovedProperty()
+   {
+      // creating property
+      $property = [
+         'uuid' => Uuid::uuid6(),
+         "name" => "Golden Tulip Annex",
+         "street_address_1" => "No.12 E West-street, Abelemkpe - Accra",
+         "property_type_id" => PropertyType::find(1)->id,
+         "country_id" => 80,
+         "city" => "accra",
+         "created_by" => 1,
+         "area" => "Airport",
+         'status' => 3
+      ];
+      $createPropertyResult = Property::create($property);
+
+      // property details
+      $propertyDetails = [
+         "id" => $createPropertyResult->uuid,
+         "property_id" => $createPropertyResult->id,
+         "current_onboard_stage" => "Completed",
+         "created_by" => 1,
+
+         "latitude" => 5.550000,
+         "longitude" => -0.020000,
+         "facilities" => [1,3],
+         "serve_breakfast" => "Yes",
+         "languages_spoke" => ["English","Twi","French"],
+         "subpolicies" => ["1" =>"Yes","2" => "No"],
+
+         "total_guest_capacity" => 4,
+         "total_bathrooms" => 3,
+         "room_details" => [
+            ["name" => "bedroom1", "bed_type" => 1, "bed_qty" => 1],
+            ["name" => "bedroom2", "bed_type" => 1, "bed_qty" => 1],
+            ["name" => "bedroom3", "bed_type" => 1, "bed_qty" => 1]
+         ],
+         "num_of_rooms" => 3,
+         "amenities" => [1, 3, 2],
+         "price_list" => [
+            ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
+            ["guest_occupancy" => 3, "amount" => 90, "discount" => 10],
+            ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
+         ],
+         "summary_text" => "this  is a long text"
+      ];
+
+      $request = new Request();
+      $request->merge($propertyDetails);
+
+      $newProperty = new NewPropertyListingController();
+      $newProperty->OnBoarding($request);
    }
 }

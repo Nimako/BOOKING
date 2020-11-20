@@ -55,6 +55,7 @@ Route::group(['prefix'=>'property'],function(){
 
     # searching of approved properties
     Route::post('/search',  [PropertyListingController::class,'SearchProperty']);
+    Route::post('/create-dummy',  [NewPropertyListingController::class,'CreateDummydata']);
 });
 
 

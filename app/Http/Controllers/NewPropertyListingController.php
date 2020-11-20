@@ -15,6 +15,7 @@ use App\Models\RoomPrices;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
+use Database\Seeders\AmenitiesSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
@@ -39,19 +40,21 @@ class NewPropertyListingController extends Controller
          else {
             // if property record found
             $searchedProperty = Property::where(['uuid' => $request->id])->first();
+            //variable declaration
+            $addToRequestObj['property_id'] = $searchedProperty->id;
 
             // property data pre-processing
             if(!empty($request->latitude) || !empty($request->longitude))
-               $request->request->add(['geolocation' => $request->latitude.','.$request->longitude]);
+               $addToRequestObj['geolocation'] = $request->latitude.','.$request->longitude;
             if(!empty($request->languages_spoke))
-               $request->request->add(['languages_spoken' => implode(STRING_GLUE, (array)$request->languages_spoke)]);
+               $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
-               $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
+               $addToRequestObj['property_type_id'] = PropertyType::where(['uuid' => $request->property_type_id])->first()->id;
             if(!empty($request->room_details))
-               $request->request->add(['num_of_rooms' => sizeof($request->room_details)]);
+               $addToRequestObj['num_of_rooms'] = sizeof($request->room_details);
 
-            $request->request->add(['property_id' => $searchedProperty->id]);
-
+            // adding to request obj
+            $request->merge($addToRequestObj);
             // saving property info
             $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
 
@@ -230,5 +233,14 @@ class NewPropertyListingController extends Controller
          // return statement
          return ApiResponse::returnSuccessData($searchedProperty);
       }
+   }
+
+   public function CreateDummydata()
+   {
+      $a = new AmenitiesSeeder();
+      $a->createNewProperty();
+      $a->createApprovedProperty();
+
+      return "success";
    }
 }
