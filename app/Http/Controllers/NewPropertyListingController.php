@@ -9,7 +9,7 @@ use App\Models\CommonRoomAmenities;
 use App\Models\Facility;
 use App\Models\Property;
 use App\Models\PropertyType;
-use App\Models\RoomApartment;
+use App\Models\ApartmentDetail;
 use App\Models\RoomDetails;
 use App\Models\RoomPrices;
 use App\Models\SubPolicy;
@@ -102,10 +102,10 @@ class NewPropertyListingController extends Controller
             // apartment details
             if(!empty($request->room_size) || !empty($request->total_guest_capacity) || !empty($request->total_rooms) || !empty($request->total_bathrooms))
             {
-               if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first())
+               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first())
                   $room->update($request->all());
                else
-                  $room = RoomApartment::create($request->all());
+                  $room = ApartmentDetail::create($request->all());
 
                if(!empty($request->room_details))
                {
@@ -113,8 +113,9 @@ class NewPropertyListingController extends Controller
                      $bedDetails[] = [
                         'room_id' => $room->id,
                         'room_name' => $detail['name'],
-                        'bed_type' => $detail['bed_type'],
-                        'bed_type_qty' => $detail['bed_qty']
+                        'similiar_rooms' => @$detail['similiar_rooms'],
+                        'bed_types' => json_encode($detail['bed_details']),
+                        'added_amenities' => json_encode(@$detail['added_amenities']),
                      ];
                   }
                   RoomDetails::insert($bedDetails);
@@ -123,7 +124,7 @@ class NewPropertyListingController extends Controller
 
             # if amenities added to request
             if(!empty($request->amenities)) {
-               $room = RoomApartment::where(['property_id' => $searchedProperty->id])->first();
+               $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
                $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
                if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
                   $doNothing = "";
@@ -139,7 +140,7 @@ class NewPropertyListingController extends Controller
                $commonAmenities->save();
 
                // updating link to room details
-               $searchedRoom = RoomApartment::find($room->id);
+               $searchedRoom = ApartmentDetail::find($room->id);
                $searchedRoom->common_room_amenity_id = $commonAmenities->id;
                $searchedRoom->save();
             }
@@ -147,7 +148,7 @@ class NewPropertyListingController extends Controller
             # image uploads
             if($request->hasFile('images')) {
                # searching for record
-               if($room = RoomApartment::where(['property_id' => $searchedProperty->id])->first()) {
+               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
                   // unlinking previous files
                   if($room->image_paths != null) {
                      $filePaths = explode(STRING_GLUE, $room->image_paths);
@@ -160,14 +161,14 @@ class NewPropertyListingController extends Controller
                      $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
                   }
                   # updating file upload field
-                  RoomApartment::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
+                  ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                }
             }
 
             # room prices
             if(!empty($request->price_list)) {
                $guestOccupancy = $amount = $discounts = array();
-               $room = RoomApartment::where(['property_id' => $searchedProperty->id])->first();
+               $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
                foreach ($request->price_list as $pricesDetails) {
                   $guestOccupancy[] = $pricesDetails['guest_occupancy'];
                   $amount[] = $pricesDetails['amount'];
@@ -226,10 +227,8 @@ class NewPropertyListingController extends Controller
       }
       else{
          // if property record found
-         $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
-         //$searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->where('current_onboard_stage', '<>', "Completed")->first();
+         $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->first();
 
-         //
          // return statement
          return ApiResponse::returnSuccessData($searchedProperty);
       }

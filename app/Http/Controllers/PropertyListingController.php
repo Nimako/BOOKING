@@ -9,7 +9,7 @@ use App\Models\Country;
 use App\Models\Facility;
 use App\Models\Property;
 use App\Models\PropertyRating;
-use App\Models\RoomApartment;
+use App\Models\ApartmentDetail;
 use App\Models\RoomDetails;
 use App\Models\RoomPrices;
 use App\Traits\ApiResponse;
@@ -35,7 +35,7 @@ class PropertyListingController extends Controller
          if($searchedPropertys = Property::where(['created_by' => $request->userid])->get()) {
             foreach ($searchedPropertys as $property) {
                # other searches
-               $apartmentDetails = RoomApartment::where(['property_id' => $property->id])->first();
+               $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
 
                $responseData[] = [
                   'uuid' => $property->uuid,
@@ -85,15 +85,15 @@ class PropertyListingController extends Controller
             # query build and result
             $selectFields = trim(implode(',', array('a.id','uuid','name','geolocation','street_address_1','primary_telephone',
                'serve_breakfast','languages_spoken','image_paths','b.id as room_id','total_guest_capacity','total_bathrooms',
-               'num_of_rooms','a.summary_text','a.about_us'
+               'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage'
             )), ',');
-            $leftJoins = implode('', array('left join room_apartments b on b.property_id = a.id',
+            $leftJoins = implode('', array('left join apartment_details b on b.property_id = a.id',
                //'left join common_room_amenities c on c.id = b.common_room_amenity_id'
             ));
             $query = "select {$selectFields} from properties a {$leftJoins} where ".$where_condition;
             $searchedPropertys = DB::select($query);
 
-            foreach ($searchedPropertys as $property) { //return (array)$property;
+            foreach ($searchedPropertys as $property) {
                # variables
                $images = explode(STRING_GLUE, $property->image_paths);
                $geoData = explode(',', $property->geolocation);
@@ -115,10 +115,11 @@ class PropertyListingController extends Controller
 
                $responseData[] = [
                   'uuid' => $property->uuid,
+                  'current_onboard_stage' => $property->current_onboard_stage,
+                  'status' => PROPERTY_STATUSES[$property->property_status],
                   'name' => $property->name,
                   'geolocation' => $property->geolocation,
                   'street_address_1' => $property->street_address_1,
-                  'primary_telephone' => $property->primary_telephone,
                   'serve_breakfast' => $property->serve_breakfast,
                   'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
                   'displayImg' => $images[0],

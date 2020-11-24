@@ -10,18 +10,21 @@ class RoomDetails extends Model
     use HasFactory;
 
 
-   protected $hidden = ['id','created_at','updated_at','status','updated_by','created_by','room_id','bed_type','added_amenity_ids'];
+   protected $hidden = ['id','created_at','updated_at','status','updated_by','created_by','room_id'];
 
-   protected $appends = ['bed_type_name'];
+   //protected $appends = ['bed_type_name'];
 
-   public function getBedTypeNameAttribute()
+   public function getBedTypesAttribute($value)
    {
-      return $this->attributes['bed_type_name'] = BedType::find($this->bed_type)->name;
+      $jsonData = json_decode($value);
+      $tempVar = array_map(function($data){return $data->bed_type;}, $jsonData);
+
+      return BedType::find($tempVar);
    }
 
    public function getAddedAmenityTextAttribute()
    {
       if(!empty($this->added_amenity_text))
-         return $this->added_amenity_text = explode(STRING_GLUE, $this->added_amenity_text);
+         return $this->added_amenity_text = json_decode($this->added_amenity_text);
    }
 }

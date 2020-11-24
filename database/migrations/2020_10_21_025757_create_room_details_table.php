@@ -23,12 +23,16 @@ class CreateRoomDetailsTable extends Migration
             // Table Fields
             $table->unsignedBigInteger('room_id');
             $table->string('room_name',255);
-            $table->string('bed_type',255)->nullable();
-            $table->integer('bed_type_qty')->nullable();
-            $table->string('added_amenity_ids', 255)->nullable();
-            $table->text('added_amenity_text')->nullable();
+            $table->integer('similiar_rooms')->nullable()->default(1);
+            $table->text('bed_types')->nullable();
+            $table->text('added_amenities')->nullable();
+
+            //$table->string('bed_type',255)->nullable();
+            //$table->integer('bed_type_qty')->nullable();
+            //$table->string('added_amenity_ids', 255)->nullable();
+            //$table->text('added_amenity_text')->nullable();
             // Foreign Keys
-            $table->foreign('room_id')->references('id')->on('room_apartments');
+            //$table->foreign('room_id')->references('id')->on('room_apartments');
         });
     }
 

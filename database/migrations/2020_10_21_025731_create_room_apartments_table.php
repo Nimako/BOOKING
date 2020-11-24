@@ -30,7 +30,7 @@ class CreateRoomApartmentsTable extends Migration
             $table->string('total_bathrooms')->nullable();
             $table->string('num_of_rooms')->nullable();
             // Foreign Keys
-            $table->foreign('property_id')->references('id')->on('properties');
+            //$table->foreign('property_id')->references('id')->on('properties');
             //$table->foreign('common_room_amenity_id')->references('id')->on('common_room_amenities');
         });
     }

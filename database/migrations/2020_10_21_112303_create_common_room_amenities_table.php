@@ -26,7 +26,7 @@ class CreateCommonRoomAmenitiesTable extends Migration
             $table->text('popular_amenity_text')->nullable();
             $table->float('price')->nullable();
             // Foreign Keys
-            $table->foreign('room_id')->references('id')->on('room_apartments');
+            //$table->foreign('room_id')->references('id')->on('room_apartments');
         });
     }
 

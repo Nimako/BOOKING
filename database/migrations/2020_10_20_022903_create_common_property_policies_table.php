@@ -25,7 +25,7 @@ class CreateCommonPropertyPoliciesTable extends Migration
             $table->string('sub_policy_ids', 255)->nullable();
             $table->text('sub_policy_text')->nullable();
             // Foreign Keys
-            $table->foreign('property_id')->references('id')->on('properties');
+            //$table->foreign('property_id')->references('id')->on('properties');
         });
     }
 

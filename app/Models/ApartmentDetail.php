@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RoomApartment extends Model
+class ApartmentDetail extends Model
 {
     use HasFactory;
 
@@ -23,7 +23,7 @@ class RoomApartment extends Model
          if(!empty($url))
             $paths[] = asset('storage/app/public/'.$url);
       }
-      return $this->attributes['image_pathss'] = $paths;
+      return $this->attributes['image_pathss'] = @$paths;
    }
 
    public function getAmenitiesAttribute()

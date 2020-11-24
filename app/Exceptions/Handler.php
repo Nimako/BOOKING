@@ -49,11 +49,11 @@ class Handler extends ExceptionHandler
     public function render($request, $exception)
     {
         # Mysql Query Error
-        if($exception instanceof QueryException) {
+        /*if($exception instanceof QueryException) {
             $errorMsg = explode('(', $exception->getMessage());
             $details = ['FileName' => $exception->getFile(), 'LineNum' => $exception->getLine()];
             return ApiResponse::returnErrorMessage($errorMsg[0], $details);
-        }
+        }*/
 
         # Sending Emails Error
         /*if($exception instanceof Swift_TransportException) {

@@ -25,7 +25,7 @@ class CreateCommonPropertyFacilitiesTable extends Migration
             $table->string('facility_ids', 255)->nullable();
             $table->text('facility_text')->nullable();
             // Foreign Keys
-            $table->foreign('property_id')->references('id')->on('properties');
+            //$table->foreign('property_id')->references('id')->on('properties');
         });
     }
 

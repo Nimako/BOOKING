@@ -26,7 +26,7 @@ class CreateRoomPricesTable extends Migration
             $table->string('discount', 255)->nullable();
             $table->string('amount', 255)->nullable();
             // Foreign Keys
-            $table->foreign('room_id')->references('id')->on('room_apartments');
+            //$table->foreign('room_id')->references('id')->on('room_apartments');
         });
     }
 

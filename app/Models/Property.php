@@ -15,15 +15,20 @@ class Property extends Model
     ];
 
     protected $hidden = ['created_at','updated_at','updated_by',];
-    protected $appends = ['property_type_text'];
+    protected $appends = ['property_type_text','text_status'];
 
    public function Details()
    {
-      return $this->hasOne('App\Models\RoomApartment');
+      return $this->hasOne('App\Models\ApartmentDetail');
    }
 
    public function getPropertyTypeTextAttribute()
    {
       return $this->attributes['property_type_text'] = PropertyType::find($this->property_type_id)->name;
+   }
+
+   public function getTextStatusAttribute()
+   {
+      return $this->attributes['text_status'] = PROPERTY_STATUSES[$this->status];
    }
 }

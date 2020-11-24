@@ -30,5 +30,11 @@ define('PENDING_PROPERTY_APPROVAL', 2);
 define('PROPERTY_IN_REVIEW', 3);
 define('PUBLISHED_PROPERTY', 3);
 
+define('PROPERTY_STATUSES', array(
+   1 => 'Pending-Approval',
+   2 => 'Pending-Approval',
+   3 => 'Published',
+));
+
 #### Others ####
 define('STRING_GLUE', '**');

@@ -45,7 +45,7 @@ class CreatePropertiesTable extends Migration
             $table->text('images_paths')->nullable();
             $table->string('current_onboard_stage')->nullable();
             // Foreign Keys
-            $table->foreign('property_type_id')->references('id')->on('property_types');
+            //$table->foreign('property_type_id')->references('id')->on('property_types');
         });
     }
 

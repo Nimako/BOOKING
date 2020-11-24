@@ -62,11 +62,14 @@ class AmenitiesSeeder extends Seeder
    public static function CreateBedTypes()
    {
       $bedTypes = [
-         ['name' => "Single Bed", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => "Double Bed", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => "KingSize Bed", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => "QueenSize Bed", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => "Sofa Bed", 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Single Bed", 'created_by' => 0, 'expected_sleeps' => 1, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Double Bed", 'created_by' => 0, 'expected_sleeps' => 2, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Queen-Size Bed", 'created_by' => 0, 'expected_sleeps' => 2, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "King-Size Bed", 'created_by' => 0, 'expected_sleeps' => 2, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Extra-Large Double Bed (Super-King-Size)", 'expected_sleeps' => 2, 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Bunk Bed", 'created_by' => 0, 'expected_sleeps' => 1, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Sofa Bed", 'created_by' => 0, 'expected_sleeps' => 1, 'created_at' => date('Y-m-d H:i:s')],
+         ['name' => "Futon Mat", 'created_by' => 0, 'expected_sleeps' => 1, 'created_at' => date('Y-m-d H:i:s')],
       ];
 
       BedType::insert($bedTypes);
@@ -398,12 +401,12 @@ class AmenitiesSeeder extends Seeder
          'LastName' => "Mordreds",
          'Email' => "osborne.mordred@gmail.com",
          'PhoneNum' => '233541786220',
-         'UserPassword' => password_hash('P@$$w0rd', PASSWORD_DEFAULT),
+         'UserPassword' => password_hash('123456', PASSWORD_DEFAULT),
          'DisplayName' => "OsMordreds",
-         'DateBirth' => "2020-09-07",
+         'DateBirth' => date('Y-m-d'),
          'Country' => "Ghana",
          'City' => "Accra",
-         'Region' => "Greatre-Accra",
+         'Region' => "Greater-Accra",
          'HasProperty' => 'YES',
          'Verified' => 'YES',
          'FirstLogin' => date('Y-m-d H:i:s')
@@ -412,39 +415,74 @@ class AmenitiesSeeder extends Seeder
 
       // creating property
       $property = [
-         'uuid' => Uuid::uuid6(),
-         "name" => "Golden Tulip Annex",
-         "street_address_1" => "No.12 E West-street, Abelemkpe - Accra",
-         "property_type_id" => PropertyType::find(1)->id,
+         'uuid' => "1eb2cdb7-12b0-6d5c-bd0e-00e04c680037",
+         "name" => "Damian Properties",
+         "street_address_1" => "No 12E Network Street, Buduburam - Awutu-Senya East",
+         "postal_code" => "+233",
          "country_id" => 80,
-         "city" => "accra",
+         "area" => "Limousine",
+         "property_type_id" => PropertyType::find(1)->id,
+         "city" => "cape-coast",
          "created_by" => $userInsertResult->id,
-         "area" => "Airport"
       ];
       $createPropertyResult = Property::create($property);
 
       // property details
       $propertyDetails = [
+         // required params
          "id" => $createPropertyResult->uuid,
          "current_onboard_stage" => "Stage5",
          "created_by" => 1,
 
+         // properties tbl data
+         "about_us" => "Damian Properties is part of the InnerWork Group of Companies whose purposeful aim is to provide
+            quality and affordable homes/apartments to its surrounding neighbours. A restaurant, an outdoor pool, and a 24-hour
+            fitness center are available at this aparthotel. Free self parking, free airport pick-up, and a free manager's
+            reception are also provided. Other amenities include a bar/lounge, a children's pool, and concierge services.
+            Each apartment provides a kitchenette with a refrigerator, an oven, a stovetop, and a microwave. For a bit of
+            entertainment, a flat-screen TV comes with cable channels, and guests can also appreciate conveniences like
+            a washing machine and a living room",
+         "summary_text" => "Located in Awutu-Senya, Damian Properties is in an area with great market proximity. ... and ...
+            are cultural highlights, and travelers looking to shop may want to visit ... Mall and ... Mall. Traveling with
+             kids? Consider ... Zoo and Endangered Primate Breeding Centre and ... Botanical Gardens.",
+         "nearby_locations" => "Liberia Camp Market - 5min drive, Kasoa Township - 15mins drive",
+         "serve_breakfast" => "No",
+         "languages_spoke" => ["English","Twi","German"],
          "latitude" => 5.550000,
          "longitude" => -0.020000,
-         "facilities" => [1,3],
-         "serve_breakfast" => "Yes",
-         "languages_spoke" => ["English","Twi","French"],
+         // common property facilities tbl data
+         "facilities" => [1,2,3,5,9,10],
+         // common_property_policies
          "subpolicies" => ["1" =>"Yes","2" => "No"],
-
+         // apartment details tbl data
          "total_guest_capacity" => 4,
          "total_bathrooms" => 3,
          "room_details" => [
-            ["name" => "bedroom1", "bed_type" => 1, "bed_qty" => 1],
-            ["name" => "bedroom2", "bed_type" => 1, "bed_qty" => 1],
-            ["name" => "bedroom3", "bed_type" => 1, "bed_qty" => 1]
+            [  "name" => "Exclusive Apartment",
+               'bed_details' => [
+                  ["bed_type" => 2, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 1
+            ],
+            [  "name" => "Premium Apartment",
+               'bed_details' => [
+                  ["bed_type" => 4, "bed_qty" => 1],
+                  ["bed_type" => 3, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 2,
+               'added_amenities' => null
+            ],
+            ["name" => "Luxury Apartment",
+               'bed_details' => [
+                  ["bed_type" => 4, "bed_qty" => 1],
+                  ["bed_type" => 3, "bed_qty" => 1],
+                  ["bed_type" => 2, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 1
+            ]
          ],
-         "num_of_rooms" => 3,
-         "amenities" => [1, 3, 2],
+         "num_of_rooms" => 4,
+         "amenities" => [1,6,9,3],
          "price_list" => [
             ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
             ["guest_occupancy" => 3, "amount" => 90, "discount" => 10],
@@ -465,14 +503,14 @@ class AmenitiesSeeder extends Seeder
       // creating property
       $property = [
          'uuid' => Uuid::uuid6(),
-         "name" => "Golden Tulip Annex",
-         "street_address_1" => "No.12 E West-street, Abelemkpe - Accra",
+         "name" => "Accra Luxury Apartments",
+         "street_address_1" => "5 Circular Road, 19 Cantonments, Accra Ghana.",
          "property_type_id" => PropertyType::find(1)->id,
          "country_id" => 80,
          "city" => "accra",
          "created_by" => 1,
-         "area" => "Airport",
-         'status' => 3
+         "area" => "Cantonments",
+         'status' => PUBLISHED_PROPERTY
       ];
       $createPropertyResult = Property::create($property);
 
@@ -483,21 +521,51 @@ class AmenitiesSeeder extends Seeder
          "current_onboard_stage" => "Completed",
          "created_by" => 1,
 
-         "latitude" => 5.550000,
-         "longitude" => -0.020000,
-         "facilities" => [1,3],
+         // properties tbl data
+         "about_us" => "At East Legon, one of Accra’s most exclusive neighbourhoods and within a 10 minute drive from the
+            Kotoka International Aiport, offers well-appointed apartments; studio, one bed, two and three bed configurations
+            for your needs.In our enclave of alluring buildings; The Gallery, Clifton Place and Court, each apartment has
+            a balcony, fully fitted modern kitchen, complimentary tea and coffee with a kettle and toaster. There is also
+            a washing machine, iron and ironing board in all the units.",
+         "summary_text" => "There are two swimming pools (ground level and roof top with great views overlooking the
+            Airport City area) and a gym with the latest cardio vascular and strength training equipment.",
+         "nearby_locations" => "Accra Mall - 10 min drive, University of Ghana - 11 min drive,
+            Accra Zoo and Endangered Primate Breeding Centre - 14 min drive, Achimota Forest - 14 min drive,
+            Legon Botanical Gardens - 16 min drive",
          "serve_breakfast" => "Yes",
          "languages_spoke" => ["English","Twi","French"],
+         "latitude" => 5.84,
+         "longitude" => -2.2,
+         "facilities" => [1,3],
          "subpolicies" => ["1" =>"Yes","2" => "No"],
 
          "total_guest_capacity" => 4,
          "total_bathrooms" => 3,
          "room_details" => [
-            ["name" => "bedroom1", "bed_type" => 1, "bed_qty" => 1],
-            ["name" => "bedroom2", "bed_type" => 1, "bed_qty" => 1],
-            ["name" => "bedroom3", "bed_type" => 1, "bed_qty" => 1]
+            [  "name" => "Exclusive Apartment",
+               'bed_details' => [
+                  ["bed_type" => 2, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 1
+            ],
+            [  "name" => "Premium Apartment",
+               'bed_details' => [
+                  ["bed_type" => 4, "bed_qty" => 1],
+                  ["bed_type" => 3, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 2,
+               'added_amenities' => null
+            ],
+            ["name" => "Luxury Apartment",
+               'bed_details' => [
+                  ["bed_type" => 4, "bed_qty" => 1],
+                  ["bed_type" => 3, "bed_qty" => 1],
+                  ["bed_type" => 2, "bed_qty" => 1],
+               ],
+               "similiar_rooms" => 1
+            ]
          ],
-         "num_of_rooms" => 3,
+         "num_of_rooms" => 4,
          "amenities" => [1, 3, 2],
          "price_list" => [
             ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
