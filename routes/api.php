@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DefaultValuesController;
 use App\Http\Controllers\NewPropertyListingController;
 use App\Http\Controllers\PropertyListingController;
@@ -58,6 +59,10 @@ Route::group(['prefix'=>'property'],function(){
     Route::post('/create-dummy',  [NewPropertyListingController::class,'CreateDummydata']);
 });
 
+// CronJob
+Route::group(['prefix'=>'cronjob'],function(){
+   Route::get('currency-rate',  [CronJobController::class,'CurrenyRateUpdate']);
+});
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);
 

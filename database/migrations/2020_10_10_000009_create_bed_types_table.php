@@ -23,6 +23,7 @@ class CreateBedTypesTable extends Migration
             // Field
             $table->string('name')->unique();
             $table->integer('expected_sleeps')->default(1);
+            $table->string('dimension')->nullable();
         });
     }
 

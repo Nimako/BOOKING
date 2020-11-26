@@ -43,6 +43,7 @@ class CreatePropertiesTable extends Migration
             $table->string('languages_spoken', 255)->nullable();
             $table->string('images_ids', 255)->nullable();
             $table->text('images_paths')->nullable();
+            $table->integer('num_of_floors')->nullable();
             $table->string('current_onboard_stage')->nullable();
             // Foreign Keys
             //$table->foreign('property_type_id')->references('id')->on('property_types');

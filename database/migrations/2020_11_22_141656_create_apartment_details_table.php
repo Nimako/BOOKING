@@ -22,13 +22,13 @@ class CreateApartmentDetailsTable extends Migration
            $table->bigInteger('updated_by')->nullable();
            // Table Fields
            $table->unsignedBigInteger('property_id');
+           $table->string('room_name');
            $table->unsignedBigInteger('common_room_amenity_id')->nullable();
            $table->string('image_ids', 255)->nullable();
            $table->text('image_paths')->nullable();
-           $table->string('room_size')->nullable();
-           $table->string('total_guest_capacity')->nullable();
-           $table->string('total_bathrooms')->nullable();
-           $table->string('num_of_rooms')->nullable();
+           $table->integer('total_guest_capacity')->nullable();
+           $table->integer('total_bathrooms')->nullable();
+           $table->integer('num_of_rooms')->nullable();
            // Foreign Keys
            //$table->foreign('property_id')->references('id')->on('properties');
         });

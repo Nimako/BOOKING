@@ -415,7 +415,7 @@ class AmenitiesSeeder extends Seeder
 
       // creating property
       $property = [
-         'uuid' => "1eb2cdb7-12b0-6d5c-bd0e-00e04c680037",
+         'uuid' => Uuid::uuid6(),
          "name" => "Damian Properties",
          "street_address_1" => "No 12E Network Street, Buduburam - Awutu-Senya East",
          "postal_code" => "+233",
@@ -424,17 +424,7 @@ class AmenitiesSeeder extends Seeder
          "property_type_id" => PropertyType::find(1)->id,
          "city" => "cape-coast",
          "created_by" => $userInsertResult->id,
-      ];
-      $createPropertyResult = Property::create($property);
 
-      // property details
-      $propertyDetails = [
-         // required params
-         "id" => $createPropertyResult->uuid,
-         "current_onboard_stage" => "Stage5",
-         "created_by" => 1,
-
-         // properties tbl data
          "about_us" => "Damian Properties is part of the InnerWork Group of Companies whose purposeful aim is to provide
             quality and affordable homes/apartments to its surrounding neighbours. A restaurant, an outdoor pool, and a 24-hour
             fitness center are available at this aparthotel. Free self parking, free airport pick-up, and a free manager's
@@ -447,52 +437,55 @@ class AmenitiesSeeder extends Seeder
              kids? Consider ... Zoo and Endangered Primate Breeding Centre and ... Botanical Gardens.",
          "nearby_locations" => "Liberia Camp Market - 5min drive, Kasoa Township - 15mins drive",
          "serve_breakfast" => "No",
-         "languages_spoke" => ["English","Twi","German"],
-         "latitude" => 5.550000,
-         "longitude" => -0.020000,
-         // common property facilities tbl data
-         "facilities" => [1,2,3,5,9,10],
-         // common_property_policies
-         "subpolicies" => ["1" =>"Yes","2" => "No"],
-         // apartment details tbl data
-         "total_guest_capacity" => 4,
-         "total_bathrooms" => 3,
+         "languages_spoken" => "English**Twi**German",
+         "latitude" => 5.55,
+         "longitude" => -0.02,
+      ];
+      $createPropertyResult = Property::create($property);
+
+      // property details
+      $propertyDetails[] = [
+         "room_name" => "Exclusive Apartment",
          "room_details" => [
-            [  "name" => "Exclusive Apartment",
+            [  "name" => "Bedroom 1",
                'bed_details' => [
                   ["bed_type" => 2, "bed_qty" => 1],
                ],
-               "similiar_rooms" => 1
-            ],
-            [  "name" => "Premium Apartment",
-               'bed_details' => [
-                  ["bed_type" => 4, "bed_qty" => 1],
-                  ["bed_type" => 3, "bed_qty" => 1],
-               ],
-               "similiar_rooms" => 2,
                'added_amenities' => null
             ],
-            ["name" => "Luxury Apartment",
-               'bed_details' => [
-                  ["bed_type" => 4, "bed_qty" => 1],
-                  ["bed_type" => 3, "bed_qty" => 1],
-                  ["bed_type" => 2, "bed_qty" => 1],
-               ],
-               "similiar_rooms" => 1
-            ]
          ],
          "num_of_rooms" => 4,
-         "amenities" => [1,6,9,3],
+         "similiar_rooms" => 2,
+         "total_guest_capacity" => 4,
+         "total_bathrooms" => 3,
          "price_list" => [
             ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
             ["guest_occupancy" => 3, "amount" => 90, "discount" => 10],
             ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
          ],
-         "summary_text" => "this  is a long text"
+         "image_paths" => [
+            "properties/2020/November/dummy/premium/1.j",
+            "properties/2020/November/dummy/premium/2.j",
+            "properties/2020/November/dummy/premium/3.j",
+            "properties/2020/November/dummy/premium/4.j",
+         ]
+      ];
+
+      $propertyInfo = [
+         "id" => $createPropertyResult->uuid,
+         "property_id" => $createPropertyResult->id,
+         "current_onboard_stage" => "Stage5",
+         "created_by" => 1,
+         'num_of_floors' => 1,
+         "facilities" => [1,2,3,5,9,10],
+         "amenities" => [1,6,9,3],
+         "subpolicies" => [1 => "No",2 => "No"],
+
+         'details' => $propertyDetails
       ];
 
       $request = new Request();
-      $request->merge($propertyDetails);
+      $request->merge($propertyInfo);
 
       $newProperty = new NewPropertyListingController();
       return $newProperty->OnBoarding($request);
@@ -510,18 +503,8 @@ class AmenitiesSeeder extends Seeder
          "city" => "accra",
          "created_by" => 1,
          "area" => "Cantonments",
-         'status' => PUBLISHED_PROPERTY
-      ];
-      $createPropertyResult = Property::create($property);
+         'status' => PUBLISHED_PROPERTY,
 
-      // property details
-      $propertyDetails = [
-         "id" => $createPropertyResult->uuid,
-         "property_id" => $createPropertyResult->id,
-         "current_onboard_stage" => "Completed",
-         "created_by" => 1,
-
-         // properties tbl data
          "about_us" => "At East Legon, one of Accra’s most exclusive neighbourhoods and within a 10 minute drive from the
             Kotoka International Aiport, offers well-appointed apartments; studio, one bed, two and three bed configurations
             for your needs.In our enclave of alluring buildings; The Gallery, Clifton Place and Court, each apartment has
@@ -533,52 +516,114 @@ class AmenitiesSeeder extends Seeder
             Accra Zoo and Endangered Primate Breeding Centre - 14 min drive, Achimota Forest - 14 min drive,
             Legon Botanical Gardens - 16 min drive",
          "serve_breakfast" => "Yes",
-         "languages_spoke" => ["English","Twi","French"],
+         "languages_spoke" => "English**Twi**French",
          "latitude" => 5.84,
          "longitude" => -2.2,
-         "facilities" => [1,3],
-         "subpolicies" => ["1" =>"Yes","2" => "No"],
+      ];
+      $createPropertyResult = Property::create($property);
 
-         "total_guest_capacity" => 4,
-         "total_bathrooms" => 3,
+      // property details
+      $propertyDetails[] = [
+         "room_name" => "Luxury Apartment",
          "room_details" => [
-            [  "name" => "Exclusive Apartment",
+            [  "name" => "Master Bedroom",
                'bed_details' => [
-                  ["bed_type" => 2, "bed_qty" => 1],
+                  ["bed_type" => 5, "bed_qty" => 1],
                ],
-               "similiar_rooms" => 1
-            ],
-            [  "name" => "Premium Apartment",
-               'bed_details' => [
-                  ["bed_type" => 4, "bed_qty" => 1],
-                  ["bed_type" => 3, "bed_qty" => 1],
-               ],
-               "similiar_rooms" => 2,
                'added_amenities' => null
             ],
-            ["name" => "Luxury Apartment",
+            [  "name" => "Bedroom 2",
                'bed_details' => [
-                  ["bed_type" => 4, "bed_qty" => 1],
-                  ["bed_type" => 3, "bed_qty" => 1],
                   ["bed_type" => 2, "bed_qty" => 1],
                ],
-               "similiar_rooms" => 1
-            ]
+               'added_amenities' => null
+            ],
+            [  "name" => "Guest Room",
+               'bed_details' => [
+                  ["bed_type" => 6, "bed_qty" => 1],
+               ],
+               'added_amenities' => null
+            ],
+            [  "name" => "Living Room",
+               'bed_details' => [
+                  ["bed_type" => 7, "bed_qty" => 2],
+               ],
+               'added_amenities' => null
+            ],
          ],
-         "num_of_rooms" => 4,
-         "amenities" => [1, 3, 2],
+         "num_of_rooms" => 3,
+         "similiar_rooms" => 0,
+         "total_guest_capacity" => 8,
+         "total_bathrooms" => 2,
          "price_list" => [
-            ["guest_occupancy" => 4, "amount" => 100, "discount" => 0],
-            ["guest_occupancy" => 3, "amount" => 90, "discount" => 10],
+            ["guest_occupancy" => 8, "amount" => 250, "discount" => 0],
+            ["guest_occupancy" => 6, "amount" => 215, "discount" => 14],
+            ["guest_occupancy" => 4, "amount" => 190, "discount" => 24]
+         ],
+         "image_paths" => [
+            "properties/2020/November/dummy/luxury/1.j",
+            "properties/2020/November/dummy/luxury/2.j",
+            "properties/2020/November/dummy/luxury/3.j",
+            "properties/2020/November/dummy/luxury/4.j",
+         ]
+      ];
+
+      $propertyDetails[] = [
+         "room_name" => "Premium Apartment",
+         "room_details" => [
+            [  "name" => "Master Bedroom",
+               'bed_details' => [
+                  ["bed_type" => 5, "bed_qty" => 1],
+               ],
+               'added_amenities' => null
+            ],
+            [  "name" => "Bedroom 2",
+               'bed_details' => [
+                  ["bed_type" => 2, "bed_qty" => 1],
+               ],
+               'added_amenities' => null
+            ],
+            [  "name" => "Living Room",
+               'bed_details' => [
+                  ["bed_type" => 7, "bed_qty" => 1],
+               ],
+               'added_amenities' => null
+            ],
+         ],
+         "num_of_rooms" => 3,
+         "similiar_rooms" => 0,
+         "total_guest_capacity" => 6,
+         "total_bathrooms" => 2,
+         "price_list" => [
+            ["guest_occupancy" => 6, "amount" => 100, "discount" => 0],
+            ["guest_occupancy" => 4, "amount" => 90, "discount" => 10],
             ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
          ],
-         "summary_text" => "this  is a long text"
+         "image_paths" => [
+            "properties/2020/November/dummy/premium/1.j",
+            "properties/2020/November/dummy/premium/2.j",
+            "properties/2020/November/dummy/premium/3.j",
+            "properties/2020/November/dummy/premium/4.j",
+         ]
+      ];
+
+      $propertyInfo = [
+         "id" => $createPropertyResult->uuid,
+         "property_id" => $createPropertyResult->id,
+         "current_onboard_stage" => "Completed",
+         "created_by" => 1,
+         'num_of_floors' => 1,
+         "facilities" => [1,3],
+         "amenities" => [1,6,9,3],
+         "subpolicies" => [1 => "Yes",2 => "No"],
+
+         'details' => $propertyDetails
       ];
 
       $request = new Request();
-      $request->merge($propertyDetails);
+      $request->merge($propertyInfo);
 
       $newProperty = new NewPropertyListingController();
-      $newProperty->OnBoarding($request);
+      return $newProperty->OnBoarding($request);
    }
 }

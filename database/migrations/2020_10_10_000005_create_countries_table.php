@@ -24,6 +24,7 @@ class CreateCountriesTable extends Migration
             $table->string('numcode')->nullable();
             $table->string('phonecode')->nullable();
             $table->string('currency')->nullable();
+            $table->string('currency_rates')->nullable();
         });
     }
 

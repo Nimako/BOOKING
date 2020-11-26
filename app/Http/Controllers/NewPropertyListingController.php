@@ -50,8 +50,6 @@ class NewPropertyListingController extends Controller
                $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
                $addToRequestObj['property_type_id'] = PropertyType::where(['uuid' => $request->property_type_id])->first()->id;
-            if(!empty($request->room_details))
-               $addToRequestObj['num_of_rooms'] = sizeof($request->room_details);
 
             // adding to request obj
             $request->merge($addToRequestObj);
@@ -100,25 +98,81 @@ class NewPropertyListingController extends Controller
             }
 
             // apartment details
-            if(!empty($request->room_size) || !empty($request->total_guest_capacity) || !empty($request->total_rooms) || !empty($request->total_bathrooms))
+            if(!empty($request->details))
             {
-               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first())
-                  $room->update($request->all());
-               else
-                  $room = ApartmentDetail::create($request->all());
+               foreach ($request->details as $detailss) {
+                  if(!empty(@$detailss['image_paths']))
+                     $images = implode(STRING_GLUE, @$detailss['image_paths']);
+                  $apartmentDetailsInfo= [
+                     'room_name' => $detailss['room_name'],
+                     'property_id' => $searchedProperty->id,
+                     'total_guest_capacity' => $detailss['total_guest_capacity'],
+                     'total_bathrooms' => $detailss['total_bathrooms'],
+                     'num_of_rooms' => $detailss['num_of_rooms'],
+                     'image_paths' => @$images
+                  ];
+                  /*if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first())
+                     $room->update($apartmentDetailsInfo);
+                  else*/
+                     $room = ApartmentDetail::create($apartmentDetailsInfo);
 
-               if(!empty($request->room_details))
-               {
-                  foreach ($request->room_details as $detail) {
-                     $bedDetails[] = [
-                        'room_id' => $room->id,
-                        'room_name' => $detail['name'],
-                        'similiar_rooms' => @$detail['similiar_rooms'],
-                        'bed_types' => json_encode($detail['bed_details']),
-                        'added_amenities' => json_encode(@$detail['added_amenities']),
-                     ];
+                  // roomDetails
+                  if(!empty($detailss['room_details']))
+                  {
+                     foreach ($detailss['room_details'] as $detail) {
+                        $roomDetails[] = [
+                           'room_id' => $room->id,
+                           'room_name' => $detail['name'],
+                           'bed_types' => json_encode($detail['bed_details']),
+                           'added_amenities' => json_encode(@$detail['added_amenities']),
+                        ];
+                     }
+                     RoomDetails::insert($roomDetails);
+                     $roomDetails = array();
                   }
-                  RoomDetails::insert($bedDetails);
+
+                  # image uploads
+                  if($request->hasFile('images')) {
+                     # searching for record
+                     if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
+                        // unlinking previous files
+                        if($room->image_paths != null) {
+                           $filePaths = explode(STRING_GLUE, $room->image_paths);
+                           foreach ($filePaths as $filePath) {
+                              unlink('storage/'.$filePath);
+                           }
+                        }
+                        // upload new files
+                        foreach ($request->file('images') as $image){
+                           $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+                        }
+                        # updating file upload field
+                        ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
+                     }
+                  }
+
+                  # room prices
+                  if(!empty($detailss['price_list'])) {
+                     $guestOccupancy = $amount = $discounts = array();
+                     $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
+                     foreach ($detailss['price_list'] as $pricesDetails) {
+                        $guestOccupancy[] = $pricesDetails['guest_occupancy'];
+                        $amount[] = $pricesDetails['amount'];
+                        $discount[] = $pricesDetails['discount'];
+                     }
+                     // saving data
+                     if($roomPrices = RoomPrices::where(['room_id' => $room->id])->first())
+                        $doNothing = "";
+                     else {
+                        $roomPrices = new RoomPrices();
+                        $roomPrices->room_id = $room->id;
+                     }
+
+                     $roomPrices->guest_occupancy = implode(STRING_GLUE, $guestOccupancy);
+                     $roomPrices->amount = implode(STRING_GLUE, $amount);
+                     $roomPrices->discount = implode(STRING_GLUE, $discount);
+                     $roomPrices->save();
+                  }
                }
             }
 
@@ -143,49 +197,6 @@ class NewPropertyListingController extends Controller
                $searchedRoom = ApartmentDetail::find($room->id);
                $searchedRoom->common_room_amenity_id = $commonAmenities->id;
                $searchedRoom->save();
-            }
-
-            # image uploads
-            if($request->hasFile('images')) {
-               # searching for record
-               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
-                  // unlinking previous files
-                  if($room->image_paths != null) {
-                     $filePaths = explode(STRING_GLUE, $room->image_paths);
-                     foreach ($filePaths as $filePath) {
-                        unlink('storage/'.$filePath);
-                     }
-                  }
-                  // upload new files
-                  foreach ($request->file('images') as $image){
-                     $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
-                  }
-                  # updating file upload field
-                  ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
-               }
-            }
-
-            # room prices
-            if(!empty($request->price_list)) {
-               $guestOccupancy = $amount = $discounts = array();
-               $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
-               foreach ($request->price_list as $pricesDetails) {
-                  $guestOccupancy[] = $pricesDetails['guest_occupancy'];
-                  $amount[] = $pricesDetails['amount'];
-                  $discount[] = $pricesDetails['discount'];
-               }
-               // saving data
-               if($roomPrices = RoomPrices::where(['room_id' => $room->id])->first())
-                  $doNothing = "";
-               else {
-                  $roomPrices = new RoomPrices();
-                  $roomPrices->room_id = $room->id;
-               }
-
-               $roomPrices->guest_occupancy = implode(STRING_GLUE, $guestOccupancy);
-               $roomPrices->amount = implode(STRING_GLUE, $amount);
-               $roomPrices->discount = implode(STRING_GLUE, $discount);
-               $roomPrices->save();
             }
 
             // return statement

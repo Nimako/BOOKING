@@ -26,6 +26,7 @@ class CreateRoomDetailsTable extends Migration
             $table->integer('similiar_rooms')->nullable()->default(1);
             $table->text('bed_types')->nullable();
             $table->text('added_amenities')->nullable();
+            $table->string('dimension')->nullable();
 
             //$table->string('bed_type',255)->nullable();
             //$table->integer('bed_type_qty')->nullable();
