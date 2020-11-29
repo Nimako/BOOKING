@@ -21,7 +21,8 @@ class CreateCommonRoomAmenitiesTable extends Migration
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // Field
-            $table->unsignedBigInteger('room_id');
+            $table->unsignedBigInteger('property_id')->nullable();
+            $table->unsignedBigInteger('room_id')->nullable();
             $table->string('popular_amenity_ids')->nullable();
             $table->text('popular_amenity_text')->nullable();
             $table->float('price')->nullable();

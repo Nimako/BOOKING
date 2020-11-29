@@ -58,7 +58,11 @@ class PropertyListingController extends Controller
    {
       // Validation
       $rules = [
-         'country' => "required"
+         'country' => "required",
+         'city' => "required",
+         'latitude' => "required",
+         'longitude' => "required",
+         'property_type' => "required",
       ];
       $validator = Validator::make($request->all(), $rules);
       if($validator->fails()) {
@@ -87,54 +91,63 @@ class PropertyListingController extends Controller
                'serve_breakfast','languages_spoken','image_paths','b.id as room_id','total_guest_capacity','total_bathrooms',
                'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage'
             )), ',');
-            $leftJoins = implode('', array('left join apartment_details b on b.property_id = a.id',
+            $leftJoins = implode(' ', array('left join apartment_details b on b.property_id = a.id',
                //'left join common_room_amenities c on c.id = b.common_room_amenity_id'
             ));
-            $query = "select {$selectFields} from properties a {$leftJoins} where ".$where_condition;
-            $searchedPropertys = DB::select($query);
+            $distinctQuery = "select distinct a.id from properties a {$leftJoins} where ".$where_condition;
+            $propertiesFound = DB::select($distinctQuery);
+            if(!empty($propertiesFound))
+            {
+               $property_ids = implode(',', array_map(function($data){ return $data->id;}, $propertiesFound));
+               $query = "select {$selectFields} from properties a {$leftJoins} where a.id in ({$property_ids})";
+               $searchedPropertys = DB::select($query);
 
-            foreach ($searchedPropertys as $property) {
-               # variables
-               $images = explode(STRING_GLUE, $property->image_paths);
-               $geoData = explode(',', $property->geolocation);
-               $roomPrices = RoomPrices::whereRaw("room_id = $property->room_id")->first();
+               // removing duplicates
+               foreach ($searchedPropertys as $property) { $formatted[$property->id] = $property; }
+               foreach ($formatted as $property) {
+                  # variables
+                  $images = explode(STRING_GLUE, $property->image_paths);
+                  $geoData = explode(',', $property->geolocation);
+                  $roomPrices[] = RoomPrices::whereRaw("room_id = $property->room_id")->first();
 
-               $guestOccupancy = explode(STRING_GLUE, $roomPrices->guest_occupancy);
-               $allDiscounts = explode(STRING_GLUE, $roomPrices->discount);
-               $allamount = explode(STRING_GLUE, $roomPrices->amount);
-               $priceIndex = array_search($request->num_of_guests, $guestOccupancy);
+                  $guestOccupancy = explode(STRING_GLUE, @$roomPrices->guest_occupancy);
+                  $allDiscounts = explode(STRING_GLUE, @$roomPrices->discount);
+                  $allamount = explode(STRING_GLUE, @$roomPrices->amount);
+                  $priceIndex = array_search($request->num_of_guests, $guestOccupancy);
 
-               if($searchedFacilities = CommonPropertyFacility::where(['property_id' => $property->id])->first()) {
-                  $facilities_ids = explode(STRING_GLUE, $searchedFacilities->facility_ids);
-                  $facilities = Facility::select(['name','icon_class'])->find($facilities_ids);
+                  if($searchedFacilities = CommonPropertyFacility::where(['property_id' => $property->id])->first()) {
+                     $facilities_ids = explode(STRING_GLUE, $searchedFacilities->facility_ids);
+                     $facilities = Facility::select(['name','icon_class'])->find($facilities_ids);
+                  }
+                  if($searchedAmenities = CommonRoomAmenities::where(['room_id' => $property->room_id])->first()) {
+                     $amenities_ids = explode(STRING_GLUE, $searchedAmenities->popular_amenity_ids);
+                     $amenities = Amenity::select(['name','icon_class'])->find($amenities_ids);
+                  }
+
+
+                  $distanceFromLocation = ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],@$geoData[1],'K'))." km";
+                  $responseData[] = [
+                     'uuid' => $property->uuid,
+                     'current_onboard_stage' => $property->current_onboard_stage,
+                     'status' => PROPERTY_STATUSES[$property->property_status],
+                     'name' => $property->name,
+                     'geolocation' => $property->geolocation,
+                     'street_address_1' => $property->street_address_1,
+                     'serve_breakfast' => $property->serve_breakfast,
+                     'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
+                     'displayImg' => $images[0],
+                     'distance_from_location' => $distanceFromLocation,
+                     'price' => $allamount[$priceIndex],
+                     'discount_given' => $allDiscounts[$priceIndex],
+                     'facilities' => $facilities,
+                     'amenities' => @$amenities,
+                     'rating' => PropertyRating::where(['property_id' => $property->id])->first()->current_rating ?? "Not Rated",
+                     'summary_text' => $property->summary_text,
+                     'about_us' => $property->about_us,
+                     'room_details' => RoomDetails::where(['room_id'=>$property->room_id])->get()
+                  ];
                }
-               if($searchedAmenities = CommonRoomAmenities::where(['room_id' => $property->room_id])->first()) {
-                  $amenities_ids = explode(STRING_GLUE, $searchedAmenities->popular_amenity_ids);
-                  $amenities = Amenity::select(['name','icon_class'])->find($amenities_ids);
-               }
-
-               $responseData[] = [
-                  'uuid' => $property->uuid,
-                  'current_onboard_stage' => $property->current_onboard_stage,
-                  'status' => PROPERTY_STATUSES[$property->property_status],
-                  'name' => $property->name,
-                  'geolocation' => $property->geolocation,
-                  'street_address_1' => $property->street_address_1,
-                  'serve_breakfast' => $property->serve_breakfast,
-                  'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
-                  'displayImg' => $images[0],
-                  'distance_from_location' => ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],$geoData[1],'K'))." km",
-                  'price' => $allamount[$priceIndex],
-                  'discount_given' => $allDiscounts[$priceIndex],
-                  'facilities' => $facilities,
-                  'amenities' => $amenities,
-                  'rating' => PropertyRating::where(['property_id' => $property->id])->first()->current_rating ?? "Not Rated",
-                  'summary_text' => $property->summary_text,
-                  'about_us' => $property->about_us,
-                  'room_details' => RoomDetails::where(['room_id'=>$property->room_id])->get()
-               ];
             }
-
 
          }
 
