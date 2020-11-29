@@ -15,11 +15,23 @@ class Property extends Model
     ];
 
     protected $hidden = ['created_at','updated_at','updated_by',];
-    protected $appends = ['property_type_text','text_status'];
+    protected $appends = ['property_type_text','text_status','facilities','policies'];
 
    public function Details()
    {
       return $this->hasMany('App\Models\ApartmentDetail');
+   }
+
+   public function getFacilitiesAttribute()
+   {
+      if($searchedCommRmFacilitis = CommonPropertyFacility::find($this->id))
+         return $this->attributes['facilities'] = Facility::wherein('id', explode(STRING_GLUE, $searchedCommRmFacilitis->facility_ids))->get(['name','icon_class']);
+   }
+
+   public function getPoliciesAttribute()
+   {
+      if($searchedCommRmFacilitis = CommonPropertyPolicy::find($this->id))
+         return $this->attributes['policies'] = explode(STRING_GLUE, $searchedCommRmFacilitis->sub_policy_text);
    }
 
    public function getPropertyTypeTextAttribute()
