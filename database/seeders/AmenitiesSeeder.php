@@ -438,8 +438,7 @@ class AmenitiesSeeder extends Seeder
          "nearby_locations" => "Liberia Camp Market - 5min drive, Kasoa Township - 15mins drive",
          "serve_breakfast" => "No",
          "languages_spoken" => "English**Twi**German",
-         "latitude" => 5.55,
-         "longitude" => -0.02,
+         "geolocation" => "5.55,-0.02"
       ];
       $createPropertyResult = Property::create($property);
 
@@ -464,10 +463,10 @@ class AmenitiesSeeder extends Seeder
             ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
          ],
          "image_paths" => [
-            "properties/2020/November/dummy/premium/1.j",
-            "properties/2020/November/dummy/premium/2.j",
-            "properties/2020/November/dummy/premium/3.j",
-            "properties/2020/November/dummy/premium/4.j",
+            "properties/dummy/premium/00f445f0.webp",
+            "properties/dummy/luxury/2.jpg",
+            "properties/dummy/premium/466cd527.webp",
+            "properties/dummy/luxury/4.jpg",
          ]
       ];
 
@@ -516,9 +515,8 @@ class AmenitiesSeeder extends Seeder
             Accra Zoo and Endangered Primate Breeding Centre - 14 min drive, Achimota Forest - 14 min drive,
             Legon Botanical Gardens - 16 min drive",
          "serve_breakfast" => "Yes",
-         "languages_spoke" => "English**Twi**French",
-         "latitude" => 5.84,
-         "longitude" => -2.2,
+         "languages_spoken" => "English**Twi**French",
+         "geolocation" => "5.84,-2.2"
       ];
       $createPropertyResult = Property::create($property);
 
@@ -561,10 +559,10 @@ class AmenitiesSeeder extends Seeder
             ["guest_occupancy" => 4, "amount" => 190, "discount" => 24]
          ],
          "image_paths" => [
-            "properties/2020/November/dummy/luxury/1.j",
-            "properties/2020/November/dummy/luxury/2.j",
-            "properties/2020/November/dummy/luxury/3.j",
-            "properties/2020/November/dummy/luxury/4.j",
+            "properties/dummy/luxury/1.jpg",
+            "properties/dummy/luxury/2.jpg",
+            "properties/dummy/luxury/3.jpg",
+            "properties/dummy/luxury/4.jpg",
          ]
       ];
 
@@ -600,10 +598,10 @@ class AmenitiesSeeder extends Seeder
             ["guest_occupancy" => 2, "amount" => 80, "discount" => 20]
          ],
          "image_paths" => [
-            "properties/2020/November/dummy/premium/1.j",
-            "properties/2020/November/dummy/premium/2.j",
-            "properties/2020/November/dummy/premium/3.j",
-            "properties/2020/November/dummy/premium/4.j",
+            "properties/dummy/premium/00f445f0.webp",
+            "properties/dummy/premium/173b9529.webp",
+            "properties/dummy/premium/466cd527.webp",
+            "properties/dummy/premium/c4776898.webp",
          ]
       ];
 
