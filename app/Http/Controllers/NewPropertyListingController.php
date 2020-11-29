@@ -239,8 +239,16 @@ class NewPropertyListingController extends Controller
          return ApiResponse::returnErrorMessage($message = $validator->errors());
       }
       else{
+         $generalImages = array();
          // if property record found
          $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->first();
+
+         // repopulating various room images as property images
+         foreach ($searchedProperty->details as $images) {
+            $generalImages =  array_merge($generalImages, $images['image_pathss']);
+         }
+
+         $searchedProperty->all_property_images = $generalImages;
 
          // return statement
          return ApiResponse::returnSuccessData($searchedProperty);

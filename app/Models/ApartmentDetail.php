@@ -54,5 +54,5 @@ class ApartmentDetail extends Model
 
          return $this->attributes['price_list'] = $responseData;
       }
-    }
+   }
 }
