@@ -4,6 +4,7 @@ use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DefaultValuesController;
 use App\Http\Controllers\NewPropertyListingController;
 use App\Http\Controllers\PropertyListingController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
@@ -64,6 +65,12 @@ Route::group(['prefix'=>'property'],function(){
 // CronJob
 Route::group(['prefix'=>'cronjob'],function(){
    Route::get('currency-rate',  [CronJobController::class,'CurrenyRateUpdate']);
+});
+
+// User Actions
+Route::group(['prefix'=>'user'],function(){
+   # Onboarding routes
+   Route::post('/partner-account/save',  [UserController::class,'CreatePartnerAccount']);
 });
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);

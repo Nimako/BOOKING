@@ -7,7 +7,6 @@ use App\Models\CommonPropertyFacility;
 use App\Models\CommonPropertyPolicy;
 use App\Models\CommonRoomAmenities;
 use App\Models\Facility;
-use App\Models\HotelDetail;
 use App\Models\HotelDetails;
 use App\Models\Property;
 use App\Models\PropertyType;

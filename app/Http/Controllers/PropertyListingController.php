@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amenity;
+use App\Models\Booking;
 use App\Models\CommonPropertyFacility;
 use App\Models\CommonRoomAmenities;
 use App\Models\Country;
@@ -171,6 +172,25 @@ class PropertyListingController extends Controller
          return ($miles * 0.8684);
       } else {
          return $miles;
+      }
+   }
+
+   public function booking(Request $request)
+   {
+      // Validation
+      $rules = [
+         'userid' => "required",
+         'parent_property' => "required|exists:properties,uuid"
+      ];
+      $validator = Validator::make($request->all(), $rules, $customMessage = ['parent_property.exists' => "Invalid Property Reference"]);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         if(Booking::insert($request->all()))
+            return ApiResponse::returnSuccessMessage($message = "Property Booked");
+         else
+            return ApiResponse::returnErrorMessage($message = "An Error Occurred");
       }
    }
 }
