@@ -3,6 +3,7 @@
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DefaultValuesController;
 use App\Http\Controllers\NewPropertyListingController;
+use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyListingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -72,6 +73,9 @@ Route::group(['prefix'=>'property'],function(){
     # searching of approved properties
     Route::post('/search',  [PropertyListingController::class,'SearchProperty']);
     Route::post('/create-dummy',  [NewPropertyListingController::class,'CreateDummydata']);
+
+    Route::post('/duplicate',  [PropertyController::class,'DuplicateProperty']);
+    Route::post('/delete',  [PropertyController::class,'destroy']);
 });
 
 // CronJob
