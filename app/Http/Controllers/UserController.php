@@ -6,6 +6,7 @@ use App\Events\SendEmail;
 use App\Models\UserPartnerAccount;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 
@@ -19,7 +20,7 @@ class UserController extends Controller
     */
    public function CreatePartnerAccount(Request $request)
    {
-      // Validation
+      // validation
       $rules = [
          'email' => "required",
          'fullname' => "required",
@@ -36,12 +37,17 @@ class UserController extends Controller
             return ApiResponse::returnErrorMessage($message = "Email Already Exists");
          // adding new request params
          $email_token = sha1(microtime().$request->email);
-         $request->merge(['uuid' => Uuid::uuid6(), 'email_token' => $email_token]);
+         $request->merge([
+            'uuid' => Uuid::uuid6(),
+            'email_token' => $email_token,
+            'token_expiration' => date('Y-m-d H:i:s', strtotime('+ 4hours')),
+            'password' => Hash::make($request->password)
+         ]);
          if($responseData = UserPartnerAccount::create($request->except('confirm_password'))){
             // Sending Email
             $details = [
                'email' => $request->email,
-               'token' => $email_token,
+               'token' => config('user-defined.main-site-url')."verify-email/".$email_token,
             ];
             event(new SendEmail($request->email, $details));
 
@@ -51,12 +57,22 @@ class UserController extends Controller
          else
             return ApiResponse::returnErrorMessage($message = "An Error Occurred");
       }
-    }
+   }
 
    public function VerifyPartnerAccount(Request $request)
    {
-      $rules = [
-         ''
-      ];
-    }
+      if($searchedToken = UserPartnerAccount::where(['email_token' => $request->VerifyCode])->first()) {
+         $tokenExpirationTime = date('YmdHis', strtotime($searchedToken->token_expiration));
+         $currentTime = date('YmdHis');
+         if($currentTime > $tokenExpirationTime)
+            return ApiResponse::returnErrorMessage($message = "Token Expired. Please Login and Request Validation Again");
+         else {
+            $searchedToken->token_validated = 1;
+            $searchedToken->save();
+            return ApiResponse::returnSuccessMessage($message = "Email Validated Successfully");
+         }
+      }
+      else
+         return ApiResponse::returnErrorMessage($message = "Invalid Token");
+   }
 }

@@ -67,10 +67,12 @@ Route::group(['prefix'=>'cronjob'],function(){
    Route::get('currency-rate',  [CronJobController::class,'CurrenyRateUpdate']);
 });
 
+
 // User Actions
 Route::group(['prefix'=>'user'],function(){
    # Onboarding routes
    Route::post('/partner-account/save',  [UserController::class,'CreatePartnerAccount']);
+   Route::post('verify-partner-account-token',  [UserController::class,'VerifyPartnerAccount']);
 });
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);

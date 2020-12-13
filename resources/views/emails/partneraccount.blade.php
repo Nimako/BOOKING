@@ -7,7 +7,7 @@
 
    <h2>Verify your Partner Account </h2>
 
-   <a class="btn btn-block btn-primary" href="{{url('/verify-partner-account/').'/'.$details['token']}}">
+   <a class="btn btn-block btn-primary" href="{{$details['token']}}">
       Please Click Here To Confirm Your Account </a>
 
 </body>

@@ -22,12 +22,14 @@ class CreateUserPartnerAccountsTable extends Migration
            $table->dateTime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
            // Fields
            $table->uuid('uuid');
-           $table->string('Fullname')->nullable();
+           $table->string('fullname')->nullable();
            $table->string('phone_no')->nullable();
            $table->string('email')->unique();
-           $table->string('password')->nullable();
+           $table->text('password')->nullable();
            $table->string('useraccount_id')->nullable();
            $table->string('email_token')->nullable();
+           $table->dateTime('token_expiration')->nullable();
+           $table->char('token_validated', 1)->nullable()->default('0');
         });
     }
 
