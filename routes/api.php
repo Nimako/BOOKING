@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\AuthController;
 
 
 /*
@@ -43,6 +44,17 @@ Route::group(['middleware' => 'checkheaders'], function () {
     });
 });
 
+
+Route::group(['middleware' => 'api','prefix' => 'auths'], function ($router) {
+    Route::post('/login',  [AuthController::class,'login']);
+    // Route::post('login', 'AuthController@login');
+    // Route::post('logout', 'AuthController@logout');
+    // Route::post('refresh', 'AuthController@refresh');
+    // Route::post('me', 'AuthController@me');
+});
+
+
+
 // Default Item Listing
 Route::group(['prefix'=>'default-items'],function(){
    Route::post('/',  [DefaultValuesController::class,'GetDefaultList']);
@@ -73,6 +85,8 @@ Route::group(['prefix'=>'user'],function(){
    # Onboarding routes
    Route::post('/partner-account/save',  [UserController::class,'CreatePartnerAccount']);
    Route::post('verify-partner-account-token',  [UserController::class,'VerifyPartnerAccount']);
+   Route::post('/login', [UserController::class,'login'])->name("login");
+
 });
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);
