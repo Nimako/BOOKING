@@ -16,4 +16,8 @@ class UserPartnerAccount extends Model
    {
       return password_hash($this->password, PASSWORD_DEFAULT);
    }
+
+   
+
+
 }
