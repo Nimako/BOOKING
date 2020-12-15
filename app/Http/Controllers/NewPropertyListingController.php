@@ -46,7 +46,7 @@ class NewPropertyListingController extends Controller
 
             // property data pre-processing
             if(!empty($request->latitude) || !empty($request->longitude))
-               return $addToRequestObj['geolocation'] = $request->latitude.','.$request->longitude;
+               $addToRequestObj['geolocation'] = $request->latitude.','.$request->longitude;
             if(!empty($request->languages_spoke))
                $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
