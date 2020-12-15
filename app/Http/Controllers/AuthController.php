@@ -28,9 +28,12 @@ class AuthController extends Controller
      */
     public function login()
     {
+        if(empty($request->email)){
+            return response()->json(['statusCode'=>500, 'message' => 'Username is required']);
+        }
 
-        if(empty($request->email) || empty($request->password)){
-            return response()->json(['statusCode'=>500, 'message' => 'Username and password is required']);
+        if(empty($request->email)){
+            return response()->json(['statusCode'=>500, 'message' => 'Password is required']);
         }
         
         $credentials = request(['email', 'password']);
