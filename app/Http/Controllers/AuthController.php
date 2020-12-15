@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -24,14 +28,31 @@ class AuthController extends Controller
      */
     public function login()
     {
+        
         $credentials = request(['email', 'password']);
+        $user = User::where("email",$credentials['email'])->first();
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $customClaims = [
+            "partner_id" => $user->id,
+            "uuid"       => $user->uuid,
+            "email"      => $user->email,
+            "useraccount_id" => $user->useraccount_id,
+            "phone_no"    => $user->phone_no,
+            "role"        => "partner"
+        ];
+
+        try {
+            if (! $token = JWTAuth::claims($customClaims)->attempt($credentials)) {
+                return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['statusCode'=>500, 'message' => 'could_not_create_token'], 500);
         }
 
-        return $this->respondWithToken($token,auth()->user());
+        return $this->respondWithToken($token);
+
     }
+
 
     /**
      * Get the authenticated User.
@@ -53,6 +74,7 @@ class AuthController extends Controller
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
+        
     }
 
     /**
@@ -72,17 +94,15 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token,$user)
+    protected function respondWithToken($token)
     {
         return response()->json([
-            "partner_id" => $user->id,
-            "uuid"       => $user->uuid,
-            "email"      => $user->email,
-            "useraccount_id" => $user->useraccount_id,
-            "phone_no" => $user->phone_no,
+      
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            "status"=> 200,
+            "message"=> "success"
         ]);
     }
 }
