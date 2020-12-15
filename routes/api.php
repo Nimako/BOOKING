@@ -49,7 +49,7 @@ Route::group(['middleware' => 'api','prefix' => 'auths'], function ($router) {
     Route::post('/login',  [AuthController::class,'login']);
     // Route::post('login', 'AuthController@login');
     // Route::post('logout', 'AuthController@logout');
-    // Route::post('refresh', 'AuthController@refresh');
+    Route::post('/refresh',[AuthController::class,'refresh']);
     // Route::post('me', 'AuthController@me');
 });
 
