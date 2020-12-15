@@ -30,7 +30,7 @@ class AuthController extends Controller
     {
 
         if(empty($request->email) || empty($request->password)){
-            return response()->json(['statusCode'=>500, 'message' => 'Username and password is required'], 500);
+            return response()->json(['statusCode'=>500, 'message' => 'Username and password is required']);
         }
         
         $credentials = request(['email', 'password']);
@@ -47,10 +47,10 @@ class AuthController extends Controller
 
         try {
             if (! $token = JWTAuth::claims($customClaims)->attempt($credentials)) {
-                return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials'], 401);
+                return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials']);
             }
         } catch (JWTException $e) {
-            return response()->json(['statusCode'=>500, 'message' => 'could_not_create_token'], 500);
+            return response()->json(['statusCode'=>500, 'message' => 'could_not_create_token']);
         }
 
         return $this->respondWithToken($token);
