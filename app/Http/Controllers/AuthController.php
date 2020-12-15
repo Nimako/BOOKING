@@ -28,6 +28,10 @@ class AuthController extends Controller
      */
     public function login()
     {
+
+        if(empty($request->email) || empty($request->password)){
+            return response()->json(['statusCode'=>500, 'message' => 'Username and password is required'], 500);
+        }
         
         $credentials = request(['email', 'password']);
         $user = User::where("email",$credentials['email'])->first();
