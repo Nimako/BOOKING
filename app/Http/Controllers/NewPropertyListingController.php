@@ -231,7 +231,7 @@ class NewPropertyListingController extends Controller
       // Validation
       $rules = [
          'id' => "required|exists:properties,uuid",
-         'userid' => "required|exists:useraccount,id"
+         //'userid' => "required|exists:useraccount,id"
       ];
       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
       if($validator->fails()) {
@@ -239,8 +239,8 @@ class NewPropertyListingController extends Controller
       }
       else{
          $generalImages = array();
-         // if property record found
-         $searchedProperty = Property::with('details')->where(['uuid' => $request->id, 'created_by' => $request->userid])->first();
+         // if property record found // 'created_by' => $request->userid
+         $searchedProperty = Property::with('details')->where(['uuid' => $request->id])->first();
 
          // repopulating various room images as property images
          foreach ($searchedProperty->details as $images) {

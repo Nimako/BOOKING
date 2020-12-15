@@ -33,7 +33,7 @@ class PropertyListingController extends Controller
       else{
          # variable declaration
          $responseData = array();
-         if($searchedPropertys = Property::where(['created_by' => $request->userid])->get()) {
+         if($searchedPropertys = Property::where(['created_by' => $request->userid])->whereRaw('status != '.DELETED_PROPERTY)->get()) {
             foreach ($searchedPropertys as $property) {
                # other searches
                $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();

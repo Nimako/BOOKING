@@ -29,11 +29,14 @@ define('STATUS', array(
 define('PENDING_PROPERTY_APPROVAL', 2);
 define('PROPERTY_IN_REVIEW', 3);
 define('PUBLISHED_PROPERTY', 3);
+define('DELETED_PROPERTY', 5);
 
 define('PROPERTY_STATUSES', array(
    1 => 'Pending-Approval',
    2 => 'Pending-Approval',
    3 => 'Published',
+   4 => 'Suspended',
+   5 => 'Deleted'
 ));
 
 #### Others ####
