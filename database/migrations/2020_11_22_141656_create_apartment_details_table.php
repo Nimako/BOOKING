@@ -15,6 +15,7 @@ class CreateApartmentDetailsTable extends Migration
     {
         Schema::create('apartment_details', function (Blueprint $table) {
            $table->id();
+           $table->uuid('uuid');
            $table->timestamps();
            // Central Columns
            $table->char('status', 2)->default(1);
