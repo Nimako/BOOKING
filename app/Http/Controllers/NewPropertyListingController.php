@@ -105,6 +105,7 @@ class NewPropertyListingController extends Controller
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
                   $apartmentDetailsInfo= [
+                     'uuid' => Uuid::uuid6(),
                      'room_name' => $detailss['room_name'],
                      'property_id' => $searchedProperty->id,
                      'total_guest_capacity' => $detailss['total_guest_capacity'],
@@ -244,7 +245,7 @@ class NewPropertyListingController extends Controller
 
          // repopulating various room images as property images
          foreach ($searchedProperty->details as $images) {
-            $generalImages =  array_merge($generalImages, $images['image_pathss']);
+            $generalImages =  @array_merge($generalImages, $images['image_pathss']);
          }
 
          $searchedProperty->all_property_images = $generalImages;

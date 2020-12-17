@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers;
 
@@ -28,38 +28,35 @@ class AuthController extends Controller
      */
     public function login()
     {
+       $credentials = request(['email', 'password']);
+       if(empty($credentials['email'])){
+          return response()->json(['statusCode'=>500, 'message' => 'Username is required']);
+       }
+       if(empty($credentials['password'])){
+          return response()->json(['statusCode'=>500, 'message' => 'Password is required']);
+       }
+       $user = User::where("email",$credentials['email'])->first();
 
-        $credentials = request(['email', 'password']);
-
-        if(empty($credentials['email'])){
-            return response()->json(['statusCode'=>500, 'message' => 'Username is required']);
-        }
-
-        if(empty($credentials['password'])){
-            return response()->json(['statusCode'=>500, 'message' => 'Password is required']);
-        }
-        
-        $user = User::where("email",$credentials['email'])->first();
-
-        $customClaims = [
-            "partner_id" => $user->id,
-            "uuid"       => $user->uuid,
-            "email"      => $user->email,
-            "useraccount_id" => $user->useraccount_id,
-            "phone_no"    => $user->phone_no,
-            "role"        => "partner"
-        ];
-
-        try {
-            if (! $token = JWTAuth::claims($customClaims)->attempt($credentials)) {
-                return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials']);
-            }
-        } catch (JWTException $e) {
-            return response()->json(['statusCode'=>500, 'message' => 'could_not_create_token']);
-        }
-
-        return $this->respondWithToken($token);
-
+       if(empty($user)){
+        return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials']);
+       }
+       
+       $customClaims = [
+          "partner_id" => $user->id,
+          "uuid"       => $user->uuid,
+          "email"      => $user->email,
+          "useraccount_id" => $user->useraccount_id,
+          "phone_no"    => $user->phone_no,
+          "role"        => "partner"
+       ];
+       try {
+          if (! $token = JWTAuth::claims($customClaims)->attempt($credentials)) {
+             return response()->json(['statusCode'=>500, 'message' => 'invalid username and password']);
+          }
+       } catch (JWTException $e) {
+          return response()->json(['statusCode'=>500, 'message' => 'could_not_create_token']);
+       }
+       return $this->respondWithToken($token);
     }
 
 
@@ -83,7 +80,7 @@ class AuthController extends Controller
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
-        
+
     }
 
     /**
@@ -106,7 +103,7 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-      
+
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
