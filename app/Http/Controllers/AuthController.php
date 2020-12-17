@@ -28,15 +28,17 @@ class AuthController extends Controller
      */
     public function login()
     {
-        if(empty($request->email)){
+
+        $credentials = request(['email', 'password']);
+
+        if(empty($credentials['email'])){
             return response()->json(['statusCode'=>500, 'message' => 'Username is required']);
         }
 
-        if(empty($request->email)){
+        if(empty($credentials['password'])){
             return response()->json(['statusCode'=>500, 'message' => 'Password is required']);
         }
         
-        $credentials = request(['email', 'password']);
         $user = User::where("email",$credentials['email'])->first();
 
         $customClaims = [
