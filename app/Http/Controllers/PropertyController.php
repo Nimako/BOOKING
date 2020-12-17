@@ -21,6 +21,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
+use File;
 
 class PropertyController extends Controller
 {
@@ -64,6 +65,13 @@ class PropertyController extends Controller
                  // apartment details
                  $searchedDetails = ApartmentDetail::where(['uuid' => $request->duplicate_id])->get();
                  foreach ($searchedDetails as $details) {
+                    // image duplication mgmt
+                     $images = array_map(function($image){
+                        $cpy_img = substr($image, 0, strripos($image, '.'))."_dup.webp";
+                        File::copy($image, $cpy_img);
+                        return $cpy_img;
+                     }, $details->image_pathss);
+
                     // duplicate apartment details
                     $apartmentDetails = [
                        'uuid' => Uuid::uuid6(),
@@ -73,7 +81,7 @@ class PropertyController extends Controller
                        'total_bathrooms' => $details->total_bathrooms,
                        'num_of_rooms' => $details->num_of_rooms,
                        //'common_room_amenity_id' => $details->common_room_amenity_id,
-                       'image_paths' => implode(STRING_GLUE, $details->image_pathss),
+                       'image_paths' => implode(STRING_GLUE, $images),
                     ];
                     $newlySaveApartment = ApartmentDetail::create($apartmentDetails);
 
