@@ -67,10 +67,18 @@ class PropertyController extends Controller
                  foreach ($searchedDetails as $details) {
                     // image duplication mgmt
                      $images = array_map(function($image){
+                        $a = explode('storage', $image);
+                        $copy4rm = storage_path($a[1]);
+
                         $cpy_img = substr($image, 0, strripos($image, '.'))."_dup.webp";
-                        File::copy($image, $cpy_img);
+                        $a = explode('storage', $cpy_img);
+                        $copy2 = storage_path($a[1]);
+
+                        File::copy($copy4rm, $copy2);
                         return $cpy_img;
                      }, $details->image_pathss);
+
+                     //return $images;
 
                     // duplicate apartment details
                     $apartmentDetails = [
