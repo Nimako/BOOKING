@@ -70,7 +70,7 @@ class PropertyController extends Controller
                         $a = explode('storage/', $image);
                         $copy4rm = storage_path($a[1]);
 
-                        $cpy_img = substr($image, 0, strripos($image, '.'))."_dup.webp";
+                        $cpy_img = str_replace(' ', '_', substr($image, 0, strripos($image, '.'))."_dup_".microtime().".webp");
                         $a = explode('storage/', $cpy_img);
                         $copy2 = storage_path($a[1]);
 
@@ -106,13 +106,20 @@ class PropertyController extends Controller
                     ApartmentDetail::find($newlySaveApartment->id)->update(['common_room_amenity_id' => $newDetails->id]);
 
                     // duplicate room details
-                    $searched = RoomDetails::where(['room_id' => $newlySaveApartment->id])->get(['id']);
+                    $searched = RoomDetails::where(['room_id' => $details->id])->get();
                     foreach ($searched as $roomSearched) {
                        $internalSearched = RoomDetails::find($roomSearched->id);
                        $newRoomDetails = $internalSearched->replicate();
                        $newRoomDetails->room_id = $newlySaveApartment->id;
                        $newRoomDetails->save();
                     }
+
+                    // duplicate room prices
+                    $searchedDetails = RoomPrices::where(['room_id' => $details->id])->first();
+                    $newDetails = $searchedDetails->replicate();
+                    //$newDetails->property_id = $searchedProperty->id;
+                    $newDetails->room_id = $newlySaveApartment->id;
+                    $newDetails->save();
                  }
               break;
            }
