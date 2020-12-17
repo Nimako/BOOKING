@@ -245,7 +245,7 @@ class NewPropertyListingController extends Controller
 
          // repopulating various room images as property images
          foreach ($searchedProperty->details as $images) {
-            $generalImages =  array_merge($generalImages, $images['image_pathss']);
+            $generalImages =  @array_merge($generalImages, $images['image_pathss']);
          }
 
          $searchedProperty->all_property_images = $generalImages;
