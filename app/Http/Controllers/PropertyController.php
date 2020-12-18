@@ -25,117 +25,13 @@ use File;
 
 class PropertyController extends Controller
 {
-    /**
-     * Duplicate a listing of the resource.
-     *
-     * @return Response
-     */
-    public function DuplicateProperty(Request $request)
-    {
-       // validation
-       $rules = [
-          'id' => "required|exists:properties,uuid",
-          'duplicate_id' => "required"
-       ];
-       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
-       if($validator->fails()) {
-          return ApiResponse::returnErrorMessage($message = $validator->errors());
-       }
-       else {
-           // property info
-           $searchedProperty = Property::where(['uuid' => $request->id])->first();
-           /*$newProperty = $searchedProperty->replicate();
-           $newProperty->uuid = Uuid::uuid6();
-           $newProperty->save();*/
-
-           switch ($searchedProperty->property_type_id) {
-              case 1 :
-                 /*// common property facilities
-                 $searchedDetails = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first();
-                 $newDetails = $searchedDetails->replicate();
-                 $newDetails->property_id = $searchedProperty->id;
-                 $newDetails->save();*/
-
-                 /*// common property policies
-                 $searchedDetails = CommonPropertyPolicy::where(['property_id' => $searchedProperty->id])->first();
-                 $newDetails = $searchedDetails->replicate();
-                 $newDetails->property_id = $searchedProperty->id;
-                 $newDetails->save();*/
-
-                 // apartment details
-                 $searchedDetails = ApartmentDetail::where(['uuid' => $request->duplicate_id])->get();
-                 foreach ($searchedDetails as $details) {
-                    // image duplication mgmt
-                     $images = array_map(function($image){
-                        $a = explode('storage/', $image);
-                        $copy4rm = storage_path($a[1]);
-
-                        $cpy_img = str_replace(' ', '_', substr($image, 0, strripos($image, '.'))."_dup_".microtime().".webp");
-                        $a = explode('storage/', $cpy_img);
-                        $copy2 = storage_path($a[1]);
-
-                        File::copy($copy4rm, $copy2);
-                        $imageReturned = explode('public/', $cpy_img);
-
-                        return $imageReturned[1];
-                     }, $details->image_pathss);
-
-                     //return $images;
-
-                    // duplicate apartment details
-                    $apartmentDetails = [
-                       'uuid' => Uuid::uuid6(),
-                       'property_id' => $searchedProperty->id,
-                       'room_name' => $details->room_name,
-                       'total_guest_capacity' => $details->total_guest_capacity,
-                       'total_bathrooms' => $details->total_bathrooms,
-                       'num_of_rooms' => $details->num_of_rooms,
-                       //'common_room_amenity_id' => $details->common_room_amenity_id,
-                       'image_paths' => implode(STRING_GLUE, $images),
-                    ];
-                    $newlySaveApartment = ApartmentDetail::create($apartmentDetails);
-
-                    // duplicating common room amenities
-                    $searchedDetails = CommonRoomAmenities::find($details->common_room_amenity_id);
-                    $newDetails = $searchedDetails->replicate();
-                    $newDetails->property_id = $searchedProperty->id;
-                    $newDetails->room_id = $newlySaveApartment->id;
-                    $newDetails->save();
-
-                    //updating apartment details
-                    ApartmentDetail::find($newlySaveApartment->id)->update(['common_room_amenity_id' => $newDetails->id]);
-
-                    // duplicate room details
-                    $searched = RoomDetails::where(['room_id' => $details->id])->get();
-                    foreach ($searched as $roomSearched) {
-                       $internalSearched = RoomDetails::find($roomSearched->id);
-                       $newRoomDetails = $internalSearched->replicate();
-                       $newRoomDetails->room_id = $newlySaveApartment->id;
-                       $newRoomDetails->save();
-                    }
-
-                    // duplicate room prices
-                    $searchedDetails = RoomPrices::where(['room_id' => $details->id])->first();
-                    $newDetails = $searchedDetails->replicate();
-                    //$newDetails->property_id = $searchedProperty->id;
-                    $newDetails->room_id = $newlySaveApartment->id;
-                    $newDetails->save();
-                 }
-              break;
-           }
-
-           // retrun
-          return ApiResponse::returnSuccessData($searchedProperty);
-       }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-   public function OnBoarding(Request $request)
+   /**
+    * Store a newly created resource in storage.
+    *
+    * @param Request $request
+    * @return JsonResponse
+    */
+    public function OnBoarding(Request $request)
    {
       // if property exists
       if(!empty($request->id))
@@ -339,6 +235,111 @@ class PropertyController extends Controller
       }
    }
 
+    /**
+     * Duplicate a listing of the resource.
+     *
+     * @return Response
+     */
+    public function DuplicateProperty(Request $request)
+    {
+       // validation
+       $rules = [
+          'id' => "required|exists:properties,uuid",
+          'duplicate_id' => "required"
+       ];
+       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
+       if($validator->fails()) {
+          return ApiResponse::returnErrorMessage($message = $validator->errors());
+       }
+       else {
+           // property info
+           $searchedProperty = Property::where(['uuid' => $request->id])->first();
+           /*$newProperty = $searchedProperty->replicate();
+           $newProperty->uuid = Uuid::uuid6();
+           $newProperty->save();*/
+
+           switch ($searchedProperty->property_type_id) {
+              case 1 :
+                 /*// common property facilities
+                 $searchedDetails = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first();
+                 $newDetails = $searchedDetails->replicate();
+                 $newDetails->property_id = $searchedProperty->id;
+                 $newDetails->save();*/
+
+                 /*// common property policies
+                 $searchedDetails = CommonPropertyPolicy::where(['property_id' => $searchedProperty->id])->first();
+                 $newDetails = $searchedDetails->replicate();
+                 $newDetails->property_id = $searchedProperty->id;
+                 $newDetails->save();*/
+
+                 // apartment details
+                 $searchedDetails = ApartmentDetail::where(['uuid' => $request->duplicate_id])->get();
+                 foreach ($searchedDetails as $details) {
+                    // image duplication mgmt
+                     $images = array_map(function($image){
+                        $a = explode('storage/', $image);
+                        $copy4rm = storage_path($a[1]);
+
+                        $cpy_img = str_replace(' ', '_', substr($image, 0, strripos($image, '.'))."_dup_".microtime().".webp");
+                        $a = explode('storage/', $cpy_img);
+                        $copy2 = storage_path($a[1]);
+
+                        File::copy($copy4rm, $copy2);
+                        $imageReturned = explode('public/', $cpy_img);
+
+                        return $imageReturned[1];
+                     }, $details->image_pathss);
+
+                     //return $images;
+
+                    // duplicate apartment details
+                    $apartmentDetails = [
+                       'uuid' => Uuid::uuid6(),
+                       'property_id' => $searchedProperty->id,
+                       'room_name' => $details->room_name,
+                       'total_guest_capacity' => $details->total_guest_capacity,
+                       'total_bathrooms' => $details->total_bathrooms,
+                       'num_of_rooms' => $details->num_of_rooms,
+                       //'common_room_amenity_id' => $details->common_room_amenity_id,
+                       'image_paths' => implode(STRING_GLUE, $images),
+                    ];
+                    $newlySaveApartment = ApartmentDetail::create($apartmentDetails);
+
+                    // duplicating common room amenities
+                    $searchedDetails = CommonRoomAmenities::find($details->common_room_amenity_id);
+                    $newDetails = $searchedDetails->replicate();
+                    $newDetails->property_id = $searchedProperty->id;
+                    $newDetails->room_id = $newlySaveApartment->id;
+                    $newDetails->save();
+
+                    //updating apartment details
+                    ApartmentDetail::find($newlySaveApartment->id)->update(['common_room_amenity_id' => $newDetails->id]);
+
+                    // duplicate room details
+                    $searched = RoomDetails::where(['room_id' => $details->id])->get();
+                    foreach ($searched as $roomSearched) {
+                       $internalSearched = RoomDetails::find($roomSearched->id);
+                       $newRoomDetails = $internalSearched->replicate();
+                       $newRoomDetails->room_id = $newlySaveApartment->id;
+                       $newRoomDetails->save();
+                    }
+
+                    // duplicate room prices
+                    $searchedDetails = RoomPrices::where(['room_id' => $details->id])->first();
+                    $newDetails = $searchedDetails->replicate();
+                    //$newDetails->property_id = $searchedProperty->id;
+                    $newDetails->room_id = $newlySaveApartment->id;
+                    $newDetails->save();
+                 }
+              break;
+           }
+
+           // retrun
+          return ApiResponse::returnSuccessData($searchedProperty);
+       }
+    }
+
+
     public function store_old(Request $request)
     {
         if(!empty($request->getFields)) {
@@ -370,23 +371,6 @@ class PropertyController extends Controller
         }
     }
 
-    public function PropertyApproval($propertyId)
-    {
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-
     /**
      * Remove the specified resource from storage.
      *
@@ -398,6 +382,7 @@ class PropertyController extends Controller
        // validation
        $rules = [
           'id' => "required|exists:properties,uuid",
+          'delete_id' => "required",
        ];
        $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
        if($validator->fails()) {
@@ -405,8 +390,15 @@ class PropertyController extends Controller
        }
        else {
           $searchedProperty = Property::where(['uuid' => $request->id])->first();
-          $searchedProperty->status = DELETED_PROPERTY;
-          $searchedProperty->save();
+          switch ($searchedProperty->property_type_id) {
+             case 1 :
+                // apartment details
+                //return $searchedDetails = ApartmentDetail::where(['uuid' => $request->delete_id])->first();
+                if($searchedDetails = ApartmentDetail::where(['uuid' => $request->delete_id])->first())
+                   $searchedDetails->update(['status' => DELETED_PROPERTY]);
+
+                break;
+          }
 
           return ApiResponse::returnSuccessMessage("Property Deleted Successfully");
        }

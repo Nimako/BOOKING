@@ -19,7 +19,7 @@ class Property extends Model
 
    public function Details()
    {
-      return $this->hasMany('App\Models\ApartmentDetail');
+      return $this->hasMany('App\Models\ApartmentDetail')->where('status','<>', 5);
    }
 
    public function getFacilitiesAttribute()
