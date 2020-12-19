@@ -422,6 +422,9 @@ class NewPropertyListingController extends Controller
 
          // saving data
          $responseData = Property::create($request->all());
+         $request->merge(['property_id' => $responseData->id]);
+         //return $request->all();
+         $hotelDetails = HotelDetails::create($request->all());
          // return statement
          return ApiResponse::returnSuccessData(array('id' => $responseData->uuid, 'completed_onboard_stage' => "Stage1"));
       }
