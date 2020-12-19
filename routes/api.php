@@ -59,6 +59,7 @@ Route::group(['middleware' => 'api','prefix' => 'auths'], function ($router) {
 // Default Item Listing
 Route::group(['prefix'=>'default-items'],function(){
    Route::post('/',  [DefaultValuesController::class,'GetDefaultList']);
+   Route::post('/roomnames',  [DefaultValuesController::class,'GetRoomNames']);
 });
 
 // Property Listing

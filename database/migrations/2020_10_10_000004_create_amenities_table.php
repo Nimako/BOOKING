@@ -21,8 +21,9 @@ class CreateAmenitiesTable extends Migration
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             // fields
-            $table->string('name')->unique();
+            $table->string('name')->nullable();
             $table->string('icon_class')->nullable();
+            $table->string('category')->nullable();
         });
     }
 

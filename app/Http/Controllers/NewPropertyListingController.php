@@ -338,7 +338,6 @@ class NewPropertyListingController extends Controller
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
 
                   $room = $searchedProperty;
-
                   // roomDetails
                   if(!empty($detailss['room_details']))
                   {
@@ -346,6 +345,7 @@ class NewPropertyListingController extends Controller
                         $roomDetails[] = [
                            'property_id' => $searchedProperty->id,
                            'room_name' => $detail['name'],
+                           'custom_room_name' => $detail['custom_name'],
                            'bed_types' => json_encode($detail['bed_details']),
                            'added_amenities' => (empty(@$detail['added_amenities'])) ? null : json_encode(@$detail['added_amenities']),
                         ];
@@ -357,24 +357,6 @@ class NewPropertyListingController extends Controller
                         HotelDetails::insert($roomDetails);
                      $roomDetails = array();
                   }
-
-                  # image uploads
-                  /*if($request->hasFile('images')) {
-                     # searching for record
-                     if($room->image_paths != null) {
-                        $filePaths = explode(STRING_GLUE, $room->image_paths);
-                        foreach ($filePaths as $filePath) {
-                           unlink('storage/'.$filePath);
-                        }
-                     }
-
-                     // upload new files
-                     foreach ($request->file('images') as $image){
-                        $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
-                     }
-                     # updating file upload field
-                     Property::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
-                  }*/
 
                   # room prices
                   if(!empty($detailss['price_list'])) {

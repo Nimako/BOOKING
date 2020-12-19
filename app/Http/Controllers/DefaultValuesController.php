@@ -8,8 +8,10 @@ use App\Models\Country;
 use App\Models\Facility;
 use App\Models\Policy;
 use App\Models\PropertyType;
+use App\Models\RoomType;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DefaultValuesController extends Controller
 {
@@ -34,11 +36,29 @@ class DefaultValuesController extends Controller
          case 'bedtypes' :
             $responseData = BedType::all(['id','name']);
             break;
+         case 'roomtypes' :
+            $retrieved = RoomType::distinct()->get(['category'])->toArray();
+            $responseData = array_map(function($data){ return $data['category']; }, $retrieved);
+            break;
          default :
-            $responseData['options'] = ['amenities','facilities','policies','property_types','country','bedtypes'];
+            $responseData['options'] = ['amenities','facilities','policies','property_types','country','bedtypes','roomtypes'];
             break;
       }
 
       return ApiResponse::returnData($responseData);
+   }
+
+   public function GetRoomNames(Request $request)
+   {
+      $rules = [
+         'room_category' => "required"
+      ];
+      $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         return ApiResponse::returnSuccessData(RoomType::where(['category' => $request->room_category])->get());
+      }
    }
 }
