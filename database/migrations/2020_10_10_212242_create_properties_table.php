@@ -46,6 +46,13 @@ class CreatePropertiesTable extends Migration
             $table->text('images_paths')->nullable();
             $table->integer('num_of_floors')->nullable();
             $table->string('current_onboard_stage')->nullable();
+
+            $table->string('listed_on')->nullable();
+            $table->string('star_rating')->nullable();
+            $table->string('own_multiple_property')->nullable();
+            $table->string('name_of_company_group_chain')->nullable();
+            $table->string('use_channel_manager')->nullable();
+            $table->string('channel_manager_name')->nullable();
             // Foreign Keys
             //$table->foreign('property_type_id')->references('id')->on('property_types');
         });

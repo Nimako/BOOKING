@@ -287,7 +287,7 @@ class NewPropertyListingController extends Controller
             // adding to request obj
             $request->merge($addToRequestObj);
             // saving property info
-            $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
+            $propertyUpdateResponse = $searchedProperty->update($request->all());
 
             # if facilities added to request
             if(!empty($request->facilities)) {
@@ -337,48 +337,29 @@ class NewPropertyListingController extends Controller
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
 
-                  $room = $searchedProperty;
                   // roomDetails
                   if(!empty($detailss['room_details']))
                   {
                      foreach ($detailss['room_details'] as $detail) {
-                        $roomDetails[] = [
+                        $roomDetails = [
                            'property_id' => $searchedProperty->id,
-                           'room_name' => $detail['name'],
-                           'custom_room_name' => $detail['custom_name'],
+                           'room_name' => $detail['room_name'],
+                           'custom_room_name' => $detail['custom_room_name'],
+                           'smoking_policy' => $detail['smoking_policy'],
+                           'similiar_rooms' => $detail['similiar_rooms'],
                            'bed_types' => json_encode($detail['bed_details']),
+                           'total_guest_capacity' => 8,
+                           'dimension' => "25 square feet",
+                           'price' => json_encode($detail['price']),
                            'added_amenities' => (empty(@$detail['added_amenities'])) ? null : json_encode(@$detail['added_amenities']),
                         ];
-                     }
-                     // searching for update
-                     if($searchedRecord = HotelDetails::where(['room_name' => $detail['name'], 'property_id' => $searchedProperty->id])->first())
-                        HotelDetails::find($searchedRecord->id)->update($roomDetails[0]);
-                     else
-                        HotelDetails::insert($roomDetails);
-                     $roomDetails = array();
-                  }
 
-                  # room prices
-                  if(!empty($detailss['price_list'])) {
-                     $guestOccupancy = $amount = $discounts = array();
-                     $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
-                     foreach ($detailss['price_list'] as $pricesDetails) {
-                        $guestOccupancy[] = $pricesDetails['guest_occupancy'];
-                        $amount[] = $pricesDetails['amount'];
-                        $discount[] = $pricesDetails['discount'];
+                        if($searchedRecord = HotelDetails::where(['room_name' => $detail['room_name'], 'property_id' => $searchedProperty->id])->first())
+                           HotelDetails::find($searchedRecord->id)->update($roomDetails);
+                        else
+                           HotelDetails::insert($roomDetails);
+                        unset($roomDetails);
                      }
-                     // saving data
-                     if($roomPrices = RoomPrices::where(['room_id' => $room->id])->first())
-                        $doNothing = "";
-                     else {
-                        $roomPrices = new RoomPrices();
-                        $roomPrices->room_id = $room->id;
-                     }
-
-                     $roomPrices->guest_occupancy = implode(STRING_GLUE, $guestOccupancy);
-                     $roomPrices->amount = implode(STRING_GLUE, $amount);
-                     $roomPrices->discount = implode(STRING_GLUE, $discount);
-                     $roomPrices->save();
                   }
                }
             }
@@ -416,15 +397,19 @@ class NewPropertyListingController extends Controller
             return ApiResponse::returnErrorMessage($message = $validator->errors());
 
          // data pre-processing
-         $request->request->add(['uuid' => Uuid::uuid6()]);
+
          if(!empty($request->property_type_id))
             $request->merge(['property_type_id' => PropertyType::where(['uuid' => $request->property_type_id])->first()->id]);
 
          // saving data
-         $responseData = Property::create($request->all());
-         $request->merge(['property_id' => $responseData->id]);
-         //return $request->all();
-         $hotelDetails = HotelDetails::create($request->all());
+         if($searchedProperty = Property::where(['name' => $request->name])->first()) {
+            $searchedProperty->update($request->all());
+            $responseData = $searchedProperty;
+         }
+         else {
+            $request->request->add(['uuid' => Uuid::uuid6()]);
+            $responseData = Property::create($request->all());
+         }
          // return statement
          return ApiResponse::returnSuccessData(array('id' => $responseData->uuid, 'completed_onboard_stage' => "Stage1"));
       }
