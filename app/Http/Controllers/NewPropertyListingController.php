@@ -348,33 +348,6 @@ class NewPropertyListingController extends Controller
                   HotelDetails::find($searchedRecord->id)->update($hotelDetails);
                else
                   HotelDetails::create($hotelDetails);
-               return $hotelDetails;
-               foreach ($request->details as $detailss) {
-                  if(!empty(@$detailss['image_paths']))
-                     $images = implode(STRING_GLUE, @$detailss['image_paths']);
-
-                  // roomDetails
-                  if(!empty($detailss['room_details']))
-                  {
-                     foreach ($detailss['room_details'] as $detail) {
-                        $roomDetails = [
-                           'property_id' => $searchedProperty->id,
-                           'room_name' => $detail['room_name'],
-                           'custom_room_name' => $detail['custom_room_name'],
-                           'smoking_policy' => $detail['smoking_policy'],
-                           'similiar_rooms' => $detail['similiar_rooms'],
-                           'bed_types' => json_encode($detail['bed_details']),
-                           'total_guest_capacity' => 8,
-                           'dimension' => "25 square feet",
-                           'price' => json_encode($detail['price']),
-                           '' => (empty(@$detail['added_amenities'])) ? null : json_encode(@$detail['added_amenities'])
-                        ];
-
-
-                        unset($roomDetails);
-                     }
-                  }
-               }
             }
 
             // saving other hotel details

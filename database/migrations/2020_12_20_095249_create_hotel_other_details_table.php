@@ -29,6 +29,7 @@ class CreateHotelOtherDetailsTable extends Migration
             $table->string('use_channel_manager')->nullable();
             $table->string('channel_manager_name')->nullable();
             $table->text('parking_options')->nullable();
+            $table->text('extra_bed_options')->nullable();
         });
     }
 
