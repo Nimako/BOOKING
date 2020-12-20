@@ -8,6 +8,7 @@ use App\Models\CommonPropertyPolicy;
 use App\Models\CommonRoomAmenities;
 use App\Models\Facility;
 use App\Models\HotelDetails;
+use App\Models\HotelOtherDetails;
 use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\ApartmentDetail;
@@ -279,6 +280,8 @@ class NewPropertyListingController extends Controller
             // property data pre-processing
             if(!empty($request->latitude) || !empty($request->longitude))
                $addToRequestObj['geolocation'] = $request->latitude.','.$request->longitude;
+            if(!empty($request->serve_breakfast))
+               $addToRequestObj['serve_breakfast'] = $request->serve_breakfast;
             if(!empty($request->languages_spoke))
                $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
@@ -333,6 +336,19 @@ class NewPropertyListingController extends Controller
             // apartment details
             if(!empty($request->details))
             {
+               $hotelDetails =  $request->details[0]['room_details'][0];
+               // added factors
+               $hotelDetails['created_by'] = $request->created_by;
+               $hotelDetails['property_id'] = $searchedProperty->id;
+               $hotelDetails['bed_types'] = json_encode($hotelDetails['bed_details']);
+               $hotelDetails['price'] = json_encode($hotelDetails['pricelist']);
+               $hotelDetails['added_amenities'] = (empty(@$hotelDetails['added_amenities'])) ? null : json_encode(@$hotelDetails['added_amenities']);
+
+               if($searchedRecord = HotelDetails::where(['room_name' => $hotelDetails['room_name'], 'property_id' => $searchedProperty->id])->first())
+                  HotelDetails::find($searchedRecord->id)->update($hotelDetails);
+               else
+                  HotelDetails::create($hotelDetails);
+               return $hotelDetails;
                foreach ($request->details as $detailss) {
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
@@ -351,18 +367,21 @@ class NewPropertyListingController extends Controller
                            'total_guest_capacity' => 8,
                            'dimension' => "25 square feet",
                            'price' => json_encode($detail['price']),
-                           'added_amenities' => (empty(@$detail['added_amenities'])) ? null : json_encode(@$detail['added_amenities']),
+                           '' => (empty(@$detail['added_amenities'])) ? null : json_encode(@$detail['added_amenities'])
                         ];
 
-                        if($searchedRecord = HotelDetails::where(['room_name' => $detail['room_name'], 'property_id' => $searchedProperty->id])->first())
-                           HotelDetails::find($searchedRecord->id)->update($roomDetails);
-                        else
-                           HotelDetails::insert($roomDetails);
+
                         unset($roomDetails);
                      }
                   }
                }
             }
+
+            // saving other hotel details
+            if($searchedOtherDetails = HotelOtherDetails::where(['property_id' => $searchedProperty->id])->first())
+               $searchedOtherDetails->update($request->all());
+            else
+               HotelOtherDetails::create($request->all());
 
             # if amenities added to request
             if(!empty($request->amenities)) {
