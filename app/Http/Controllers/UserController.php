@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
+use JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
@@ -22,9 +25,9 @@ class UserController extends Controller
    {
       // validation
       $rules = [
-         'email' => "required",
-         'fullname' => "required",
-         'password' => 'min:8|required_with:confirm_password|same:confirm_password',
+         'email'            => "required",
+         'fullname'         => "required",
+         'password'         => 'min:8|required_with:confirm_password|same:confirm_password',
          'confirm_password' => 'min:8'
       ];
       $validator = Validator::make($request->all(), $rules);
@@ -38,10 +41,10 @@ class UserController extends Controller
          // adding new request params
          $email_token = sha1(microtime().$request->email);
          $request->merge([
-            'uuid' => Uuid::uuid6(),
-            'email_token' => $email_token,
+            'uuid'             => Uuid::uuid6(),
+            'email_token'      => $email_token,
             'token_expiration' => date('Y-m-d H:i:s', strtotime('+ 4hours')),
-            'password' => Hash::make($request->password)
+            'password'         => Hash::make($request->password)
          ]);
          if($responseData = UserPartnerAccount::create($request->except('confirm_password'))){
             // Sending Email
@@ -50,14 +53,14 @@ class UserController extends Controller
                'token' => config('user-defined.main-site-url')."verify-email/".$email_token,
             ];
             event(new SendEmail($request->email, $details));
-
-            // return
             return ApiResponse::returnSuccessData($responseData);
          }
          else
             return ApiResponse::returnErrorMessage($message = "An Error Occurred");
       }
    }
+
+   
 
    public function VerifyPartnerAccount(Request $request)
    {
@@ -69,7 +72,7 @@ class UserController extends Controller
          else {
             $searchedToken->token_validated = 1;
             $searchedToken->save();
-            return ApiResponse::returnSuccessMessage($message = "Email Validated Successfully");
+            return ApiResponse::returnSuccessMessage($message = "Email verified Successfully");
          }
       }
       else

@@ -38,7 +38,7 @@ class AuthController extends Controller
        $user = User::where("email",$credentials['email'])->first();
 
        if(empty($user)){
-        return response()->json(['statusCode'=>500, 'message' => 'invalid_credentials']);
+        return response()->json(['statusCode'=>500, 'message' => 'Email does not exist in our system']);
        }
        
        $customClaims = [
@@ -106,9 +106,9 @@ class AuthController extends Controller
 
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
-            "status"=> 200,
-            "message"=> "success"
+            'expires_in' =>  auth()->factory()->getTTL() * 60,
+            "statusCode" =>  200,
+            "message"    => "success"
         ]);
     }
 }
