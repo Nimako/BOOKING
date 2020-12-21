@@ -34,6 +34,7 @@ class CreatePropertiesTable extends Migration
             $table->string('area')->nullable();
             $table->text('about_us')->nullable();
             $table->text('summary_text')->nullable();
+            $table->string('contact_name')->nullable();
             $table->string('primary_telephone')->nullable();
             $table->string('secondary_telephone')->nullable();
             $table->string('email', 255)->nullable();

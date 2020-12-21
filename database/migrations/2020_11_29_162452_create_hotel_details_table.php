@@ -22,12 +22,16 @@ class CreateHotelDetailsTable extends Migration
            $table->bigInteger('updated_by')->nullable();
            // Table Fields
            $table->unsignedBigInteger('property_id');
-           $table->string('room_name');
+           $table->string('room_name')->nullable();
+           $table->string('custom_room_name')->nullable();
+           $table->text('smoking_policy')->nullable();
            $table->text('bed_types')->nullable();
+           $table->integer('total_guest_capacity')->nullable();
            $table->text('added_amenities')->nullable();
            $table->string('dimension')->nullable();
            $table->text('image_paths')->nullable();
-           $table->text('prices')->nullable();
+           $table->text('price')->nullable();
+           $table->integer('similiar_rooms')->nullable();
         });
     }
 

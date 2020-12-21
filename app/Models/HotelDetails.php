@@ -9,5 +9,6 @@ class HotelDetails extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['room_name','bed_types','added_amenities','dimension','image_paths'];
+    protected $fillable = ['property_id','room_name','custom_room_name','price','smoking_policy', 'bed_types','similiar_rooms',
+       'added_amenities','dimension','image_paths','total_guest_capacity','parking_options','created_by','updated_by'];
 }
