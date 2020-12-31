@@ -105,7 +105,7 @@ class NewPropertyListingController extends Controller
                foreach ($request->details as $detailss) {
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
-                  $apartmentDetailsInfo= [
+                  $apartmentDetailsInfo = [
                      'uuid' => Uuid::uuid6(),
                      'room_name' => $detailss['room_name'],
                      'property_id' => $searchedProperty->id,

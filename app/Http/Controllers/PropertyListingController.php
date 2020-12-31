@@ -8,9 +8,11 @@ use App\Models\CommonPropertyFacility;
 use App\Models\CommonRoomAmenities;
 use App\Models\Country;
 use App\Models\Facility;
+use App\Models\HotelDetails;
 use App\Models\Property;
 use App\Models\PropertyRating;
 use App\Models\ApartmentDetail;
+use App\Models\PropertyType;
 use App\Models\RoomDetails;
 use App\Models\RoomPrices;
 use App\Traits\ApiResponse;
@@ -34,19 +36,35 @@ class PropertyListingController extends Controller
          # variable declaration
          $responseData = array();
          if($searchedPropertys = Property::where(['created_by' => $request->userid])->whereRaw('status != '.DELETED_PROPERTY)->get()) {
-            foreach ($searchedPropertys as $property) {
+            foreach ($searchedPropertys as $property) { //return $property;
                # other searches
-               $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
+               switch ($property->property_type_id) {
+                  case 1:
+                     $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
+                     $totalGuestCapacity = $apartmentDetails->total_guest_capacity;
+                     $images = $apartmentDetails->image_pathss;
+                     break;
+
+                  case 3 :
+                     $hotelDetails = HotelDetails::where(['property_id' => $property->id])->first();
+                     $totalGuestCapacity = $hotelDetails->total_guest_capacity;
+                     $images = explode(STRING_GLUE, $hotelDetails->image_paths);
+                     break;
+               }
+
 
                $responseData[] = [
                   'uuid' => $property->uuid,
                   'property_type_text' => $property->property_type_text,
                   'name' => $property->name,
                   'street_address_1' => $property->street_address_1,
-                  'display_img' => @$apartmentDetails->image_pathss[0],
-                  'num_of_guest' => @$apartmentDetails->total_guest_capacity,
+                  'display_img' => @$images[0],
+                  'num_of_guest' => @$totalGuestCapacity,
                   'num_of_rooms' => @$apartmentDetails->num_of_rooms
                ];
+
+               ## resetting values
+               unset($images, $totalGuestCapacity);
             }
          }
 
@@ -88,9 +106,10 @@ class PropertyListingController extends Controller
                @$numofrooms_condition;
 
             # query build and result
-            $selectFields = trim(implode(',', array('a.id','uuid','name','geolocation','street_address_1','primary_telephone',
+            $selectFields = trim(implode(',', array('a.id','a.uuid','name','geolocation','street_address_1','primary_telephone',
                'serve_breakfast','languages_spoken','image_paths','b.id as room_id','total_guest_capacity','total_bathrooms',
-               'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage'
+               'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage',
+               '(select name from property_types where property_types.id = a.property_type_id) as property_type_text '
             )), ',');
             $leftJoins = implode(' ', array('left join apartment_details b on b.property_id = a.id',
                //'left join common_room_amenities c on c.id = b.common_room_amenity_id'
@@ -132,6 +151,7 @@ class PropertyListingController extends Controller
                      'current_onboard_stage' => $property->current_onboard_stage,
                      'status' => PROPERTY_STATUSES[$property->property_status],
                      'name' => $property->name,
+                     'property_type_text' => $property->property_type_text,
                      'geolocation' => $property->geolocation,
                      'street_address_1' => $property->street_address_1,
                      'serve_breakfast' => $property->serve_breakfast,
