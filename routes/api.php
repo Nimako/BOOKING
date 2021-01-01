@@ -79,6 +79,9 @@ Route::group(['prefix'=>'property'],function(){
 
     Route::post('/duplicate',  [PropertyController::class,'DuplicateProperty']);
     Route::post('/delete',  [PropertyController::class,'destroy']);
+
+    # hotel routes
+    Route::post('/hotel/view',  [PropertyController::class,'HotelDetails']);
 });
 
 // CronJob

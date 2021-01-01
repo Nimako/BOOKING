@@ -7,8 +7,10 @@ use App\Models\ApartmentDetail;
 use App\Models\CommonPropertyFacility;
 use App\Models\CommonPropertyPolicy;
 use App\Models\CommonRoomAmenities;
+use App\Models\Country;
 use App\Models\Facility;
 use App\Models\Property;
+use App\Models\PropertyRating;
 use App\Models\PropertyType;
 use App\Models\RoomDetails;
 use App\Models\RoomPrices;
@@ -18,6 +20,7 @@ use App\Traits\ImageProcessor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
@@ -403,4 +406,24 @@ class PropertyController extends Controller
           return ApiResponse::returnSuccessMessage("Property Deleted Successfully");
        }
     }
+
+
+   public function HotelDetails(Request $request)
+   {
+      // Validation
+      $rules = [
+         'id' => "required",
+      ];
+      $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         # properties tbl
+         $where_condition = ['uuid' => $request->id];
+         $searchedProperty = Property::with('hoteldetails', 'OtherHotelDetails')->where($where_condition)->first();
+         # return
+         return ApiResponse::returnSuccessData(@$searchedProperty);
+      }
+   }
 }

@@ -338,23 +338,48 @@ class NewPropertyListingController extends Controller
             {
                $hotelDetails =  $request->details[0]['room_details'][0];
                // added factors
-               $hotelDetails['created_by'] = $request->created_by;
-               $hotelDetails['property_id'] = $searchedProperty->id;
-               $hotelDetails['bed_types'] = json_encode($hotelDetails['bed_details']);
-               $hotelDetails['price'] = json_encode($hotelDetails['pricelist']);
-               $hotelDetails['added_amenities'] = (empty(@$hotelDetails['added_amenities'])) ? null : json_encode(@$hotelDetails['added_amenities']);
+               $hotelDetailsSave = [
+                  'created_by' =>  $request->created_by,
+                  'property_id' => $searchedProperty->id,
+                  'room_name' => $hotelDetails['room_name'],
+                  'custom_room_name' => $hotelDetails['custom_room_name'],
+                  'smoking_policy' => $hotelDetails['smoking_policy'],
+                  'similiar_rooms' => $hotelDetails['similiar_rooms'],
+                  'total_guest_capacity' => $hotelDetails['total_guest_capacity'],
+                  'dimension' => $hotelDetails['dimension'],
+                  'bed_types' => json_encode($hotelDetails['bed_details']),
+                  'price' => json_encode($hotelDetails['pricelist']),
+                  'added_amenities' => (empty(@$hotelDetails['added_amenities'])) ? null : json_encode(@$hotelDetails['added_amenities'])
+               ];
 
-               if($searchedRecord = HotelDetails::where(['room_name' => $hotelDetails['room_name'], 'property_id' => $searchedProperty->id])->first())
-                  HotelDetails::find($searchedRecord->id)->update($hotelDetails);
+               //return $hotelDetailsSave;
+
+               if($searchedRecord = HotelDetails::where(['room_name' => $hotelDetails['room_name'], 'property_id' => $searchedProperty->id])->first()) {
+                  $hotelResult = $result =  HotelDetails::find($searchedRecord->id);
+                  $result->update($hotelDetailsSave);
+               }
                else
-                  HotelDetails::create($hotelDetails);
+                  $hotelResult = HotelDetails::create($hotelDetailsSave);
             }
 
             // saving other hotel details
+            $HotelOtherDetails = [
+               'created_by' => $request->created_by,
+               'property_id' => $searchedProperty->id,
+               'hotel_details_id' => $hotelResult->id,
+               'listed_on' => $request->listed_on,
+               'star_rating' => $request->star_rating,
+               'own_multiple_hotel' => $request->own_multiple_hotel,
+               'name_of_company_group_chain' => $request->name_of_company_group_chain,
+               'use_channel_manager' => $request->use_channel_manager,
+               'channel_manager_name' => $request->channel_manager_name,
+               'parking_options' => json_encode($request->parking_options),
+               'extra_bed_options' => json_encode($request->extra_bed_options),
+            ];
             if($searchedOtherDetails = HotelOtherDetails::where(['property_id' => $searchedProperty->id])->first())
-               $searchedOtherDetails->update($request->all());
+               $searchedOtherDetails->update($HotelOtherDetails);
             else
-               HotelOtherDetails::create($request->all());
+               HotelOtherDetails::create($HotelOtherDetails);
 
             # if amenities added to request
             if(!empty($request->amenities)) {

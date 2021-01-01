@@ -15,11 +15,21 @@ class Property extends Model
     ];
 
     protected $hidden = ['created_at','updated_at','updated_by',];
-    protected $appends = ['property_type_text','text_status','facilities','policies'];
+    protected $appends = ['property_type_text','text_status','facilities','policies', 'country_name'];
+
+   public function HotelDetails()
+   {
+      return $this->hasMany('App\Models\HotelDetails')->where('status','<>', DELETED_PROPERTY);
+   }
+
+   public function OtherHotelDetails()
+   {
+      return $this->hasMany('App\Models\HotelOtherDetails')->where('status','<>', DELETED_PROPERTY);
+   }
 
    public function Details()
    {
-      return $this->hasMany('App\Models\ApartmentDetail')->where('status','<>', 5);
+      return $this->hasMany('App\Models\ApartmentDetail')->where('status','<>', DELETED_PROPERTY);
    }
 
    public function getFacilitiesAttribute()
@@ -42,5 +52,10 @@ class Property extends Model
    public function getTextStatusAttribute()
    {
       return $this->attributes['text_status'] = PROPERTY_STATUSES[$this->status];
+   }
+
+   public function getCountryNameAttribute()
+   {
+      return Country::find($this->country_id)->name;
    }
 }
