@@ -18,9 +18,8 @@ class CreateRoomDetailsTable extends Migration
             $table->timestamps();
             // Central Columns
             $table->char('status', 2)->default(1);
-            $table->bigInteger('created_by')->nullable();
-            $table->bigInteger('updated_by')->nullable();
             // Table Fields
+           $table->uuid('uuid');
             $table->unsignedBigInteger('room_id');
             $table->string('room_name',255);
             $table->integer('similiar_rooms')->nullable()->default(1);

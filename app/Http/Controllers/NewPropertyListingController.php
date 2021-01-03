@@ -103,34 +103,56 @@ class NewPropertyListingController extends Controller
             if(!empty($request->details))
             {
                foreach ($request->details as $detailss) {
+                  # variable declaration
+                  $img = $uuid = $room_name = $total_guest_capacity = $total_bathrooms = $num_of_rooms = array();
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
-                  $apartmentDetailsInfo = [
-                     'uuid' => Uuid::uuid6(),
-                     'room_name' => $detailss['room_name'],
-                     'property_id' => $searchedProperty->id,
-                     'total_guest_capacity' => $detailss['total_guest_capacity'],
-                     'total_bathrooms' => $detailss['total_bathrooms'],
-                     'num_of_rooms' => $detailss['num_of_rooms'],
-                     'image_paths' => @$images
-                  ];
-                  /*if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first())
-                     $room->update($apartmentDetailsInfo);
-                  else*/
-                     $room = ApartmentDetail::create($apartmentDetailsInfo);
+
+                  // check if insert or update
+                  if (empty($detailss['id']))
+                     $uuid = array('uuid' => Uuid::uuid6());
+                  if (@$detailss['room_name'])
+                     $room_name = array('room_name' => $detailss['room_name']);
+                  if (@$detailss['total_guest_capacity'])
+                     $total_guest_capacity = array('total_guest_capacity' => $detailss['total_guest_capacity']);
+                  if (@$detailss['total_bathrooms'])
+                     $total_bathrooms = array('total_bathrooms' => $detailss['total_bathrooms']);
+                  if (@$detailss['num_of_rooms'])
+                     $num_of_rooms = array('num_of_rooms' => $detailss['num_of_rooms']);
+                  if (@$images)
+                     $img = array('image_paths' => @$images);
+
+                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img);
+                  if(!empty($apartmentDetailsInfo)) {
+                     $apartmentDetailsInfo['property_id'] = $searchedProperty->id;
+                     $room = ApartmentDetail::updateOrCreate($condition = ['uuid' => @$detailss['id']], $apartmentDetailsInfo);
+                  }
 
                   // roomDetails
                   if(!empty($detailss['room_details']))
                   {
+                     if(empty($room))
+                        $room = ApartmentDetail::where(['uuid' => $detailss['id']])->first();
+
                      foreach ($detailss['room_details'] as $detail) {
-                        $roomDetails[] = [
-                           'room_id' => $room->id,
-                           'room_name' => $detail['name'],
-                           'bed_types' => json_encode($detail['bed_details']),
-                           'added_amenities' => json_encode(@$detail['added_amenities']),
-                        ];
+                        $generatedUuid = $roomid = $room_name = $bed_types = $added_amenities = array();
+                        # conditional variable
+                        if(empty($detail['id']))
+                           $generatedUuid = ['uuid' => Uuid::uuid6()];
+                        if(!empty($room))
+                           $roomid = array('room_id' => @$room->id);
+                        if(!empty($detail['name']))
+                           $room_name = array('room_name' => $detail['name']);
+                        if(!empty($detail['bed_details']))
+                           $bed_types = array('bed_types' => json_encode($detail['bed_details']));
+                        if(!empty($detail['added_amenities']))
+                           $added_amenities = array('added_amenities' => $detail['added_amenities']);
+
+                        if(!empty($roomDetails = array_merge($generatedUuid,$roomid,$room_name,$bed_types,$added_amenities)))
+                           RoomDetails::updateOrCreate($condition = ['uuid' => @$detail['id']], $roomDetails);
                      }
-                     RoomDetails::insert($roomDetails);
+                     //return $roomDetails;
+
                      $roomDetails = array();
                   }
 

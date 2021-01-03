@@ -43,12 +43,14 @@ class PropertyListingController extends Controller
                      $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
                      $totalGuestCapacity = $apartmentDetails->total_guest_capacity;
                      $images = $apartmentDetails->image_pathss;
+                     $num_of_rooms = @$apartmentDetails->num_of_rooms;
                      break;
 
                   case 3 :
                      $hotelDetails = HotelDetails::where(['property_id' => $property->id])->first();
                      $totalGuestCapacity = $hotelDetails->total_guest_capacity;
                      $images = explode(STRING_GLUE, $hotelDetails->image_paths);
+                     $num_of_rooms = HotelDetails::where(['property_id' => $property->id])->get()->count();
                      break;
                }
 
@@ -60,7 +62,7 @@ class PropertyListingController extends Controller
                   'street_address_1' => $property->street_address_1,
                   'display_img' => @$images[0],
                   'num_of_guest' => @$totalGuestCapacity,
-                  'num_of_rooms' => @$apartmentDetails->num_of_rooms
+                  'num_of_rooms' => $num_of_rooms
                ];
 
                ## resetting values
@@ -79,8 +81,8 @@ class PropertyListingController extends Controller
       $rules = [
          'country' => "required",
          'city' => "required",
-         'latitude' => "required",
-         'longitude' => "required",
+         /*'latitude' => "required",
+         'longitude' => "required",*/
          'property_type' => "required",
       ];
       $validator = Validator::make($request->all(), $rules);

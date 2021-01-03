@@ -9,8 +9,9 @@ class RoomDetails extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['uuid','room_id','room_name','similar_rooms','bed_types','added_amenities','dimension'];
 
-   protected $hidden = ['id','created_at','updated_at','status','updated_by','created_by','room_id'];
+   protected $hidden = ['id','created_at','updated_at','status','room_id'];
 
    //protected $appends = ['bed_type_name'];
 
