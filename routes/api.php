@@ -99,6 +99,13 @@ Route::group(['prefix'=>'user'],function(){
 
 });
 
+// Booking Apis
+Route::group(['prefix'=>'reservation'],function(){
+   # Onboarding routes
+   Route::post('/save',  [UserController::class,'CreatePartnerAccount']);
+
+});
+
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);
 
 

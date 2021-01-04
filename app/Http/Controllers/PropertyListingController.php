@@ -14,7 +14,6 @@ use App\Models\PropertyRating;
 use App\Models\ApartmentDetail;
 use App\Models\PropertyType;
 use App\Models\RoomDetails;
-use App\Models\RoomPrices;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,8 +80,6 @@ class PropertyListingController extends Controller
       $rules = [
          'country' => "required",
          'city' => "required",
-         /*'latitude' => "required",
-         'longitude' => "required",*/
          'property_type' => "required",
       ];
       $validator = Validator::make($request->all(), $rules);
@@ -111,7 +108,8 @@ class PropertyListingController extends Controller
             $selectFields = trim(implode(',', array('a.id','a.uuid','name','geolocation','street_address_1','primary_telephone',
                'serve_breakfast','languages_spoken','image_paths','b.id as room_id','total_guest_capacity','total_bathrooms',
                'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage',
-               '(select name from property_types where property_types.id = a.property_type_id) as property_type_text '
+               '(select name from property_types where property_types.id = a.property_type_id) as property_type_text ',
+               'price_list'
             )), ',');
             $leftJoins = implode(' ', array('left join apartment_details b on b.property_id = a.id',
                //'left join common_room_amenities c on c.id = b.common_room_amenity_id'
@@ -130,12 +128,6 @@ class PropertyListingController extends Controller
                   # variables
                   $images = explode(STRING_GLUE, $property->image_paths);
                   $geoData = explode(',', $property->geolocation);
-                  $roomPrices[] = RoomPrices::whereRaw("room_id = $property->room_id")->first();
-
-                  $guestOccupancy = explode(STRING_GLUE, @$roomPrices->guest_occupancy);
-                  $allDiscounts = explode(STRING_GLUE, @$roomPrices->discount);
-                  $allamount = explode(STRING_GLUE, @$roomPrices->amount);
-                  $priceIndex = array_search($request->num_of_guests, $guestOccupancy);
 
                   if($searchedFacilities = CommonPropertyFacility::where(['property_id' => $property->id])->first()) {
                      $facilities_ids = explode(STRING_GLUE, $searchedFacilities->facility_ids);
@@ -160,8 +152,7 @@ class PropertyListingController extends Controller
                      'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
                      'displayImg' => $images[0],
                      'distance_from_location' => $distanceFromLocation,
-                     'price' => $allamount[$priceIndex],
-                     'discount_given' => $allDiscounts[$priceIndex],
+                     'pricelist' => json_decode($property->price_list),
                      'facilities' => $facilities,
                      'amenities' => @$amenities,
                      'rating' => PropertyRating::where(['property_id' => $property->id])->first()->current_rating ?? "Not Rated",
@@ -171,7 +162,6 @@ class PropertyListingController extends Controller
                   ];
                }
             }
-
          }
 
          # return

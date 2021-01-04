@@ -13,7 +13,6 @@ use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\ApartmentDetail;
 use App\Models\RoomDetails;
-use App\Models\RoomPrices;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
@@ -121,8 +120,10 @@ class NewPropertyListingController extends Controller
                      $num_of_rooms = array('num_of_rooms' => $detailss['num_of_rooms']);
                   if (@$images)
                      $img = array('image_paths' => @$images);
+                  if (@$detailss['price_list'])
+                     $price_list = array('price_list' => json_encode($detailss['price_list']));
 
-                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img);
+                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img,$price_list);
                   if(!empty($apartmentDetailsInfo)) {
                      $apartmentDetailsInfo['property_id'] = $searchedProperty->id;
                      $room = ApartmentDetail::updateOrCreate($condition = ['uuid' => @$detailss['id']], $apartmentDetailsInfo);
@@ -174,29 +175,6 @@ class NewPropertyListingController extends Controller
                         # updating file upload field
                         ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                      }
-                  }
-
-                  # room prices
-                  if(!empty($detailss['price_list'])) {
-                     $guestOccupancy = $amount = $discounts = array();
-                     $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
-                     foreach ($detailss['price_list'] as $pricesDetails) {
-                        $guestOccupancy[] = $pricesDetails['guest_occupancy'];
-                        $amount[] = $pricesDetails['amount'];
-                        $discount[] = $pricesDetails['discount'];
-                     }
-                     // saving data
-                     if($roomPrices = RoomPrices::where(['room_id' => $room->id])->first())
-                        $doNothing = "";
-                     else {
-                        $roomPrices = new RoomPrices();
-                        $roomPrices->room_id = $room->id;
-                     }
-
-                     $roomPrices->guest_occupancy = implode(STRING_GLUE, $guestOccupancy);
-                     $roomPrices->amount = implode(STRING_GLUE, $amount);
-                     $roomPrices->discount = implode(STRING_GLUE, $discount);
-                     $roomPrices->save();
                   }
                }
             }

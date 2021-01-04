@@ -30,6 +30,7 @@ class CreateApartmentDetailsTable extends Migration
            $table->integer('total_guest_capacity')->nullable();
            $table->integer('total_bathrooms')->nullable();
            $table->integer('num_of_rooms')->nullable();
+           $table->string('price_list',255)->nullable();
            // Foreign Keys
            //$table->foreign('property_id')->references('id')->on('properties');
         });

@@ -1090,8 +1090,8 @@ class AmenitiesSeeder extends Seeder
       ];
       $createPropertyResult = Property::create($property);
 
-      // property details
-      $propertyDetails[] = [
+      // property details $propertyDetails[]
+      $apartment1 = [
          "room_name" => "Luxury Apartment",
          "room_details" => [
             [  "name" => "Master Bedroom",
@@ -1136,7 +1136,7 @@ class AmenitiesSeeder extends Seeder
          ]
       ];
 
-      $propertyDetails[] = [
+      $apartment2[] = [
          "room_name" => "Premium Apartment",
          "room_details" => [
             [  "name" => "Master Bedroom",
@@ -1185,7 +1185,7 @@ class AmenitiesSeeder extends Seeder
          "amenities" => [1,6,9,3],
          "subpolicies" => [1 => "Yes",2 => "No"],
 
-         'details' => $propertyDetails
+         'details' => array_merge($apartment1, $apartment2)
       ];
 
       $request = new Request();
