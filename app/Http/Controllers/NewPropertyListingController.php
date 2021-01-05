@@ -104,7 +104,7 @@ class NewPropertyListingController extends Controller
             {
                foreach ($request->details as $detailss) {
                   # variable declaration
-                  $img = $uuid = $room_name = $total_guest_capacity = $total_bathrooms = $num_of_rooms = array();
+                  $img = $uuid = $room_name = $total_guest_capacity = $total_bathrooms = $num_of_rooms = $price_list = array();
                   if(!empty(@$detailss['image_paths']))
                      $images = implode(STRING_GLUE, @$detailss['image_paths']);
 
