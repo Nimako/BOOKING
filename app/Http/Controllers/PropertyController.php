@@ -88,12 +88,13 @@ class PropertyController extends Controller
                            File::copy($copy4rm, $copy2);
                            $imageReturned = explode('public/', $cpy_img);
 
-                           return $imageReturned;
+                           return $imageReturned[1];
                         }
 
                      }, (array)$details->image_pathss);
 
                     // duplicate apartment details
+                    //return $images;
                     $apartmentDetails = [
                        'uuid' => Uuid::uuid6(),
                        'property_id' => $searchedProperty->id,
