@@ -41,18 +41,6 @@ class AmenitiesSeeder extends Seeder
 
    public static function CreateAmenities()
    {
-      /*$amenityList = [
-         ['name' => 'Air Condition', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Kitchenette', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Kitchen', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Balcony', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'View', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Flat-Scrren Tv', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Private Pool', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Terrace', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-         ['name' => 'Washing-Machine', 'created_by' => 0, 'created_at' => date('Y-m-d H:i:s')],
-      ];*/
-
       $amenityList = array(
          array('id' => '1','created_at' => date('Y-m-d H:i:s'),'updated_at' => NULL,'status' => '1','created_by' => NULL,'updated_by' => NULL,'name' => 'Sound proofing','icon_class' => NULL,'category' => 'Room amenities'),
          array('id' => '2','created_at' => date('Y-m-d H:i:s'),'updated_at' => NULL,'status' => '1','created_by' => NULL,'updated_by' => NULL,'name' => ' Seating Area','icon_class' => NULL,'category' => 'Room amenities'),
@@ -665,7 +653,6 @@ class AmenitiesSeeder extends Seeder
 
    public static function CreatePolicy()
    {
-      $policy_id = 0;
       $policyList = [
          'House Rules' => [
             ['name' => "Smoking Allowed", 'options' => "Yes / No"],
@@ -1136,7 +1123,7 @@ class AmenitiesSeeder extends Seeder
          ]
       ];
 
-      $apartment2[] = [
+      $apartment2 = [
          "room_name" => "Premium Apartment",
          "room_details" => [
             [  "name" => "Master Bedroom",
@@ -1185,7 +1172,7 @@ class AmenitiesSeeder extends Seeder
          "amenities" => [1,6,9,3],
          "subpolicies" => [1 => "Yes",2 => "No"],
 
-         'details' => array_merge($apartment1, $apartment2)
+         'details' => [$apartment1, $apartment2]
       ];
 
       $request = new Request();

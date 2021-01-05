@@ -18,6 +18,7 @@ use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
 use Database\Seeders\AmenitiesSeeder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 
@@ -148,7 +149,6 @@ class NewPropertyListingController extends Controller
                            $bed_types = array('bed_types' => json_encode($detail['bed_details']));
                         if(!empty($detail['added_amenities']))
                            $added_amenities = array('added_amenities' => $detail['added_amenities']);
-
                         if(!empty($roomDetails = array_merge($generatedUuid,$roomid,$room_name,$bed_types,$added_amenities)))
                            RoomDetails::updateOrCreate($condition = ['uuid' => @$detail['id']], $roomDetails);
                      }

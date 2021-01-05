@@ -87,6 +87,7 @@ Route::group(['prefix'=>'property'],function(){
 // CronJob
 Route::group(['prefix'=>'cronjob'],function(){
    Route::get('currency-rate',  [CronJobController::class,'CurrenyRateUpdate']);
+   Route::post('hisense',  [NewPropertyListingController::class,'SalesData']);
 });
 
 
