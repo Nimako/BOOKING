@@ -124,7 +124,7 @@ class NewPropertyListingController extends Controller
                   if (@$detailss['price_list'])
                      $price_list = array('price_list' => json_encode($detailss['price_list']));
 
-                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img,$price_list);
+                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img,@$price_list);
                   if(!empty($apartmentDetailsInfo)) {
                      $apartmentDetailsInfo['property_id'] = $searchedProperty->id;
                      $room = ApartmentDetail::updateOrCreate($condition = ['uuid' => @$detailss['id']], $apartmentDetailsInfo);
