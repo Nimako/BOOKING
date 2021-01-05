@@ -181,25 +181,28 @@ class NewPropertyListingController extends Controller
 
             # if amenities added to request
             if(!empty($request->amenities)) {
-               $room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first();
-               $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
-               if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
-                  $doNothing = "";
-               else {
-                  $commonAmenities = new CommonRoomAmenities();
-                  $commonAmenities->room_id = $room->id;
+               if($roomArray = ApartmentDetail::where(['property_id' => $searchedProperty->id])->get()) {
+                  foreach ($roomArray as $room) {
+                     $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
+                     if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
+                        $doNothing = "";
+                     else {
+                        $commonAmenities = new CommonRoomAmenities();
+                        $commonAmenities->room_id = $room->id;
+                     }
+
+                     // saving data
+                     $amenitiesByName = array_map(function($amenity) { return $amenity['name']; }, $searchedAmenities);
+                     $commonAmenities->popular_amenity_ids = trim(implode(STRING_GLUE, (array)$request->amenities), STRING_GLUE);
+                     $commonAmenities->popular_amenity_text = trim(implode(STRING_GLUE, (array)$amenitiesByName), STRING_GLUE);
+                     $commonAmenities->save();
+
+                     // updating link to room details
+                     $searchedRoom = ApartmentDetail::find($room->id);
+                     $searchedRoom->common_room_amenity_id = $commonAmenities->id;
+                     $searchedRoom->save();
+                  }
                }
-
-               // saving data
-               $amenitiesByName = array_map(function($amenity) { return $amenity['name']; }, $searchedAmenities);
-               $commonAmenities->popular_amenity_ids = trim(implode(STRING_GLUE, (array)$request->amenities), STRING_GLUE);
-               $commonAmenities->popular_amenity_text = trim(implode(STRING_GLUE, (array)$amenitiesByName), STRING_GLUE);
-               $commonAmenities->save();
-
-               // updating link to room details
-               $searchedRoom = ApartmentDetail::find($room->id);
-               $searchedRoom->common_room_amenity_id = $commonAmenities->id;
-               $searchedRoom->save();
             }
 
             // return statement
