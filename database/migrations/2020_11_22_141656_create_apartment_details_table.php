@@ -23,7 +23,7 @@ class CreateApartmentDetailsTable extends Migration
            $table->bigInteger('updated_by')->nullable();
            // Table Fields
            $table->unsignedBigInteger('property_id');
-           $table->string('room_name');
+           $table->string('room_name')->nullable();
            $table->unsignedBigInteger('common_room_amenity_id')->nullable();
            $table->string('image_ids', 255)->nullable();
            $table->text('image_paths')->nullable();
