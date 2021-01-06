@@ -123,6 +123,8 @@ class NewPropertyListingController extends Controller
                      $img = array('image_paths' => @$images);
                   if (@$detailss['price_list'])
                      $price_list = array('price_list' => json_encode($detailss['price_list']));
+                  if (@$detailss['similiar_rooms'])
+                     $price_list = array('similiar_rooms' => json_encode($detailss['similiar_rooms']));
 
                   $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img,@$price_list);
                   if(!empty($apartmentDetailsInfo)) {

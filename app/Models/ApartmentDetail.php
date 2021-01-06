@@ -10,7 +10,8 @@ class ApartmentDetail extends Model
     use HasFactory;
 
     protected $fillable = ['uuid','property_id','common_room_amenity_id','image_ids','image_paths','room_size',
-       'total_guest_capacity','total_bathrooms','num_of_rooms','updated_by','created_by','status','room_name', 'price_list'
+       'total_guest_capacity','total_bathrooms','num_of_rooms','updated_by','created_by','status','room_name', 'price_list',
+       'similiar_rooms'
     ];
     protected $hidden = ['id','common_room_amenity_id','image_ids','image_paths','created_at','updated_at','status','updated_by','created_by','property_id'];
     protected $appends = ['amenities','room_details','image_pathss'];
