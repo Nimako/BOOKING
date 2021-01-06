@@ -158,26 +158,26 @@ class NewPropertyListingController extends Controller
 
                      $roomDetails = array();
                   }
+               }
+            }
 
-                  # image uploads
-                  if($request->hasFile('images')) {
-                     # searching for record
-                     if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
-                        // unlinking previous files
-                        if($room->image_paths != null) {
-                           $filePaths = explode(STRING_GLUE, $room->image_paths);
-                           foreach ($filePaths as $filePath) {
-                              unlink('storage/'.$filePath);
-                           }
-                        }
-                        // upload new files
-                        foreach ($request->file('images') as $image){
-                           $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
-                        }
-                        # updating file upload field
-                        ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
+            # image uploads
+            if($request->hasFile('images')) {
+               # searching for record
+               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
+                  // unlinking previous files
+                  if($room->image_paths != null) {
+                     $filePaths = explode(STRING_GLUE, $room->image_paths);
+                     foreach ($filePaths as $filePath) {
+                        unlink('storage/'.$filePath);
                      }
                   }
+                  // upload new files
+                  foreach ($request->file('images') as $image){
+                     $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+                  }
+                  # updating file upload field
+                  ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                }
             }
 

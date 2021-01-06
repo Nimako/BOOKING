@@ -221,6 +221,33 @@ class PropertyController extends Controller
 
     public function Reservation(Request $request)
     {
+       // validation
+       $rules = [
+          'id' => "required|exists:properties,uuid",
+          'details' => "required",
+          'booked_by' => "required"
+       ];
+       $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
+       if($validator->fails()) {
+          return ApiResponse::returnErrorMessage($message = $validator->errors());
+       }
+       else {
+          $searchedProperty = Property::where(['uuid' => $request->id])->first();
+          switch ($searchedProperty->property_type_id) {
+             case APARTMENT:
+                if($searchedApartment = ApartmentDetail::where(['uuid' => $request->details['details_id']])->first()) {
 
+                }
+                break;
+          }
+
+          $bookingSaveData = [
+             'booked_by' => $request->booked_by,
+             'property_id' => $searchedProperty->id,
+             'property_details_ids'
+          ];
+
+
+       }
     }
 }

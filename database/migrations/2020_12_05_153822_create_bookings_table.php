@@ -21,13 +21,16 @@ class CreateBookingsTable extends Migration
            $table->bigInteger('booked_by')->nullable();
            // Table Fields
            $table->unsignedBigInteger('property_id');
-           $table->unsignedBigInteger('property_details_ids');
+           $table->unsignedBigInteger('property_details_id');
            $table->date('expected_checkin')->nullable();
            $table->date('expected_checkout')->nullable();
            $table->date('actual_checkin')->nullable();
            $table->date('actual_checkout')->nullable();
            $table->float('total_price')->nullable();
-           $table->float('discount_given')->nullable();
+           $table->text('other_details')->nullable();
+           $table->tinyInteger('fulfilled')->nullable();
+           $table->tinyInteger('rescheduled')->nullable();
+           $table->integer('rescheduled_id')->nullable();
         });
     }
 

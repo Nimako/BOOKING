@@ -41,3 +41,7 @@ define('PROPERTY_STATUSES', array(
 
 #### Others ####
 define('STRING_GLUE', '**');
+
+define('APARTMENT', 1);
+define('HOMES', 2);
+define('HOTELS', 3);
