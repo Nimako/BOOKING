@@ -38,17 +38,17 @@ class PropertyListingController extends Controller
             foreach ($searchedPropertys as $property) { //return $property;
                # other searches
                switch ($property->property_type_id) {
-                  case 1:
+                  case APARTMENT:
                      $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
                      $totalGuestCapacity = $apartmentDetails->total_guest_capacity;
                      $images = $apartmentDetails->image_pathss;
                      $num_of_rooms = @$apartmentDetails->num_of_rooms;
                      break;
 
-                  case 3 :
+                  case HOTELS :
                      $hotelDetails = HotelDetails::where(['property_id' => $property->id])->first();
                      $totalGuestCapacity = @$hotelDetails->total_guest_capacity;
-                     $images = explode(STRING_GLUE, $hotelDetails->image_paths);
+                     $images = explode(STRING_GLUE, @$hotelDetails->image_paths);
                      $num_of_rooms = HotelDetails::where(['property_id' => $property->id])->get()->count();
                      break;
                }
