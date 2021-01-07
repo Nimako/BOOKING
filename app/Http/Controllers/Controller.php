@@ -42,6 +42,16 @@ define('PROPERTY_STATUSES', array(
 #### Others ####
 define('STRING_GLUE', '**');
 
+
 define('APARTMENT', 1);
 define('HOMES', 2);
 define('HOTELS', 3);
+
+#### Reservation ####
+define('YES', 1);
+define('NO', 0);
+
+define('PENDING', 1);
+define('CANCELLED', 2);
+define('RESCHEDULED', 3);
+define('BOOKING_FULFILLED', 4);

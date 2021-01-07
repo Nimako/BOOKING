@@ -17,6 +17,7 @@ class CreateBookingsTable extends Migration
             $table->id();
             $table->timestamps();
            // Central Columns
+           $table->uuid('uuid');
            $table->char('status', 2)->default(1);
            $table->bigInteger('booked_by')->nullable();
            // Table Fields
@@ -25,11 +26,13 @@ class CreateBookingsTable extends Migration
            $table->date('expected_checkin')->nullable();
            $table->date('expected_checkout')->nullable();
            $table->date('actual_checkin')->nullable();
-           $table->date('actual_checkout')->nullable();
+           $table->date('actual_checkout')->nullable();;
+           $table->integer('num_of_rooms')->nullable()->default(1);
            $table->float('total_price')->nullable();
            $table->text('other_details')->nullable();
-           $table->tinyInteger('fulfilled')->nullable();
-           $table->tinyInteger('rescheduled')->nullable();
+           $table->string('promo_code')->nullable();
+           $table->float('discount_applied')->nullable();
+           $table->tinyInteger('rescheduled')->nullable()->default(0);
            $table->integer('rescheduled_id')->nullable();
         });
     }

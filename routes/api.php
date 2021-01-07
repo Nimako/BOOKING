@@ -5,6 +5,7 @@ use App\Http\Controllers\DefaultValuesController;
 use App\Http\Controllers\NewPropertyListingController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyListingController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -102,7 +103,8 @@ Route::group(['prefix'=>'user'],function(){
 // Booking Apis
 Route::group(['prefix'=>'reservation'],function(){
    # Onboarding routes
-   Route::post('/save',  [UserController::class,'CreatePartnerAccount']);
+   Route::post('/save',  [ReservationController::class,'Reservation']);
+   Route::post('/reschedule',  [ReservationController::class,'Reschedule']);
 
 });
 
