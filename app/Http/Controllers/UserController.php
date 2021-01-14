@@ -15,6 +15,12 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
+
+   public function __construct()
+   {
+       $this->middleware('auth:api', ['except' => ['login']]);
+   }  
+
    /**
     * Display a listing of the resource.
     *
@@ -78,4 +84,39 @@ class UserController extends Controller
       else
          return ApiResponse::returnErrorMessage($message = "Invalid Token");
    }
+
+
+
+   public function ChangePassword(Request $request)
+   {
+      return "OK";
+      // validation
+      $rules = [
+         'email'            => "required",
+         'password'         => 'min:8|required_with:confirm_password|same:confirm_password',
+         'confirm_password' => 'min:8',
+         'oldPassword'      => 'required'
+      ];
+      $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         // validating email
+         if(!$user= UserPartnerAccount::where(['email' => $request->email])->first())
+            return ApiResponse::returnErrorMessage($message = "User is not available");
+         
+         if(!Hash::check($request->password, $user->password))
+            return ApiResponse::returnErrorMessage($message = "Invalid Old Password");
+
+         if($responseData = UserPartnerAccount::where(['email'=>$request->email])->update(['password'=> Hash::make($request->password)])){
+
+            return ApiResponse::returnSuccessData($responseData);
+         }
+         else
+            return ApiResponse::returnErrorMessage($message = "An Error Occurred");
+      }
+   }
+
+
 }

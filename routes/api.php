@@ -97,8 +97,10 @@ Route::group(['prefix'=>'user'],function(){
    Route::post('/partner-account/save',  [UserController::class,'CreatePartnerAccount']);
    Route::post('verify-partner-account-token',  [UserController::class,'VerifyPartnerAccount']);
    Route::post('/login', [UserController::class,'login'])->name("login");
-
 });
+
+Route::post('/partner/ChangePassword', [UserController::class,'ChangePassword']);
+
 
 // Booking Apis
 Route::group(['prefix'=>'reservation'],function(){
