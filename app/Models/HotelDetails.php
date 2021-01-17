@@ -32,4 +32,13 @@ class HotelDetails extends Model
    {
       return $this->attributes['price_list'] = json_decode($this->price);
    }
+
+   public function getImagePathsAttribute($value)
+   {
+      $explodedPaths = explode(STRING_GLUE, $value);
+      $responseData = array_map(function($imagepath){
+         return asset('storage/app/public/'.$imagepath);
+      },$explodedPaths);
+      return $this->image_paths = $responseData;
+   }
 }

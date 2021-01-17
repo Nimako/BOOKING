@@ -32,20 +32,20 @@ class HotelController extends Controller
                // hotel details
                $searchedDetails = HotelDetails::where(['uuid' => $request->duplicate_id])->first();
                // image duplication
-               $explodedImages = explode(STRING_GLUE, $searchedDetails->image_paths);
+               $explodedImages = $searchedDetails->image_paths;
                $images = array_map(function($image){
                   if(!empty($image)) {
                      $a = explode('storage/', $image);
-                     $copy4rm = storage_path('app\\public\\'.$a[0]);
+                     $copy4rm = storage_path($a[1]);
 
                      $cpy_img = str_replace(' ', '_', substr($image, 0, strripos($image, '.'))."_dup_".microtime().".webp");
                      $a = explode('storage/', $cpy_img);
-                     $copy2 = storage_path('app\\public\\'.$a[0]);
+                     $copy2 = storage_path($a[1]);
 
                      File::copy($copy4rm, $copy2);
                      $imageReturned = explode('public/', $cpy_img);
 
-                     return $imageReturned[0];
+                     return $imageReturned[1];
                   }
 
                }, $explodedImages);
