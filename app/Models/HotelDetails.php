@@ -9,16 +9,23 @@ class HotelDetails extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['property_id','room_name','custom_room_name','price','smoking_policy', 'bed_types','similiar_rooms',
+    protected $fillable = ['uuid','property_id','room_name','custom_room_name','price','smoking_policy', 'bed_types','similiar_rooms',
        'added_amenities','dimension','image_paths','total_guest_capacity','parking_options','created_by','updated_by'];
 
    protected $hidden = ['id','created_at','created_by','updated_at','updated_by','status','property_id','price'];
 
-   protected $appends = ['bed_type_options','price_list'];
+   protected $appends = ['price_list'];
 
-   public function getBedTypeOptionsAttribute()
+   public function getBedTypesAttribute($value)
    {
-      return $this->attributes['bed_type_options'] = json_decode($this->bed_types);
+      $bedDetails = json_decode($value);
+      foreach ($bedDetails as $bed){
+         $responseData[] = [
+            'bed_type' => BedType::find($bed->bed_type)->name,
+            'bed_qty' => $bed->bed_qty
+         ];
+      }
+      return $this->bed_type = $responseData;
    }
 
    public function getPriceListAttribute()
