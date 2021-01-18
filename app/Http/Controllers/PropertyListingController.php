@@ -48,7 +48,7 @@ class PropertyListingController extends Controller
                   case HOTELS :
                      $hotelDetails = HotelDetails::where(['property_id' => $property->id])->first();
                      $totalGuestCapacity = @$hotelDetails->total_guest_capacity;
-                     $images = explode(STRING_GLUE, @$hotelDetails->image_paths);
+                     $images = @$hotelDetails->image_paths;
                      $num_of_rooms = HotelDetails::where(['property_id' => $property->id])->get()->count();
                      break;
                }
