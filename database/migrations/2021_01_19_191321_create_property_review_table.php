@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdminUser extends Migration
+class CreatePropertyReviewTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,19 @@ class CreateAdminUser extends Migration
      */
     public function up()
     {
-        Schema::create('admin_user', function (Blueprint $table) {
+        Schema::create('property_review', function (Blueprint $table) {
             $table->id();
+            $table->timestamps();
+            // Central Columns
+            $table->char('status', 2)->default(1);
             $table->dateTime('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->dateTime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
-            // Fields
+            // Table Fields
             $table->uuid('uuid');
-            $table->string('fullname')->nullable();
-            $table->string('phone_no')->nullable();
-            $table->string('username')->unique();
-            $table->text('password')->nullable();
-            $table->string('status')->nullable();
+            $table->unsignedBigInteger('property_id');
+            $table->text('comment')->nullable();
+            $table->integer('rating')->nullable();
+            $table->text('owner_comment')->nullable();
         });
     }
 
@@ -34,6 +36,6 @@ class CreateAdminUser extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_user');
+        Schema::dropIfExists('property_review');
     }
 }
