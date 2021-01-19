@@ -40,8 +40,17 @@ class Property extends Model
 
    public function getPoliciesAttribute()
    {
-      if($searchedCommRmFacilitis = CommonPropertyPolicy::find($this->id))
-         return $this->attributes['policies'] = explode(STRING_GLUE, $searchedCommRmFacilitis->sub_policy_text);
+      if($searchedCommRmFacilitis = CommonPropertyPolicy::find($this->id)){
+         $explodedPolicies = explode(STRING_GLUE, $searchedCommRmFacilitis->sub_policy_text);
+         foreach ($explodedPolicies as $explodedPolicy){
+            $exp = explode('=', $explodedPolicy);
+            $responseData[] = [
+               $exp[0] => $exp[1]
+            ];
+         }
+      }
+
+      return $this->attributes['policies'] = $responseData;
    }
 
    public function getPropertyTypeTextAttribute()

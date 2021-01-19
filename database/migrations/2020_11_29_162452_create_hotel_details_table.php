@@ -21,6 +21,7 @@ class CreateHotelDetailsTable extends Migration
            $table->bigInteger('created_by')->nullable();
            $table->bigInteger('updated_by')->nullable();
            // Table Fields
+           $table->uuid('uuid');
            $table->unsignedBigInteger('property_id');
            $table->string('room_name')->nullable();
            $table->string('custom_room_name')->nullable();

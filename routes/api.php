@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DefaultValuesController;
+use App\Http\Controllers\HotelController;
 use App\Http\Controllers\NewPropertyListingController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyListingController;
@@ -72,7 +73,7 @@ Route::group(['prefix'=>'property'],function(){
     Route::post('/onboarding/search',  [NewPropertyListingController::class,'FullOnBoardingDetails']);
     Route::post('/onboarding/userproperties',  [PropertyListingController::class,'GetUserProperties']);
 
-    Route::post('/onboarding/hotel/save',  [NewPropertyListingController::class,'HotelOnboarding']);
+
 
     # searching of approved properties
     Route::post('/search',  [PropertyListingController::class,'SearchProperty']);
@@ -83,6 +84,9 @@ Route::group(['prefix'=>'property'],function(){
 
     # hotel routes
     Route::post('/hotel/view',  [PropertyController::class,'HotelDetails']);
+    Route::post('/hotel/duplicate',  [HotelController::class,'DuplicateRoomDetails']);
+    Route::post('/onboarding/hotel/save',  [NewPropertyListingController::class,'HotelOnboarding']);
+    Route::post('/onboarding/hotel/duplicate',  [NewPropertyListingController::class,'HotelOnboarding']);
 });
 
 // CronJob

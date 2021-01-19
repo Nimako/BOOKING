@@ -18,7 +18,6 @@ use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
 use Database\Seeders\AmenitiesSeeder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 
@@ -344,6 +343,7 @@ class NewPropertyListingController extends Controller
                $hotelDetails =  $request->details[0]['room_details'][0];
                // added factors
                $hotelDetailsSave = [
+                  'uuid' => Uuid::uuid6(),
                   'created_by' =>  $request->created_by,
                   'property_id' => $searchedProperty->id,
                   'room_name' => $hotelDetails['room_name'],
@@ -357,8 +357,6 @@ class NewPropertyListingController extends Controller
                   'added_amenities' => (empty(@$hotelDetails['added_amenities'])) ? null : json_encode(@$hotelDetails['added_amenities'])
                ];
 
-               //return $hotelDetailsSave;
-
                if($searchedRecord = HotelDetails::where(['room_name' => $hotelDetails['room_name'], 'property_id' => $searchedProperty->id])->first()) {
                   $hotelResult = $result =  HotelDetails::find($searchedRecord->id);
                   $result->update($hotelDetailsSave);
@@ -367,24 +365,59 @@ class NewPropertyListingController extends Controller
                   $hotelResult = HotelDetails::create($hotelDetailsSave);
             }
 
+            // images
+            # image uploads
+            if($request->hasFile('images')) {
+               # searching for record
+               if(!empty($request->room_name)) {
+                  foreach ($request->room_name as $roomInfo){
+                     if($room = HotelDetails::where(['room_name' => $roomInfo, 'property_id' => $searchedProperty->id])->first()) {
+                        // unlinking previous files
+                        if($room->image_paths != null) {
+                           $filePaths = explode(STRING_GLUE, $room->image_paths);
+                           foreach ($filePaths as $filePath) {
+                              if(file_exists('storage/'.$filePath))
+                                 unlink('storage/'.$filePath);
+                           }
+                        }
+                        // upload new files
+                        foreach ($request->file('images') as $image) {
+                           $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+                        }
+
+                        # updating file upload field
+                        HotelDetails::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
+                     }
+                     else {
+
+                     }
+                  }
+               }
+            }
+
             // saving other hotel details
             $HotelOtherDetails = [
-               'created_by' => $request->created_by,
-               'property_id' => $searchedProperty->id,
-               'hotel_details_id' => $hotelResult->id,
+               'hotel_details_id' => @$hotelResult->id,
                'listed_on' => $request->listed_on,
                'star_rating' => $request->star_rating,
                'own_multiple_hotel' => $request->own_multiple_hotel,
                'name_of_company_group_chain' => $request->name_of_company_group_chain,
                'use_channel_manager' => $request->use_channel_manager,
                'channel_manager_name' => $request->channel_manager_name,
-               'parking_options' => json_encode($request->parking_options),
-               'extra_bed_options' => json_encode($request->extra_bed_options),
+               'parking_options' => ($request->parking_options) ? json_encode($request->parking_options) : null,
+               'extra_bed_options' => ($request->extra_bed_options) ? json_encode($request->extra_bed_options) : null,
             ];
-            if($searchedOtherDetails = HotelOtherDetails::where(['property_id' => $searchedProperty->id])->first())
-               $searchedOtherDetails->update($HotelOtherDetails);
-            else
-               HotelOtherDetails::create($HotelOtherDetails);
+            // searching if array empty
+            $emptyArray = array_map(function($x){ return ($x == null || empty($x)) ? true : false; },$HotelOtherDetails);
+            if(array_search(false, $emptyArray)) {
+               $HotelOtherDetails['created_by'] = $request->created_by;
+               $HotelOtherDetails['property_id'] = $searchedProperty->id;
+
+               if($searchedOtherDetails = HotelOtherDetails::where(['property_id' => $searchedProperty->id])->first())
+                  $searchedOtherDetails->update($HotelOtherDetails);
+               else
+                  HotelOtherDetails::create($HotelOtherDetails);
+            }
 
             # if amenities added to request
             if(!empty($request->amenities)) {

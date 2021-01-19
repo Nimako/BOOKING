@@ -2,45 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Amenity;
 use App\Models\ApartmentDetail;
-use App\Models\Booking;
-use App\Models\CommonPropertyFacility;
-use App\Models\CommonPropertyPolicy;
 use App\Models\CommonRoomAmenities;
-use App\Models\Country;
-use App\Models\Facility;
+use App\Models\HotelDetails;
 use App\Models\Property;
-use App\Models\PropertyRating;
-use App\Models\PropertyType;
 use App\Models\RoomDetails;
-use App\Models\RoomPrices;
-use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
-use App\Traits\ImageProcessor;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
 use File;
 
 class PropertyController extends Controller
 {
-   /**
-    * Store a newly created resource in storage.
-    *
-    * @param Request $request
-    * @return JsonResponse
-    */
-
-    /**
-     * Duplicate a listing of the resource.
-     *
-     * @return Response
-     */
     public function DuplicateProperty(Request $request)
     {
        // validation
@@ -136,44 +110,6 @@ class PropertyController extends Controller
        }
     }
 
-
-    public function store_old(Request $request)
-    {
-        if(!empty($request->getFields)) {
-            return ApiResponse::returnData(Schema::getColumnListing('properties'));
-        }
-        else {
-            // Validation
-            $rules = [
-                'name' => "required",
-                'street_name' => "required",
-                'city' => "required",
-                'primary_telephone' => "required",
-                'user_id' => "required",
-                'email' => "required|email:filter"
-            ];
-            $validator = Validator::make($request->all(), $rules);
-            if($validator->fails()) {
-                return ApiResponse::returnErrorMessage($message = $validator->errors());
-            }
-
-            // Pre-data Processing
-            $request->request->add(['created_by' => $request->user_id]);
-
-            // Saving Data
-            if($property = Property::create($request->all()))
-                return ApiResponse::returnSuccessMessage($message = "Property Saved and Awaiting Review.");
-            else
-                return ApiResponse::returnErrorMessage($message = "An Error Occurred. Please Try Again or Contact Support");
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
     public function destroy(Request $request)
     {
        // validation
@@ -217,6 +153,28 @@ class PropertyController extends Controller
          $searchedProperty = Property::with('hoteldetails', 'OtherHotelDetails')->where($where_condition)->first();
          # return
          return ApiResponse::returnSuccessData(@$searchedProperty);
+      }
+   }
+
+   public function GetTotalRoomsInProperty(Request $request)
+   {
+      $rules = [
+         'id' => "required|exists:properties,uuid",
+      ];
+      $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else{
+         $searchedProperty = Property::where(['uuid' => $request->id])->first();
+         switch ($searchedProperty->property_type_id){
+            case APARTMENT:
+               return ApiResponse::returnSuccessData(ApartmentDetail::where(['property_id' => $searchedProperty->id])->count());
+               break;
+            case HOTELS:
+               return ApiResponse::returnSuccessData(HotelDetails::where(['property_id' => $searchedProperty->id])->count());
+               break;
+         }
       }
    }
 }
