@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
-use JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
-use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class UserController extends Controller
 {
+
+ 
+
    /**
     * Display a listing of the resource.
     *
@@ -78,4 +79,38 @@ class UserController extends Controller
       else
          return ApiResponse::returnErrorMessage($message = "Invalid Token");
    }
+
+
+
+   public function ChangePassword(Request $request)
+   {
+      // validation
+      $rules = [
+         'email'            => "required",
+         'password'         => 'min:8|required_with:confirm_password|same:confirm_password',
+         'confirm_password' => 'min:8',
+         'old_password'    => 'required'
+      ];
+      $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         // validating email
+         if(!$user= UserPartnerAccount::where(['email' => $request->email])->first())
+            return ApiResponse::returnErrorMessage($message = "User is not available");
+         
+         if(!Hash::check($request->old_password, $user->password))
+            return ApiResponse::returnErrorMessage($message = "Invalid Old Password");
+
+         if($responseData = UserPartnerAccount::where(['email'=>$request->email])->update(['password'=> Hash::make($request->password)])){
+
+            return ApiResponse::returnSuccessMessage("Password Change successfully");
+         }
+         else
+            return ApiResponse::returnErrorMessage($message = "An Error Occurred");
+      }
+   }
+
+
 }

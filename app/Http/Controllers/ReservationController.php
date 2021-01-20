@@ -16,7 +16,7 @@ class ReservationController extends Controller
    {
       // validation
       $rules = [
-         'id' => "required|exists:properties,uuid",
+         'id'        => "required|exists:properties,uuid",
          'details' => "required",
          'booked_by' => "required",
       ];
