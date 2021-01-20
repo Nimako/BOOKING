@@ -50,7 +50,7 @@ class Property extends Model
          }
       }
 
-      return $this->attributes['policies'] = $responseData;
+      return $this->attributes['policies'] = @$responseData;
    }
 
    public function getPropertyTypeTextAttribute()
