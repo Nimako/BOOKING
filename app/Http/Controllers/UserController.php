@@ -9,17 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
-use JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
-use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class UserController extends Controller
 {
 
-   public function __construct()
-   {
-       $this->middleware('auth:api', ['except' => ['login']]);
-   }  
+ 
 
    /**
     * Display a listing of the resource.
@@ -89,13 +84,12 @@ class UserController extends Controller
 
    public function ChangePassword(Request $request)
    {
-      return "OK";
       // validation
       $rules = [
          'email'            => "required",
          'password'         => 'min:8|required_with:confirm_password|same:confirm_password',
          'confirm_password' => 'min:8',
-         'oldPassword'      => 'required'
+         'old_password'    => 'required'
       ];
       $validator = Validator::make($request->all(), $rules);
       if($validator->fails()) {
@@ -106,12 +100,12 @@ class UserController extends Controller
          if(!$user= UserPartnerAccount::where(['email' => $request->email])->first())
             return ApiResponse::returnErrorMessage($message = "User is not available");
          
-         if(!Hash::check($request->password, $user->password))
+         if(!Hash::check($request->old_password, $user->password))
             return ApiResponse::returnErrorMessage($message = "Invalid Old Password");
 
          if($responseData = UserPartnerAccount::where(['email'=>$request->email])->update(['password'=> Hash::make($request->password)])){
 
-            return ApiResponse::returnSuccessData($responseData);
+            return ApiResponse::returnSuccessMessage("Password Change successfully");
          }
          else
             return ApiResponse::returnErrorMessage($message = "An Error Occurred");

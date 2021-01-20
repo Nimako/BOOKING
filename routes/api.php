@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReviewsController;
 
 
 /*
@@ -101,9 +102,9 @@ Route::group(['prefix'=>'user'],function(){
    Route::post('/partner-account/save',  [UserController::class,'CreatePartnerAccount']);
    Route::post('verify-partner-account-token',  [UserController::class,'VerifyPartnerAccount']);
    Route::post('/login', [UserController::class,'login'])->name("login");
+   Route::post('/change-password', [UserController::class,'ChangePassword']);
 });
 
-Route::post('/partner/ChangePassword', [UserController::class,'ChangePassword']);
 
 
 // Booking Apis
@@ -111,8 +112,20 @@ Route::group(['prefix'=>'reservation'],function(){
    # Onboarding routes
    Route::post('/save',  [ReservationController::class,'Reservation']);
    Route::post('/reschedule',  [ReservationController::class,'Reschedule']);
+});
+
+
+// Reviews Apis
+Route::group(['prefix'=>'review'],function(){
+   # Onboarding routes
+   Route::post('/save',  [ReviewsController::class,'SaveGuestReview']);
+   Route::post('/reply',  [ReviewsController::class,'OwnerReviewReply']);
+   Route::post('/get-property-reviews',  [ReviewsController::class,'GetPropertyReviews']);
+   Route::post('/get-owner-reviews',  [ReviewsController::class,'GetOwnerReviews']);
+   Route::post('/delete-review',  [ReviewsController::class,'DeleteReview']);
 
 });
+
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);
 

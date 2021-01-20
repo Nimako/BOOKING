@@ -13,6 +13,7 @@ class UserAccount extends Model
 
     protected $primaryKey  = 'id';
 
+
     protected $fillable = [
                           'Email',
                           'Password',
@@ -28,6 +29,9 @@ class UserAccount extends Model
                           'Provider',
                           'FireBaseUserID'
                         ];
+
+    protected $hidden   = ['created_at','updated_at'];
+
 
     const CREATED_AT       = 'DateCreated';
     const UPDATED_AT       = null;
