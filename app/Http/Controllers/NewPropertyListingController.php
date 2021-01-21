@@ -247,12 +247,10 @@ class NewPropertyListingController extends Controller
          $generalImages = array();
          // if property record found // 'created_by' => $request->userid
          $searchedProperty = Property::with('details')->where(['uuid' => $request->id])->first();
-
          // repopulating various room images as property images
          foreach ($searchedProperty->details as $images) {
             $generalImages =  @array_merge($generalImages, $images['image_pathss']);
          }
-
          $searchedProperty->all_property_images = $generalImages;
 
          // return statement

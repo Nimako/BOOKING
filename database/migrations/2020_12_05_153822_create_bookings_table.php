@@ -25,8 +25,10 @@ class CreateBookingsTable extends Migration
            $table->unsignedBigInteger('property_details_id');
            $table->date('expected_checkin')->nullable();
            $table->date('expected_checkout')->nullable();
+           $table->date('expected_numofguest')->nullable();
            $table->date('actual_checkin')->nullable();
-           $table->date('actual_checkout')->nullable();;
+           $table->date('actual_checkout')->nullable();
+           $table->date('actual_numofguest')->nullable();
            $table->integer('num_of_rooms')->nullable()->default(1);
            $table->float('total_price')->nullable();
            $table->text('other_details')->nullable();
@@ -34,6 +36,8 @@ class CreateBookingsTable extends Migration
            $table->float('discount_applied')->nullable();
            $table->tinyInteger('rescheduled')->nullable()->default(0);
            $table->integer('rescheduled_id')->nullable();
+           $table->string('pin')->nullable();
+           $table->string('number')->nullable();
         });
     }
 

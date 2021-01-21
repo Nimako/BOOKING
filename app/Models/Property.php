@@ -15,7 +15,7 @@ class Property extends Model
     ];
 
     protected $hidden = ['created_at','updated_at','updated_by',];
-    protected $appends = ['property_type_text','text_status','facilities','policies', 'country_name'];
+    protected $appends = ['property_type_text','text_status','facilities','policies', 'country_name','booked' ];
 
    public function HotelDetails()
    {
@@ -66,5 +66,10 @@ class Property extends Model
    public function getCountryNameAttribute()
    {
       return Country::find($this->country_id)->name;
+   }
+
+   public function getNumOfBookingsAttribute($key)
+   {
+      return $this->attributes['booked'] = Booking::where(['property_id' => $this->id])->get()->count();
    }
 }
