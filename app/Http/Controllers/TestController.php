@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Models\TecProducts;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,72 @@ class TestController extends Controller
        return back()
            ->with('success','Image Upload successful')
            ->with('imageName',$input['imagename']);
+   }
+
+   public function fixingProducts()
+   {
+      $a = "select * from demo.product_details a
+        left join demo.product_desc b on b.desc_id = a.desc_id";
+      $b = DB::select($a);
+
+      $counter = 0;
+
+      foreach ($b as $key => $item){
+
+         $real_prod_id = explode('#', $item->product_id);
+         $bb = "select * from demo.product_codes a where a.prod_id = ".$real_prod_id[1];
+         $qq = DB::select($bb);
+
+         if(!empty($qq)) {
+            $obj[$key] = (array)$item;
+            $obj[$key]['product_name'] = $qq[0]->prod_name;
+
+            // category
+            $bb = "select * from dummy.tec_categories a where a.name = '{$item->desc}'";
+            $qq2 = DB::select($bb);
+            if(!empty($qq2[0])) {
+               $category_id = $qq2[0]->id;
+            }
+            else {
+               $qry = "insert into dummy.tec_categories(name,image) values('{$item->desc}','no_image.png')";
+               $qR = DB::insert($qry);
+               $category_id = DB::table('dummy.tec_categories')->max('id');
+            }
+
+            $productArr = [
+               'code' => "PRD#".$counter,
+               'name' => $qq[0]->prod_name,
+               'category_id' => $category_id,
+               'price' => $item->unit_price,
+               'image' => $item->img_path,
+               //'tax' =>,
+               'cost' => $item->cost_price,
+               'tax_method' => 1,
+               'quantity' => $item->avail_qty,
+               'barcode_symbology' => "code128",
+               'type' => "standard",
+               //'details' =>,
+               //'alert_quantity' =>,
+            ];
+
+            $allKeys = array_keys((array)$productArr);
+            $allvalues = array_values((array)$productArr);
+
+            $columns = implode(',', $allKeys);
+            $data = '"'.implode('","', $allvalues).'"';
+
+            unset($allKeys, $allvalues);
+
+            $query = "insert into dummy.tec_products({$columns}) values({$data})";
+            DB::insert($query);
+         }
+
+         $counter++;
+      }
+
+      return $productArr;
+
+
    }
 
 }

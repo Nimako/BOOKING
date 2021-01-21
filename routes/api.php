@@ -128,6 +128,7 @@ Route::group(['prefix'=>'review'],function(){
 
 
 Route::post('/CompressImage',  [TestController::class,'CompressImage']);
+//Route::post('/newpacka',  [TestController::class,'fixingProducts']);
 
 
 
