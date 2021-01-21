@@ -371,13 +371,16 @@ class NewPropertyListingController extends Controller
                # searching for record
                if(!empty($request->room_name)) {
                   foreach ($request->room_name as $roomInfo){
+                     //return $room = HotelDetails::where(['room_name' => $roomInfo, 'property_id' => $searchedProperty->id])->first();
                      if($room = HotelDetails::where(['room_name' => $roomInfo, 'property_id' => $searchedProperty->id])->first()) {
+                        $hotelImageArray = $room->image_paths;
+
                         // unlinking previous files
-                        if($room->image_paths != null) {
-                           $filePaths = explode(STRING_GLUE, $room->image_paths);
-                           foreach ($filePaths as $filePath) {
-                              if(file_exists('storage/'.$filePath))
-                                 unlink('storage/'.$filePath);
+                        if(!empty($hotelImageArray)) {
+                           foreach ($hotelImageArray as $filePath) {
+                              $realPath = explode('storage', $filePath);
+                              if(file_exists('storage/'.$realPath[1]))
+                                 unlink('storage/'.$realPath[1]);
                            }
                         }
                         // upload new files
@@ -388,9 +391,7 @@ class NewPropertyListingController extends Controller
                         # updating file upload field
                         HotelDetails::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                      }
-                     else {
-
-                     }
+                     //  else  doNothing
                   }
                }
             }

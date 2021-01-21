@@ -12,7 +12,7 @@ class HotelDetails extends Model
     protected $fillable = ['uuid','property_id','room_name','custom_room_name','price','smoking_policy', 'bed_types','similiar_rooms',
        'added_amenities','dimension','image_paths','total_guest_capacity','parking_options','created_by','updated_by'];
 
-   protected $hidden = ['id','created_at','created_by','updated_at','updated_by','status','property_id','price'];
+   protected $hidden = ['created_at','created_by','updated_at','updated_by','property_id','price'];
 
    protected $appends = ['price_list'];
 
