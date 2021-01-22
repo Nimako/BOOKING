@@ -68,7 +68,7 @@ class Property extends Model
       return Country::find($this->country_id)->name;
    }
 
-   public function getNumOfBookingsAttribute($key)
+   public function getBookedAttribute($key)
    {
       return $this->attributes['booked'] = Booking::where(['property_id' => $this->id])->get()->count();
    }
