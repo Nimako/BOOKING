@@ -35,10 +35,14 @@ class HotelDetails extends Model
 
    public function getImagePathsAttribute($value)
    {
-      $explodedPaths = explode(STRING_GLUE, $value);
-      $responseData = array_map(function($imagepath){
-         return asset('storage/app/public/'.$imagepath);
-      },$explodedPaths);
+      $responseData = array();
+      if(!empty($value)) {
+         $explodedPaths = explode(STRING_GLUE, $value);
+         $responseData = array_map(function($imagepath){
+            return asset('storage/app/public/'.$imagepath);
+         },$explodedPaths);
+      }
+
       return $this->image_paths = $responseData;
    }
 }
