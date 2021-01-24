@@ -26,8 +26,6 @@ class CreatePropertyReviewsTable extends Migration
             $table->text('comment')->nullable();
             $table->integer('rating')->nullable();
             $table->text('owner_comment')->nullable();
-
-
         });
     }
 
