@@ -22,7 +22,7 @@ class ApartmentDetail extends Model
       $tempVar = explode(STRING_GLUE, $this->image_paths);
       foreach ($tempVar as $url) {
          if(!empty($url))
-            $paths[] = asset('storage/app/public/'.$url);
+            $paths[] = asset(SERVER_IMAGE_PREFIX.$url);
       }
       return $this->attributes['image_pathss'] = @$paths;
    }

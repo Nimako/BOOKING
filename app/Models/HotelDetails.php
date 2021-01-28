@@ -39,7 +39,7 @@ class HotelDetails extends Model
       if(!empty($value)) {
          $explodedPaths = explode(STRING_GLUE, $value);
          $responseData = array_map(function($imagepath){
-            return asset('storage/app/public/'.$imagepath);
+            return asset(SERVER_IMAGE_PREFIX.$imagepath);
          },$explodedPaths);
       }
 

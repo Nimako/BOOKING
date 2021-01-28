@@ -55,3 +55,5 @@ define('PENDING', 1);
 define('CANCELLED', 2);
 define('RESCHEDULED', 3);
 define('BOOKING_FULFILLED', 4);
+
+define('SERVER_IMAGE_PREFIX', 'storage/');
