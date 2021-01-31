@@ -12,6 +12,25 @@ use Ramsey\Uuid\Uuid;
 
 class HotelController extends Controller
 {
+   public function HotelDetails(Request $request)
+   {
+      // Validation
+      $rules = [
+         'id' => "required",
+      ];
+      $validator = Validator::make($request->all(), $rules);
+      if($validator->fails()) {
+         return ApiResponse::returnErrorMessage($message = $validator->errors());
+      }
+      else {
+         # properties tbl
+         $where_condition = ['uuid' => $request->id];
+         $searchedProperty = Property::with('hoteldetails', 'OtherHotelDetails')->where($where_condition)->first();
+         # return
+         return ApiResponse::returnSuccessData(@$searchedProperty);
+      }
+   }
+
    public function DuplicateRoomDetails(Request $request)
    {
       // validation

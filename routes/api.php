@@ -84,7 +84,7 @@ Route::group(['prefix'=>'property'],function(){
     Route::post('/delete',  [PropertyController::class,'destroy']);
 
     # hotel routes
-    Route::post('/hotel/view',  [PropertyController::class,'HotelDetails']);
+    Route::post('/hotel/view',  [HotelController::class,'HotelDetails']);
     Route::post('/hotel/duplicate',  [HotelController::class,'DuplicateRoomDetails']);
     Route::post('/hotel/delete',  [HotelController::class,'destroy']);
 

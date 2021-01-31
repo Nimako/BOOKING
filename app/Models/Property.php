@@ -72,4 +72,21 @@ class Property extends Model
    {
       return $this->attributes['booked'] = Booking::where(['property_id' => $this->id])->get()->count();
    }
+
+   public function getImagesPathsAttribute($val)
+   {
+      $responseData = array();
+      switch ($this->property_type_id) {
+         case HOTELS :
+            $allHotelImages = HotelDetails::where(['property_id' => $this->id])->get(['image_paths'])->toArray();
+            if(!empty($allHotelImages)) {
+               foreach ($allHotelImages as $allHotelImage) {
+                  $responseData = array_merge($responseData, $allHotelImage['image_paths']);
+               }
+            }
+            break;
+      }
+
+      return $this->images_paths = $responseData;
+   }
 }
