@@ -51,6 +51,8 @@ class NewPropertyListingController extends Controller
                $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
                $addToRequestObj['property_type_id'] = PropertyType::where(['uuid' => $request->property_type_id])->first()->id;
+            if(!empty($request->nearby_locations))
+               $addToRequestObj['nearby_locations'] = $request->nearby_locations;
 
             // adding to request obj
             $request->merge($addToRequestObj);
@@ -288,6 +290,8 @@ class NewPropertyListingController extends Controller
                $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
             if(!empty($request->property_type_id))
                $addToRequestObj['property_type_id'] = PropertyType::where(['uuid' => $request->property_type_id])->first()->id;
+            if(!empty($request->nearby_locations))
+               $addToRequestObj['nearby_locations'] = $request->nearby_locations;
 
             // adding to request obj
             $request->merge($addToRequestObj);
