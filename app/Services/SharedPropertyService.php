@@ -39,13 +39,15 @@ class SharedPropertyService
             ApartmentDetail::find($newApartmentDetails->id)->update(['common_room_amenity_id' => $newDetails->id]);
 
             // duplicate room details
-            $searched = RoomDetails::where(['room_id' => $newApartmentDetails->id])->get();
+            $searched = RoomDetails::where(['room_id' => $searchedDetails->id])->get();
             foreach ($searched as $roomSearched) {
                $internalSearched = RoomDetails::find($roomSearched->id);
                $newRoomDetails = $internalSearched->replicate();
                $newRoomDetails->room_id = $newApartmentDetails->id;
                $newRoomDetails->save();
             }
+
+            return ApiResponse::returnRawData(ApartmentDetail::find($newApartmentDetails->id));
          break;
 
          case HOTELS :
@@ -55,10 +57,10 @@ class SharedPropertyService
             $newRoomDetails->uuid = Uuid::uuid6();
             $newRoomDetails->image_paths = implode(STRING_GLUE, SharedPropertyService::duplicateImages($searchedDetails->image_paths));
             $newRoomDetails->save();
+
+            return ApiResponse::returnRawData(HotelDetails::find($newRoomDetails->id));
          break;
       }
-
-      return ApiResponse::returnRawData(HotelDetails::find($newRoomDetails->id));
    }
 
    public static function duplicateImages(Array $paths) : Array
