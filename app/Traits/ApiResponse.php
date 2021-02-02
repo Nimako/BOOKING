@@ -23,9 +23,9 @@ trait ApiResponse
       return response()->json(['statuscode' => SUCCESS, 'data' => $data], Response::HTTP_OK);
    }
 
-    public static function returnData($data)
+    public static function returnRawData($data)
     {
-        return response()->json(['statuscode' => SUCCESS,'data' => $data], Response::HTTP_OK);
+        return $data;
     }
 
    public static function returnSuccessMessage($message)

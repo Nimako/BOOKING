@@ -10,7 +10,7 @@ class HotelDetails extends Model
     use HasFactory;
 
     protected $fillable = ['uuid','property_id','room_name','custom_room_name','price','smoking_policy', 'bed_types','similiar_rooms',
-       'added_amenities','dimension','image_paths','total_guest_capacity','parking_options','created_by','updated_by'];
+       'added_amenities','dimension','image_paths','total_guest_capacity','parking_options','created_by','updated_by', 'status'];
 
    protected $hidden = ['created_at','created_by','updated_at','updated_by','property_id','price'];
 

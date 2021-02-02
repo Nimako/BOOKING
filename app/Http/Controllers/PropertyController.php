@@ -7,6 +7,7 @@ use App\Models\CommonRoomAmenities;
 use App\Models\HotelDetails;
 use App\Models\Property;
 use App\Models\RoomDetails;
+use App\Services\SharedPropertyService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -23,91 +24,11 @@ class PropertyController extends Controller
           'duplicate_id' => "required"
        ];
        $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
-       if($validator->fails()) {
+
+       if($validator->fails())
           return ApiResponse::returnErrorMessage($message = $validator->errors());
-       }
-       else {
-           // property info
-           $searchedProperty = Property::where(['uuid' => $request->id])->first();
-           /*$newProperty = $searchedProperty->replicate();
-           $newProperty->uuid = Uuid::uuid6();
-           $newProperty->save();*/
-
-           switch ($searchedProperty->property_type_id) {
-              case 1 :
-                 /*// common property facilities
-                 $searchedDetails = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first();
-                 $newDetails = $searchedDetails->replicate();
-                 $newDetails->property_id = $searchedProperty->id;
-                 $newDetails->save();*/
-
-                 /*// common property policies
-                 $searchedDetails = CommonPropertyPolicy::where(['property_id' => $searchedProperty->id])->first();
-                 $newDetails = $searchedDetails->replicate();
-                 $newDetails->property_id = $searchedProperty->id;
-                 $newDetails->save();*/
-
-                 // apartment details
-                 $searchedDetails = ApartmentDetail::where(['uuid' => $request->duplicate_id])->get();
-                 foreach ($searchedDetails as $details) {
-                    // image duplication mgmt
-                     $images = array_map(function($image){
-                        if(!empty($image)) {
-                           $a = explode('storage/', $image);
-                           $copy4rm = storage_path($a[1]);
-
-                           $cpy_img = str_replace(' ', '_', substr($image, 0, strripos($image, '.'))."_dup_".microtime().".webp");
-                           $a = explode('storage/', $cpy_img);
-                           $copy2 = storage_path($a[1]);
-
-                           File::copy($copy4rm, $copy2);
-                           $imageReturned = explode('public/', $cpy_img);
-
-                           return $imageReturned[1];
-                        }
-
-                     }, (array)$details->image_pathss);
-
-                    // duplicate apartment details
-                    //return $images;
-                    $apartmentDetails = [
-                       'uuid' => Uuid::uuid6(),
-                       'property_id' => $searchedProperty->id,
-                       'room_name' => $details->room_name,
-                       'total_guest_capacity' => $details->total_guest_capacity,
-                       'total_bathrooms' => $details->total_bathrooms,
-                       'num_of_rooms' => $details->num_of_rooms,
-                       //'common_room_amenity_id' => $details->common_room_amenity_id,
-                       'image_paths' => implode(STRING_GLUE, $images),
-                       'price_list' => json_encode($details->price_list)
-                    ];
-                    $newlySaveApartment = ApartmentDetail::create($apartmentDetails);
-
-                    // duplicating common room amenities
-                    $searchedDetails = CommonRoomAmenities::find($details->common_room_amenity_id);
-                    $newDetails = $searchedDetails->replicate();
-                    $newDetails->property_id = $searchedProperty->id;
-                    $newDetails->room_id = $newlySaveApartment->id;
-                    $newDetails->save();
-
-                    //updating apartment details
-                    ApartmentDetail::find($newlySaveApartment->id)->update(['common_room_amenity_id' => $newDetails->id]);
-
-                    // duplicate room details
-                    $searched = RoomDetails::where(['room_id' => $details->id])->get();
-                    foreach ($searched as $roomSearched) {
-                       $internalSearched = RoomDetails::find($roomSearched->id);
-                       $newRoomDetails = $internalSearched->replicate();
-                       $newRoomDetails->room_id = $newlySaveApartment->id;
-                       $newRoomDetails->save();
-                    }
-                 }
-              break;
-           }
-
-           // retrun
-          return ApiResponse::returnSuccessData($searchedProperty);
-       }
+       else
+          return ApiResponse::returnSuccessData((new SharedPropertyService())->duplicateProperty($request));
     }
 
     public function destroy(Request $request)
@@ -118,23 +39,11 @@ class PropertyController extends Controller
           'delete_id' => "required",
        ];
        $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
-       if($validator->fails()) {
+
+       if($validator->fails())
           return ApiResponse::returnErrorMessage($message = $validator->errors());
-       }
-       else {
-          $searchedProperty = Property::where(['uuid' => $request->id])->first();
-          switch ($searchedProperty->property_type_id) {
-             case 1 :
-                // apartment details
-                //return $searchedDetails = ApartmentDetail::where(['uuid' => $request->delete_id])->first();
-                if($searchedDetails = ApartmentDetail::where(['uuid' => $request->delete_id])->first())
-                   $searchedDetails->update(['status' => DELETED_PROPERTY]);
-
-                break;
-          }
-
-          return ApiResponse::returnSuccessMessage("Property Deleted Successfully");
-       }
+       else
+          return ApiResponse::returnSuccessMessage((new SharedPropertyService())->deleteProperty($request));
     }
 
     public function HotelDetails(Request $request)

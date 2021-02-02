@@ -45,7 +45,7 @@ class DefaultValuesController extends Controller
             break;
       }
 
-      return ApiResponse::returnData($responseData);
+      return ApiResponse::returnRawData($responseData);
    }
 
    public function GetRoomNames(Request $request)
