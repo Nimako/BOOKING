@@ -14,6 +14,7 @@ use App\Models\PropertyRating;
 use App\Models\ApartmentDetail;
 use App\Models\PropertyType;
 use App\Models\RoomDetails;
+use App\Services\PropertyService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -80,7 +81,7 @@ class PropertyListingController extends Controller
       $rules = [
          'country' => "required",
          'city' => "required",
-         'property_type' => "required",
+         'search' => "required",
       ];
       $validator = Validator::make($request->all(), $rules);
       if($validator->fails()) {
@@ -88,78 +89,37 @@ class PropertyListingController extends Controller
       }
       else {
          #
+         $publishedProperties = array();
          if($countryDetails = Country::where(['iso' => $request->country])->first()) {
-            # variable conditions
-            $country_city_condition = " and a.country_id =  ".$countryDetails->id." and a.city like '%".$request->city."%' ";
-            if($request->property_type)
-               $property_type_condition = " and a.property_type_id = ".$request->property_type;
-            if($request->num_of_guests)
-               $numofguest_condition = " and b.total_guest_capacity >= ".$request->num_of_guests;
-            if($request->num_of_rooms)
-               $numofrooms_condition = " and b.num_of_rooms >= ".$request->num_of_rooms;
-
-            # where condition
-            $where_condition = "a.status = ".PUBLISHED_PROPERTY.$country_city_condition.
-               @$property_type_condition.
-               @$numofguest_condition.
-               @$numofrooms_condition;
+            # where conditions
+            $where_conditions = "(a.status = ".PUBLISHED_PROPERTY." and a.country_id = {$countryDetails->id})";
 
             # query build and result
-            $selectFields = trim(implode(',', array('a.id','a.uuid','name','geolocation','street_address_1','primary_telephone',
-               'serve_breakfast','languages_spoken','image_paths','b.id as room_id','total_guest_capacity','total_bathrooms',
-               'num_of_rooms','a.summary_text','a.about_us','a.status as property_status','a.current_onboard_stage',
-               '(select name from property_types where property_types.id = a.property_type_id) as property_type_text ',
-               'price_list'
-            )), ',');
-            $leftJoins = implode(' ', array('left join apartment_details b on b.property_id = a.id',
-               //'left join common_room_amenities c on c.id = b.common_room_amenity_id'
-            ));
-            $distinctQuery = "select distinct a.id from properties a {$leftJoins} where ".$where_condition;
+            $distinctQuery = "select distinct a.id from properties a where {$where_conditions}";
             $propertiesFound = DB::select($distinctQuery);
+
             if(!empty($propertiesFound))
             {
-               $property_ids = implode(',', array_map(function($data){ return $data->id;}, $propertiesFound));
-               $query = "select {$selectFields} from properties a {$leftJoins} where a.id in ({$property_ids})";
-               $searchedPropertys = DB::select($query);
+               # getting property ids
+               $property_ids = array_map(function($data){ return $data->id;}, $propertiesFound);
 
-               // removing duplicates
-               foreach ($searchedPropertys as $property) { $formatted[$property->id] = $property; }
-               foreach ($formatted as $property) {
-                  # variables
-                  $images = explode(STRING_GLUE, $property->image_paths);
-                  $geoData = explode(',', $property->geolocation);
-
-                  if($searchedFacilities = CommonPropertyFacility::where(['property_id' => $property->id])->first()) {
-                     $facilities_ids = explode(STRING_GLUE, $searchedFacilities->facility_ids);
-                     $facilities = Facility::select(['name','icon_class'])->find($facilities_ids);
+               # search
+               $searchedPropertys = Property::wherein('id', $property_ids)->get();
+               foreach ($searchedPropertys as $property) {
+                  if($foundString = strstr($property->city, $request->search) || $foundString = strstr($property->name, $request->search)) {
+                     # variables
+                     $propertyDetails = PropertyService::getPropertyDetails($property->id);
+                     $geoData = explode(',', $propertyDetails->geolocation);
+                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],@$geoData[1],'K'))." km";
+                     $responseData['found'][] = $propertyDetails;
                   }
-                  if($searchedAmenities = CommonRoomAmenities::where(['room_id' => $property->room_id])->first()) {
-                     $amenities_ids = explode(STRING_GLUE, $searchedAmenities->popular_amenity_ids);
-                     $amenities = Amenity::select(['name','icon_class'])->find($amenities_ids);
+                  else {
+                     # variables
+                     $propertyDetails = PropertyService::getPropertyDetails($property->id);
+                     $geoData = explode(',', $propertyDetails->geolocation);
+                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],@$geoData[1],'K'))." km";
+                     $responseData['alternatives'] = $propertyDetails;
                   }
-
-
-                  $distanceFromLocation = ceil(PropertyListingController::distance($request->latitude,$request->longitude,@$geoData[0],@$geoData[1],'K'))." km";
-                  $responseData[] = [
-                     'uuid' => $property->uuid,
-                     'current_onboard_stage' => $property->current_onboard_stage,
-                     'status' => PROPERTY_STATUSES[$property->property_status],
-                     'name' => $property->name,
-                     'property_type_text' => $property->property_type_text,
-                     'geolocation' => $property->geolocation,
-                     'street_address_1' => $property->street_address_1,
-                     'serve_breakfast' => $property->serve_breakfast,
-                     'languages_spoken' => explode(STRING_GLUE, $property->languages_spoken),
-                     'displayImg' => $images[0],
-                     'distance_from_location' => $distanceFromLocation,
-                     'pricelist' => json_decode($property->price_list),
-                     'facilities' => $facilities,
-                     'amenities' => @$amenities,
-                     'rating' => PropertyRating::where(['property_id' => $property->id])->first()->current_rating ?? "Not Rated",
-                     'summary_text' => $property->summary_text,
-                     'about_us' => $property->about_us,
-                     'room_details' => RoomDetails::where(['room_id'=>$property->room_id])->get()
-                  ];
                }
             }
          }
