@@ -83,11 +83,13 @@ class ApartmentService
 
          case 'Stage8':
             foreach ($request->details as $detail) {
-               if ($apartmentDetails = ApartmentDetail::where(['uuid' => $detail['id']])->first()) {
-               } # new apartment details
-               else {
+               if ($apartmentDetails = ApartmentDetail::where(['uuid' => @$detail['id']])->first()) {
+               }
+               # new apartment details
+               else { //return $detail['room_details']['bed_details'];
                   $apartmentSaveData = [
                      'uuid' => Uuid::uuid6(),
+                     'property_id' => $searchedProperty->id,
                      'num_of_rooms' => $detail['num_of_rooms'],
                      'room_name' => $detail['room_name'],
                      'total_bathrooms' => $detail['total_bathrooms'],
@@ -95,15 +97,17 @@ class ApartmentService
                   ];
                   $savedApartmentDetails = ApartmentDetail::create($apartmentSaveData);
 
-                  $roomDetailSaveData = [
-                     'uuid' => Uuid::uuid6(),
-                     'room_id' => $savedApartmentDetails->id,
-                     'bed_types' => json_encode($detail['room_details']['bed_details']),
-                     'room_name' => $detail['room_details']['name'],
-                     'added_amenities' => $detail['room_details']['added_amenities'],
-                     'dimension' => $detail['room_details']['dimension']
-                  ];
-                  $savedRoomDetails = RoomDetails::create($roomDetailSaveData);
+                  foreach ($detail['room_details'] as $room_detail) {
+                     $roomDetailSaveData = [
+                        'uuid' => Uuid::uuid6(),
+                        'room_id' => $savedApartmentDetails->id,
+                        'bed_types' => json_encode($room_detail['bed_details']),
+                        'room_name' => $room_detail['name'],
+                        'added_amenities' => @$room_detail['added_amenities'],
+                        'dimension' => @$room_detail['dimension']
+                     ];
+                     $savedRoomDetails = RoomDetails::create($roomDetailSaveData);
+                  }
                }
             }
             break;
@@ -134,6 +138,6 @@ class ApartmentService
             break;
       }
 
-      return ApiResponse::returnRawData(Property::find($searchedProperty->id));
+      return ApiResponse::returnRawData(Property::with('details')->where(['id' => $searchedProperty->id])->first());
    }
 }
