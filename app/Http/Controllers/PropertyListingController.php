@@ -26,7 +26,7 @@ class PropertyListingController extends Controller
    {
       // Validation
       $rules = [
-         'userid' => "required|exists:useraccount,id"
+         'userid' => "required|exists:user_partner_accounts,id"
       ];
       $validator = Validator::make($request->all(), $rules, $customMessage = ['userid.exists' => "Invalid User Reference"]);
       if($validator->fails()) {
