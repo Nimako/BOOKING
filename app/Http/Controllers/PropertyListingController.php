@@ -41,8 +41,8 @@ class PropertyListingController extends Controller
                switch ($property->property_type_id) {
                   case APARTMENT:
                      $apartmentDetails = ApartmentDetail::where(['property_id' => $property->id])->first();
-                     $totalGuestCapacity = $apartmentDetails->total_guest_capacity;
-                     $images = $apartmentDetails->image_pathss;
+                     $totalGuestCapacity = @$apartmentDetails->total_guest_capacity;
+                     $images = @$apartmentDetails->image_pathss;
                      $num_of_rooms = @$apartmentDetails->num_of_rooms;
                      break;
 
