@@ -40,23 +40,8 @@ class NewPropertyListingController extends Controller
             return ApiResponse::returnErrorMessage($message = $validator->errors());
          }
          else {
-            switch ($request->current_onboard_stage) {
-               case 'Stage2':
-                  $responseData = ApartmentService::saveNew($request);
-                  break;
-
-               case 'Stage3':
-                  $responseData = ApartmentService::saveNew($request);
-                  break;
-
-               case 'Stage4':
-                  $responseData = ApartmentService::saveNew($request);
-                  break;
-
-               case 'Stage5':
-                  $responseData = ApartmentService::saveNew($request);
-                  break;
-            }
+            // calling service
+            $responseData = ApartmentService::saveNew($request);
 
 
             # image uploads
