@@ -14,6 +14,7 @@ use App\Models\PropertyType;
 use App\Models\ApartmentDetail;
 use App\Models\RoomDetails;
 use App\Models\SubPolicy;
+use App\Services\ApartmentService;
 use App\Traits\ApiResponse;
 use App\Traits\ImageProcessor;
 use Database\Seeders\AmenitiesSeeder;
@@ -39,131 +40,27 @@ class NewPropertyListingController extends Controller
             return ApiResponse::returnErrorMessage($message = $validator->errors());
          }
          else {
-            // if property record found
-            $searchedProperty = Property::where(['uuid' => $request->id])->first();
-            //variable declaration
-            $addToRequestObj['property_id'] = $searchedProperty->id;
+            switch ($request->current_onboard_stage) {
+               case 'Stage2':
+                  $responseData = ApartmentService::saveNew($request);
+                  break;
 
-            // property data pre-processing
-            if(!empty($request->latitude) || !empty($request->longitude))
-               $addToRequestObj['geolocation'] = $request->latitude.','.$request->longitude;
-            if(!empty($request->languages_spoke))
-               $addToRequestObj['languages_spoken'] = implode(STRING_GLUE, (array)$request->languages_spoke);
-            if(!empty($request->property_type_id))
-               $addToRequestObj['property_type_id'] = PropertyType::where(['uuid' => $request->property_type_id])->first()->id;
-            if(!empty($request->nearby_locations))
-               $addToRequestObj['nearby_locations'] = $request->nearby_locations;
+               case 'Stage3':
+                  $responseData = ApartmentService::saveNew($request);
+                  break;
 
-            // adding to request obj
-            $request->merge($addToRequestObj);
-            // saving property info
-            $propertyUpdateResponse = Property::find($searchedProperty->id)->update($request->all());
+               case 'Stage4':
+                  $responseData = ApartmentService::saveNew($request);
+                  break;
 
-            # if facilities added to request
-            if(!empty($request->facilities)) {
-               $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
-               if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
-                  $doNothing = "";
-               else {
-                  $propertyCommonFacilities = new CommonPropertyFacility();
-                  $propertyCommonFacilities->property_id = $searchedProperty->id;
-               }
-
-               // saving data
-               $facilitiesByName = array_map(function($facility) { return $facility['name']; }, $searchedFacilities);
-               $propertyCommonFacilities->facility_ids = trim(implode(STRING_GLUE, (array)$request->facilities), STRING_GLUE);
-               $propertyCommonFacilities->facility_text = trim(implode(STRING_GLUE, (array)$facilitiesByName), STRING_GLUE);
-               $propertyCommonFacilities->save();
+               case 'Stage5':
+                  $responseData = ApartmentService::saveNew($request);
+                  break;
             }
 
-            # if policies added to request
-            if(!empty($request->subpolicies))
-            {
-               $subPolicyText = $subPolicyIds = "";
-               foreach ($request->subpolicies as $key => $value) {
-                  if($subPolicy = SubPolicy::find($key)) {
-                     $subPolicyIds .= $key.STRING_GLUE;
-                     $subPolicyText .= $subPolicy->name.'='.$value.STRING_GLUE;
-                  }
-               }
-
-               if($propertyCommonPolicies = CommonPropertyPolicy::where(['property_id' => $searchedProperty->id])->first())
-                  $doNothing = "";
-               else {
-                  $propertyCommonPolicies = new CommonPropertyPolicy();
-                  $propertyCommonPolicies->property_id = $searchedProperty->id;
-               }
-
-               // saving data
-               $propertyCommonPolicies->sub_policy_ids = trim($subPolicyIds, STRING_GLUE);
-               $propertyCommonPolicies->sub_policy_text = trim($subPolicyText, STRING_GLUE);
-               $propertyCommonPolicies->save();
-            }
-
-            // apartment details
-            if(!empty($request->details))
-            {
-               foreach ($request->details as $detailss) {
-                  # variable declaration
-                  $img = $uuid = $room_name = $total_guest_capacity = $total_bathrooms = $num_of_rooms = $price_list = $similiar_rooms = array();
-                  if(!empty(@$detailss['image_paths']))
-                     $images = implode(STRING_GLUE, @$detailss['image_paths']);
-
-                  // check if insert or update
-                  if (empty($detailss['id']))
-                     $uuid = array('uuid' => Uuid::uuid6());
-                  if (@$detailss['room_name'])
-                     $room_name = array('room_name' => $detailss['room_name']);
-                  if (@$detailss['total_guest_capacity'])
-                     $total_guest_capacity = array('total_guest_capacity' => $detailss['total_guest_capacity']);
-                  if (@$detailss['total_bathrooms'])
-                     $total_bathrooms = array('total_bathrooms' => $detailss['total_bathrooms']);
-                  if (@$detailss['num_of_rooms'])
-                     $num_of_rooms = array('num_of_rooms' => $detailss['num_of_rooms']);
-                  if (@$images)
-                     $img = array('image_paths' => @$images);
-                  if (@$detailss['price_list'])
-                     $price_list = array('price_list' => json_encode($detailss['price_list']));
-                  if (@$detailss['similiar_rooms'])
-                     $similiar_rooms = array('similiar_rooms' => json_encode($detailss['similiar_rooms']));
-
-                  $apartmentDetailsInfo = array_merge($uuid,$room_name,$total_guest_capacity,$total_bathrooms,$num_of_rooms,$img,@$price_list,@$similiar_rooms);
-                  if(!empty($apartmentDetailsInfo)) {
-                     $apartmentDetailsInfo['property_id'] = $searchedProperty->id;
-                     $room = ApartmentDetail::updateOrCreate($condition = ['uuid' => @$detailss['id']], $apartmentDetailsInfo);
-                  }
-
-                  // roomDetails
-                  if(!empty($detailss['room_details']))
-                  {
-                     if(empty($room))
-                        $room = ApartmentDetail::where(['uuid' => $detailss['id']])->first();
-
-                     foreach ($detailss['room_details'] as $detail) {
-                        $generatedUuid = $roomid = $room_name = $bed_types = $added_amenities = array();
-                        # conditional variable
-                        if(empty($detail['id']))
-                           $generatedUuid = ['uuid' => Uuid::uuid6()];
-                        if(!empty($room))
-                           $roomid = array('room_id' => @$room->id);
-                        if(!empty($detail['name']))
-                           $room_name = array('room_name' => $detail['name']);
-                        if(!empty($detail['bed_details']))
-                           $bed_types = array('bed_types' => json_encode($detail['bed_details']));
-                        if(!empty($detail['added_amenities']))
-                           $added_amenities = array('added_amenities' => $detail['added_amenities']);
-                        if(!empty($roomDetails = array_merge($generatedUuid,$roomid,$room_name,$bed_types,$added_amenities)))
-                           RoomDetails::updateOrCreate($condition = ['uuid' => @$detail['id']], $roomDetails);
-                     }
-                     //return $roomDetails;
-
-                     $roomDetails = array();
-                  }
-               }
-            }
 
             # image uploads
-            if($request->hasFile('images')) {
+            /*if($request->hasFile('images')) {
                # searching for record
                if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
                   // unlinking previous files
@@ -180,36 +77,10 @@ class NewPropertyListingController extends Controller
                   # updating file upload field
                   ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
                }
-            }
-
-            # if amenities added to request
-            if(!empty($request->amenities)) {
-               if($roomArray = ApartmentDetail::where(['property_id' => $searchedProperty->id])->get()) {
-                  foreach ($roomArray as $room) {
-                     $searchedAmenities = Amenity::wherein('id', (array)$request->amenities)->get(['name'])->toArray();
-                     if($commonAmenities = CommonRoomAmenities::where(['room_id' => $room->id])->first())
-                        $doNothing = "";
-                     else {
-                        $commonAmenities = new CommonRoomAmenities();
-                        $commonAmenities->room_id = $room->id;
-                     }
-
-                     // saving data
-                     $amenitiesByName = array_map(function($amenity) { return $amenity['name']; }, $searchedAmenities);
-                     $commonAmenities->popular_amenity_ids = trim(implode(STRING_GLUE, (array)$request->amenities), STRING_GLUE);
-                     $commonAmenities->popular_amenity_text = trim(implode(STRING_GLUE, (array)$amenitiesByName), STRING_GLUE);
-                     $commonAmenities->save();
-
-                     // updating link to room details
-                     $searchedRoom = ApartmentDetail::find($room->id);
-                     $searchedRoom->common_room_amenity_id = $commonAmenities->id;
-                     $searchedRoom->save();
-                  }
-               }
-            }
+            }*/
 
             // return statement
-            return ApiResponse::returnSuccessData($data = ['id' => $searchedProperty->uuid, 'completed_onboard_stage' => $request->current_onboard_stage]);
+            return ApiResponse::returnSuccessData($responseData);
          }
       }
       // new property

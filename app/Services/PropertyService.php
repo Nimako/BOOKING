@@ -17,7 +17,7 @@ class PropertyService
             return Property::with('details')->find($searchedProperty->id);
             break;
          case HOTELS:
-            return Property::with('hotel, hotel_details')->find($searchedProperty->id);
+            return Property::with('hoteldetails, otherhoteldetails')->find($searchedProperty->id);
       }
    }
 }
