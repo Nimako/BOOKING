@@ -14,6 +14,7 @@ use App\Models\Property;
 use App\Models\RoomDetails;
 use App\Models\SubPolicy;
 use App\Traits\ApiResponse;
+use App\Traits\ImageProcessor;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
@@ -83,30 +84,36 @@ class ApartmentService
 
          case 'Stage8':
             foreach ($request->details as $detail) {
-               if ($apartmentDetails = ApartmentDetail::where(['uuid' => @$detail['id']])->first()) {
-               }
-               # new apartment details
-               else { //return $detail['room_details']['bed_details'];
-                  $apartmentSaveData = [
-                     'uuid' => Uuid::uuid6(),
-                     'property_id' => $searchedProperty->id,
-                     'num_of_rooms' => $detail['num_of_rooms'],
-                     'room_name' => $detail['room_name'],
-                     'total_bathrooms' => $detail['total_bathrooms'],
-                     'total_guest_capacity' => $detail['total_guest_capacity'],
-                  ];
-                  $savedApartmentDetails = ApartmentDetail::create($apartmentSaveData);
+               if ($apartmentDetails = ApartmentDetail::where(['uuid' => @$detail['id']])->first())
+                  $updateCondition = ['uuid' => $apartmentDetails->uuid];
+               else
+                  $updateCondition = ['uuid' => Uuid::uuid6()];
 
+               $apartmentSaveData = array_merge($updateCondition, [
+                  'property_id' => $searchedProperty->id,
+                  'num_of_rooms' => $detail['num_of_rooms'],
+                  'room_name' => $detail['room_name'],
+                  'total_bathrooms' => $detail['total_bathrooms'],
+                  'total_guest_capacity' => $detail['total_guest_capacity'],
+               ]);
+
+               $savedApartmentDetails = ApartmentDetail::updateOrCreate($updateCondition, $apartmentSaveData);
+
+               if(!empty($detail['room_details'])) {
                   foreach ($detail['room_details'] as $room_detail) {
-                     $roomDetailSaveData = [
-                        'uuid' => Uuid::uuid6(),
+                     if(!empty($roomDetails = RoomDetails::where(['uuid' => $room_detail['id']])->first()))
+                        $updateCondition = ['uuid' => $roomDetails->uuid];
+                     else
+                        $updateCondition = ['uuid' => Uuid::uuid6()];
+
+                     $roomDetailSaveData = array_merge($updateCondition, [
                         'room_id' => $savedApartmentDetails->id,
                         'bed_types' => json_encode($room_detail['bed_details']),
                         'room_name' => $room_detail['name'],
                         'added_amenities' => @$room_detail['added_amenities'],
                         'dimension' => @$room_detail['dimension']
-                     ];
-                     $savedRoomDetails = RoomDetails::create($roomDetailSaveData);
+                     ]);
+                     $savedRoomDetails = RoomDetails::updateOrCreate($updateCondition, $roomDetailSaveData);
                   }
                }
             }
@@ -136,7 +143,41 @@ class ApartmentService
                }
             }
             break;
+
+         case 'Stage10':
+            if($request->hasFile('images')) {
+               # searching for record
+               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
+                  // unlinking previous files
+                  if($room->image_paths != null) {
+                     $filePaths = explode(STRING_GLUE, $room->image_paths);
+                     foreach ($filePaths as $filePath) {
+                        unlink('storage/'.$filePath);
+                     }
+                  }
+                  // upload new files
+                  foreach ($request->file('images') as $image){
+                     $fileStoragePaths[] =  ImageProcessor::UploadImage($image, $request->id);
+                  }
+                  # updating file upload field
+                  ApartmentDetail::find($room->id)->update(['image_paths' => implode(STRING_GLUE, $fileStoragePaths)]);
+               }
+            }
+            break;
+
+         case 'Stage11':
+            $searchedApartment = ApartmentDetail::where(['uuid' => $request->apartment_id])->first();
+            $searchedApartment->price_list = json_encode($request->price_list);
+            $searchedApartment->save();
+            break;
+
+         case 'Stage12':
+            $searchedProperty->update($request->all());
+            break;
       }
+
+      // updating stages
+      $searchedProperty->update($request->all());
 
       return ApiResponse::returnRawData(Property::with('details')->where(['id' => $searchedProperty->id])->first());
    }
