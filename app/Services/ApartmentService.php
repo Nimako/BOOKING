@@ -147,7 +147,7 @@ class ApartmentService
          case 'Stage10':
             if($request->hasFile('images')) {
                # searching for record
-               if($room = ApartmentDetail::where(['property_id' => $searchedProperty->id])->first()) {
+               if($room = ApartmentDetail::where(['uuid' => $request->apartment_id])->first()) {
                   // unlinking previous files
                   if($room->image_paths != null) {
                      $filePaths = explode(STRING_GLUE, $room->image_paths);
