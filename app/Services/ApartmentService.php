@@ -101,7 +101,7 @@ class ApartmentService
 
                if(!empty($detail['room_details'])) {
                   foreach ($detail['room_details'] as $room_detail) {
-                     if(!empty($roomDetails = RoomDetails::where(['uuid' => $room_detail['id']])->first()))
+                     if(!empty($roomDetails = RoomDetails::where(['uuid' => @$room_detail['id']])->first()))
                         $updateCondition = ['uuid' => $roomDetails->uuid];
                      else
                         $updateCondition = ['uuid' => Uuid::uuid6()];
