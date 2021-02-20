@@ -166,8 +166,10 @@ class ApartmentService
             break;
 
          case 'Stage11':
-            $searchedApartment = ApartmentDetail::where(['uuid' => $request->apartment_id])->first();
-            $searchedApartment->update(['price_list' => json_encode($request->price_list)]);
+            if($searchedApartment = ApartmentDetail::where(['uuid' => $request->apartment_id])->first())
+               $searchedApartment->update(['price_list' => json_encode($request->price_list)]);
+            else 
+               return ApiResponse::returnErrorMessage($msg = "Invalid Apartment ID");
             break;
 
          case 'Stage12':
