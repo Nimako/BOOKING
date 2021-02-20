@@ -165,7 +165,7 @@ class ApartmentService
             }
             break;
 
-         case 'Stage11':
+         case 'Stage11': return $request;
             $searchedApartment = ApartmentDetail::where(['uuid' => $request->apartment_id])->first();
             $searchedApartment->price_list = json_encode($request->price_list);
             $searchedApartment->save();
