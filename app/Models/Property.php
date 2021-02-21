@@ -34,13 +34,13 @@ class Property extends Model
 
    public function getFacilitiesAttribute()
    {
-      if($searchedCommRmFacilitis = CommonPropertyFacility::find($this->id))
+      if($searchedCommRmFacilitis = CommonPropertyFacility::where(['property_id' => $this->id])->first())
          return $this->attributes['facilities'] = Facility::wherein('id', explode(STRING_GLUE, $searchedCommRmFacilitis->facility_ids))->get(['name','icon_class']);
    }
 
    public function getPoliciesAttribute()
    {
-      if($searchedCommRmFacilitis = CommonPropertyPolicy::find($this->id)){
+      if($searchedCommRmFacilitis = CommonPropertyPolicy::where(['property_id' => $this->id])->first()){
          $explodedPolicies = explode(STRING_GLUE, $searchedCommRmFacilitis->sub_policy_text);
          foreach ($explodedPolicies as $explodedPolicy){
             $exp = explode('=', $explodedPolicy);
