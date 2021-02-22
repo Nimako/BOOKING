@@ -11,6 +11,8 @@ class ImageProcessor
 {
    public static function GenerateQuality($imageSize){
 
+      return 80;
+
       if($imageSize >= 5000000){
 
          return 40;
