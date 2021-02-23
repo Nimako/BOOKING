@@ -129,7 +129,7 @@ class NewPropertyListingController extends Controller
             // saving property info
             $propertyUpdateResponse = $searchedProperty->update($request->all());
 
-            # if facilities added to request
+            # if facilities added to reques
             if(!empty($request->facilities)) {
                $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
                if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
