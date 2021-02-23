@@ -3,7 +3,6 @@
 
 namespace App\Services;
 
-
 use App\Models\Amenity;
 use App\Models\ApartmentDetail;
 use App\Models\CommonPropertyFacility;

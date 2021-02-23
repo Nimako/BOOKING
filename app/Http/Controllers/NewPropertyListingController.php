@@ -36,14 +36,12 @@ class NewPropertyListingController extends Controller
             'created_by' => "required"
          ];
          $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
-         if($validator->fails()) {
-            return ApiResponse::returnErrorMessage($message = $validator->errors());
-         }
-         else {
-            $responseData = ApartmentService::saveNew($request);
 
-            return ApiResponse::returnSuccessData($responseData);
-         }
+         if($validator->fails())
+            return ApiResponse::returnErrorMessage($message = $validator->errors());
+
+         else
+            return ApiResponse::returnSuccessData(ApartmentService::saveNew($request));
       }
       // new property
       else {
