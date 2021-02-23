@@ -22,7 +22,7 @@ class CreateHotelOtherDetailsTable extends Migration
             $table->bigInteger('updated_by')->nullable();
 
             $table->unsignedBigInteger('property_id');
-            $table->unsignedBigInteger('hotel_details_id');
+            $table->unsignedBigInteger('hotel_details_id')->nullable();
             $table->string('listed_on')->nullable();
             $table->string('star_rating')->nullable();
             $table->string('own_multiple_hotel')->nullable();
