@@ -36,12 +36,14 @@ class NewPropertyListingController extends Controller
             'created_by' => "required"
          ];
          $validator = Validator::make($request->all(), $rules, $customMessage = ['id.exists' => "Invalid Property Reference"]);
-
-         if($validator->fails())
+         if($validator->fails()) {
             return ApiResponse::returnErrorMessage($message = $validator->errors());
+         }
+         else {
+            $responseData = ApartmentService::saveNew($request);
 
-         else
-            return ApiResponse::returnSuccessData(ApartmentService::saveNew($request));
+            return ApiResponse::returnSuccessData($responseData);
+         }
       }
       // new property
       else {
@@ -129,9 +131,9 @@ class NewPropertyListingController extends Controller
             // saving property info
             $propertyUpdateResponse = $searchedProperty->update($request->all());
 
-            # if facilities added to reques
+            # if facilities added to request
             if(!empty($request->facilities)) {
-               return $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
+               $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
                if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
                   $doNothing = "";
                else {
