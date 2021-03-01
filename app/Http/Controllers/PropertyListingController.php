@@ -118,7 +118,7 @@ class PropertyListingController extends Controller
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
                      $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,@$geoData[0] ?? 0,@$geoData[1] ?? 0,'K'))." km";
-                     $responseData['alternatives'] = $propertyDetails;
+                     $responseData['alternatives'][] = $propertyDetails;
                   }
                }
             }
