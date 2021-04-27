@@ -110,8 +110,8 @@ class PropertyListingController extends Controller
                      # variables
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
-                     $geoLat = ($geoData[0]  == null ? 0 : $geoData[0]); 
-                     $geoLng = ($geoData[1]  == null ? 0 : $geoData[1]); 
+                     $geoLat = (@$geoData[0]  == null ? 0 : $geoData[0]); 
+                     $geoLng = (@$geoData[1]  == null ? 0 : $geoData[1]); 
                      $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,$geoLat,$geoLng,'K'))." km";
                      $responseData['found'][] = $propertyDetails;
                   }
@@ -119,8 +119,8 @@ class PropertyListingController extends Controller
                      # variables
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
-                     $geoLat = ($geoData[0]  == null ? 0 : $geoData[0]); 
-                     $geoLng = ($geoData[1]  == null ? 0 : $geoData[1]); 
+                     $geoLat = (@$geoData[0]  == null ? 0 : $geoData[0]); 
+                     $geoLng = (@$geoData[1]  == null ? 0 : $geoData[1]); 
                      $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,$geoLat,$geoLng,'K'))." km";
                      $responseData['alternatives'][] = $propertyDetails;
                   }
