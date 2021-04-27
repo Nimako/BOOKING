@@ -105,12 +105,13 @@ class PropertyListingController extends Controller
 
                # search
                $searchedPropertys = Property::wherein('id', $property_ids)->get();
+               return $request;
                foreach ($searchedPropertys as $property) {
                   if($foundString = strstr($property->city, $request->search) || $foundString = strstr($property->name, $request->search)) {
                      # variables
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
-                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,@$geoData[0] ?? 0,@$geoData[1] ?? 0,'K'))." km";
+                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,(@$geoData[0] ?? 0),(@$geoData[1] ?? 0),'K'))." km";
                      $responseData['found'][] = $propertyDetails;
                   }
                   else {
