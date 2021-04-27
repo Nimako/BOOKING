@@ -105,7 +105,7 @@ class PropertyListingController extends Controller
 
                # search
                $searchedPropertys = Property::wherein('id', $property_ids)->get();
-               return $request;
+               return $request->latitude;
                foreach ($searchedPropertys as $property) {
                   if($foundString = strstr($property->city, $request->search) || $foundString = strstr($property->name, $request->search)) {
                      # variables
