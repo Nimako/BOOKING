@@ -131,7 +131,7 @@ class NewPropertyListingController extends Controller
 
             # if facilities added to reques
             if(!empty($request->facilities)) {
-               return $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
+               $searchedFacilities = Facility::wherein('id', (array)$request->facilities)->get(['name'])->toArray();
                if($propertyCommonFacilities = CommonPropertyFacility::where(['property_id' => $searchedProperty->id])->first())
                   $doNothing = "";
                else {
