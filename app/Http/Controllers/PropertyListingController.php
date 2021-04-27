@@ -105,20 +105,23 @@ class PropertyListingController extends Controller
 
                # search
                $searchedPropertys = Property::wherein('id', $property_ids)->get();
-               return $request->latitude;
                foreach ($searchedPropertys as $property) {
                   if($foundString = strstr($property->city, $request->search) || $foundString = strstr($property->name, $request->search)) {
                      # variables
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
-                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,(@$geoData[0] ?? 0),(@$geoData[1] ?? 0),'K'))." km";
+                     $geoLat = ($geoData[0]  == null ? 0 : $geoData[0]); 
+                     $geoLng = ($geoData[1]  == null ? 0 : $geoData[1]); 
+                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,$geoLat,$geoLng,'K'))." km";
                      $responseData['found'][] = $propertyDetails;
                   }
                   else {
                      # variables
                      $propertyDetails = PropertyService::getPropertyDetails($property->id);
                      $geoData = explode(',', $propertyDetails->geolocation);
-                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,@$geoData[0] ?? 0,@$geoData[1] ?? 0,'K'))." km";
+                     $geoLat = ($geoData[0]  == null ? 0 : $geoData[0]); 
+                     $geoLng = ($geoData[1]  == null ? 0 : $geoData[1]); 
+                     $propertyDetails->distance_from_current_position = ceil(PropertyListingController::distance($request->latitude, $request->longitude,$geoLat,$geoLng,'K'))." km";
                      $responseData['alternatives'][] = $propertyDetails;
                   }
                }
